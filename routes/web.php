@@ -7,15 +7,18 @@ use App\Http\Controllers\FaqController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\Professional\ProfessionalController;
-use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\HelpController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Professional\ProfessionalController;
 use App\Http\Controllers\ChangePasswordController;
-use App\Http\Controllers\Company\ManageJobsController;
-use App\Http\Controllers\Company\CandidatesController;
+use App\Http\Controllers\Company\CompanyController;
+use App\Http\Controllers\Company\ManageJobsController as CompanyManageJobsController;
+use App\Http\Controllers\Company\CandidatesController as CompanyCandidatesController;
+use App\Http\Controllers\Company\DashboardController as CompanyDashboardController;
+use App\Http\Controllers\Company\PageController as CompanyPageController;
+use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
+use Illuminate\Support\Facades\Route;
 
 // Rotas Públicas
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -41,14 +44,17 @@ Route::prefix('profissional')->group(function () {
     Route::get('/painel', [ProfessionalController::class, 'dashboard'])->name('profissional.painel');
     Route::get('/favoritos', [ProfessionalController::class, 'favorites'])->name('profissional.favoritos');
     Route::get('/curriculo', [ProfessionalController::class, 'resume'])->name('profissional.curriculo');
+    Route::get('/perfil', [ProfessionalController::class, 'profile'])->name('profissional.perfil');
 });
 
 // Área da Empresa
 Route::prefix('empresa')->group(function () {
-    Route::get('/painel', [CompanyController::class, 'dashboard'])->name('empresa.painel');
+    Route::get('/painel', [CompanyDashboardController::class, 'index'])->name('empresa.painel');
     Route::get('/profissionais', [CompanyController::class, 'searchProfessionals'])->name('empresa.profissionais');
-    Route::get('/gerenciar-vagas', [ManageJobsController::class, 'index'])->name('empresa.gerenciar-vagas');
-    Route::get('/candidatos', [CandidatesController::class, 'index'])->name('empresa.candidatos');
+    Route::get('/gerenciar-vagas', [CompanyManageJobsController::class, 'index'])->name('empresa.gerenciar-vagas');
+    Route::get('/candidatos', [CompanyCandidatesController::class, 'index'])->name('empresa.candidatos');
+    Route::get('/pagina', [CompanyPageController::class, 'index'])->name('empresa.pagina');
+    Route::get('/perfil', [CompanyProfileController::class, 'index'])->name('empresa.perfil');
 });
 
 // Blog
@@ -73,3 +79,6 @@ Route::get('/alterar-senha', [ChangePasswordController::class, 'index'])->name('
 // Route::middleware(['auth'])->group(function () {
 Route::get('/ajuda', [HelpController::class, 'index'])->name('ajuda');
 // });
+
+// Rota de logout temporária para evitar erro de rota indefinida
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

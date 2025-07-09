@@ -8,7 +8,10 @@ class HelpController extends Controller
 {
     public function index()
     {
-        return view('help.index');
+        // TODO: No futuro, detectar o tipo real do usuário logado
+        $userType = 'professional'; // ou 'company'
+
+        return view('help.index', compact('userType'));
     }
 
     public function store(Request $request)

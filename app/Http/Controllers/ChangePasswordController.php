@@ -8,6 +8,9 @@ class ChangePasswordController extends Controller
 {
     public function index()
     {
-        return view('change-password.index');
+        // TODO: No futuro, detectar o tipo real do usuário logado
+        $userType = 'professional'; // ou 'company'
+
+        return view('change-password.index', compact('userType'));
     }
 }

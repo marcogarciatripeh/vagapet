@@ -4,8 +4,8 @@
             <li class="{{ request()->routeIs('profissional.painel') ? 'active' : '' }}">
                 <a href="{{ route('profissional.painel') }}"><i class="la la-home"></i>Painel</a>
             </li>
-            <li class="{{ request()->routeIs('profile*') ? 'active' : '' }}">
-                <a href="#"><i class="la la-user-tie"></i>Meu Perfil</a>
+            <li class="{{ request()->routeIs('profissional.perfil') ? 'active' : '' }}">
+                <a href="{{ route('profissional.perfil') }}"><i class="la la-user-tie"></i>Meu Perfil</a>
             </li>
             <li class="{{ request()->routeIs('profissional.curriculo*') ? 'active' : '' }}">
                 <a href="{{ route('profissional.curriculo') }}"><i class="la la-file-invoice"></i>Meu Currículo</a>

@@ -8,7 +8,7 @@
         <div class="preloader"></div>
 
         <!-- Cabeçalho Principal -->
-        @include('layouts.partials.dashboard.header')
+        @include('layouts.partials.dashboard.header-company')
 
         <!-- Header Span -->
         <span class="header-span"></span>

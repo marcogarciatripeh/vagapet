@@ -8,16 +8,20 @@
         <div class="preloader"></div>
 
         <!-- Cabeçalho Principal -->
-        @include('layouts.partials.dashboard.header')
+        @if(isset($userType) && $userType === 'company')
+            @include('layouts.partials.dashboard.header-company')
+        @else
+            @include('layouts.partials.dashboard.header-professional')
+        @endif
 
         <!-- Header Span -->
         <span class="header-span"></span>
 
         <!-- User Sidebar -->
-        @if(auth()->user()?->isProfessional())
-            @include('layouts.partials.dashboard.sidebar-professional')
-        @else
+        @if(isset($userType) && $userType === 'company')
             @include('layouts.partials.dashboard.sidebar-company')
+        @else
+            @include('layouts.partials.dashboard.sidebar-professional')
         @endif
 
         <!-- Dashboard Content -->

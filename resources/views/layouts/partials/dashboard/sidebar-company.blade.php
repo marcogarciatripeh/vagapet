@@ -4,8 +4,8 @@
             <li class="{{ request()->routeIs('empresa.painel') ? 'active' : '' }}">
                 <a href="{{ route('empresa.painel') }}"><i class="la la-home"></i>Painel</a>
             </li>
-            <li class="{{ request()->routeIs('company.profile*') ? 'active' : '' }}">
-                <a href="#"><i class="la la-building"></i>Perfil da Empresa</a>
+            <li class="{{ request()->routeIs('empresa.perfil') ? 'active' : '' }}">
+                <a href="{{ route('empresa.perfil') }}"><i class="la la-building"></i>Perfil da Empresa</a>
             </li>
             <li class="{{ request()->routeIs('empresa.gerenciar-vagas') ? 'active' : '' }}">
                 <a href="{{ route('empresa.gerenciar-vagas') }}"><i class="la la-briefcase"></i>Gerenciar Vagas</a>
