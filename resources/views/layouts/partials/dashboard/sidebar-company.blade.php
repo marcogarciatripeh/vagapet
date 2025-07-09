@@ -13,8 +13,8 @@
             <li class="{{ request()->routeIs('vagas.criar') ? 'active' : '' }}">
                 <a href="{{ route('vagas.criar') }}"><i class="la la-plus-circle"></i>Publicar Vaga</a>
             </li>
-            <li class="{{ request()->routeIs('candidatos*') ? 'active' : '' }}">
-                <a href="#"><i class="la la-user-friends"></i>Candidatos</a>
+            <li class="{{ request()->routeIs('empresa.candidatos') ? 'active' : '' }}">
+                <a href="{{ route('empresa.candidatos') }}"><i class="la la-user-friends"></i>Candidatos</a>
             </li>
             <li class="{{ request()->routeIs('planos*') ? 'active' : '' }}">
                 <a href="{{ route('planos') }}"><i class="la la-box"></i>Planos</a>

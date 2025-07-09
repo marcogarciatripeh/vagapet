@@ -7,14 +7,15 @@ use App\Http\Controllers\FaqController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ProfessionalController;
-use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\Professional\ProfessionalController;
+use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\HelpController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChangePasswordController;
 use App\Http\Controllers\Company\ManageJobsController;
+use App\Http\Controllers\Company\CandidatesController;
 
 // Rotas Públicas
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -46,10 +47,9 @@ Route::prefix('profissional')->group(function () {
 Route::prefix('empresa')->group(function () {
     Route::get('/painel', [CompanyController::class, 'dashboard'])->name('empresa.painel');
     Route::get('/profissionais', [CompanyController::class, 'searchProfessionals'])->name('empresa.profissionais');
+    Route::get('/gerenciar-vagas', [ManageJobsController::class, 'index'])->name('empresa.gerenciar-vagas');
+    Route::get('/candidatos', [CandidatesController::class, 'index'])->name('empresa.candidatos');
 });
-
-// Gerenciar Vagas da Empresa
-Route::get('/empresa/gerenciar-vagas', [ManageJobsController::class, 'index'])->name('empresa.gerenciar-vagas');
 
 // Blog
 Route::get('/blog', [BlogController::class, 'index'])->name('blog');
