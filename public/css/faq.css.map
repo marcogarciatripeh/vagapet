@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAQA,aAAa,CACX,QAAQ,CAAE,QAAQ,CAClB,OAAO,CAAE,OAAO,CAGlB,gBAAgB,CACd,WAAW,CAAE,GAAG,CAChB,SAAS,CAAE,IAAI,CACf,WAAW,CAAE,IAAI,CACjB,KAAK,CAAE,OAAO,CACd,aAAa,CAAE,IAAI,CAGrB,4BAA4B,CAC1B,aAAa,CAAE,IAAI",
+"sources": ["../HTML-base/sass/components/sections/faq.scss"],
+"names": [],
+"file": "faq.css"
+}
