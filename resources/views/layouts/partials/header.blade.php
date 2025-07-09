@@ -22,10 +22,10 @@
                         <div class="navbar-collapse collapse clearfix" id="navbarSupportedContent">
                             <ul class="navigation clearfix">
                                 <li><a href="{{ route('home') }}">Home</a></li>
-                                <li><a href="{{ route('about') }}">Sobre</a></li>
-                                <li><a href="{{ route('jobs') }}">Vagas</a></li>
-                                <li class="current"><a href="{{ route('faq.index') }}">FAQ</a></li>
-                                <li><a href="{{ route('contact') }}">Contato</a></li>
+                                <li><a href="{{ route('sobre') }}">Sobre</a></li>
+                                <li><a href="{{ route('vagas') }}">Vagas</a></li>
+                                <li class="current"><a href="{{ route('faq') }}">FAQ</a></li>
+                                <li><a href="{{ route('contato') }}">Contato</a></li>
                             </ul>
                         </div>
                     </nav>

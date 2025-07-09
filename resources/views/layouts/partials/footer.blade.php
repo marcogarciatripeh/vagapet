@@ -24,11 +24,11 @@
                                 <h4 class="widget-title">Para Profissionais</h4>
                                 <div class="widget-content">
                                     <ul class="list">
-                                        <li><a href="{{ route('jobs') }}">Procurar Vagas</a></li>
-                                        <li><a href="{{ route('categories') }}">Categorias</a></li>
-                                        <li><a href="{{ route('professional.dashboard') }}">Painel do Profissional</a></li>
-                                        <li><a href="{{ route('job.alerts') }}">Alertas de Vagas</a></li>
-                                        <li><a href="{{ route('favorites') }}">Favoritas</a></li>
+                                        <li><a href="{{ route('vagas') }}">Procurar Vagas</a></li>
+                                        <li><a href="{{ route('categorias') }}">Categorias</a></li>
+                                        <li><a href="{{ route('profissional.painel') }}">Painel do Profissional</a></li>
+                                        <li><a href="{{ route('vagas.alertas') }}">Alertas de Vagas</a></li>
+                                        <li><a href="{{ route('profissional.favoritos') }}">Favoritas</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -39,10 +39,10 @@
                                 <h4 class="widget-title">Para Empresas</h4>
                                 <div class="widget-content">
                                     <ul class="list">
-                                        <li><a href="{{ route('professionals.search') }}">Procurar Profissionais</a></li>
-                                        <li><a href="{{ route('company.dashboard') }}">Painel da Empresa</a></li>
-                                        <li><a href="{{ route('jobs.create') }}">Adicionar Vaga</a></li>
-                                        <li><a href="{{ route('plans') }}">Planos de Vaga</a></li>
+                                        <li><a href="{{ route('empresa.profissionais') }}">Procurar Profissionais</a></li>
+                                        <li><a href="{{ route('empresa.painel') }}">Painel da Empresa</a></li>
+                                        <li><a href="{{ route('vagas.criar') }}">Adicionar Vaga</a></li>
+                                        <li><a href="{{ route('planos') }}">Planos de Vaga</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -53,10 +53,10 @@
                                 <h4 class="widget-title">Sobre Nós</h4>
                                 <div class="widget-content">
                                     <ul class="list">
-                                        <li><a href="{{ route('jobs') }}">Página de Vagas</a></li>
-                                        <li><a href="{{ route('resume') }}">Página de Currículo</a></li>
+                                        <li><a href="{{ route('vagas') }}">Página de Vagas</a></li>
+                                        <li><a href="{{ route('profissional.curriculo') }}">Página de Currículo</a></li>
                                         <li><a href="{{ route('blog') }}">Blog</a></li>
-                                        <li><a href="{{ route('contact') }}">Contato</a></li>
+                                        <li><a href="{{ route('contato') }}">Contato</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -67,11 +67,11 @@
                                 <h4 class="widget-title">Recursos Úteis</h4>
                                 <div class="widget-content">
                                     <ul class="list">
-                                        <li><a href="{{ route('sitemap') }}">Mapa do Site</a></li>
-                                        <li><a href="{{ route('terms') }}">Termos de Uso</a></li>
-                                        <li><a href="{{ route('privacy') }}">Política de Privacidade</a></li>
-                                        <li><a href="{{ route('security') }}">Central de Segurança</a></li>
-                                        <li><a href="{{ route('accessibility') }}">Acessibilidade</a></li>
+                                        <li><a href="{{ route('mapa-do-site') }}">Mapa do Site</a></li>
+                                        <li><a href="{{ route('termos') }}">Termos de Uso</a></li>
+                                        <li><a href="{{ route('privacidade') }}">Política de Privacidade</a></li>
+                                        <li><a href="{{ route('seguranca') }}">Central de Segurança</a></li>
+                                        <li><a href="{{ route('acessibilidade') }}">Acessibilidade</a></li>
                                     </ul>
                                 </div>
                             </div>

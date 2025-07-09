@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Professional;
+
+use App\Http\Controllers\Controller;
 
 class ProfessionalController extends Controller
 {

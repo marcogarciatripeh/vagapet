@@ -9,4 +9,5 @@
 <script src="{{ asset('js/select2.min.js') }}"></script>
 <script src="{{ asset('js/mmenu.js') }}"></script>
 <script src="{{ asset('js/mmenu.polyfills.js') }}"></script>
+<script src="{{ asset('js/chosen.min.js') }}"></script>
 <script src="{{ asset('js/script.js') }}"></script>

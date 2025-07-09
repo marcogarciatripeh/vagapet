@@ -3,7 +3,7 @@
         <div class="main-box">
             <div class="nav-outer">
                 <div class="logo-box">
-                    <div class="logo"><a href="{{ route('professional.dashboard') }}"><img src="{{ asset('images/logo-empresa.svg') }}" alt="Logo VagaPet"></a></div>
+                    <div class="logo"><a href="{{ route('profissional.painel') }}"><img src="{{ asset('images/logo-empresa.svg') }}" alt="Logo VagaPet"></a></div>
                 </div>
                 <nav class="nav main-menu">
                     <ul class="navigation" id="navbar">
@@ -38,7 +38,7 @@
     <div class="mobile-header">
         <a href="#nav-mobile" class="mobile-nav-toggler navbar-trigger"><span class="flaticon-menu-1"></span></a>
             <div class="logo">
-                <a href="{{ route('professional.dashboard') }}"><img src="{{ asset('images/logo-empresa.svg') }}" alt="Logo VagaPet"></a>
+                <a href="{{ route('profissional.painel') }}"><img src="{{ asset('images/logo-empresa.svg') }}" alt="Logo VagaPet"></a>
             </div>
             <div class="outer-box">
                 <button id="toggle-user-sidebar">

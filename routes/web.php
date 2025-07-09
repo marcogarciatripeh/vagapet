@@ -14,52 +14,56 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\HelpController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChangePasswordController;
+use App\Http\Controllers\Company\ManageJobsController;
 
 // Rotas Públicas
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/about', [AboutController::class, 'index'])->name('about');
-Route::get('/contact', [ContactController::class, 'index'])->name('contact');
-Route::get('/faq', [FaqController::class, 'index'])->name('faq.index');
+Route::get('/sobre', [AboutController::class, 'index'])->name('sobre');
+Route::get('/contato', [ContactController::class, 'index'])->name('contato');
+Route::get('/faq', [FaqController::class, 'index'])->name('faq');
 
 // Rotas de Autenticação
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 
 // Rotas de Vagas
-Route::prefix('jobs')->group(function () {
-    Route::get('/', [JobsController::class, 'index'])->name('jobs');
-    Route::get('/create', [JobsController::class, 'create'])->name('jobs.create');
-    Route::get('/alerts', [JobsController::class, 'alerts'])->name('job.alerts');
+Route::prefix('vagas')->group(function () {
+    Route::get('/', [JobsController::class, 'index'])->name('vagas');
+    Route::get('/criar', [JobsController::class, 'create'])->name('vagas.criar');
+    Route::get('/alertas', [JobsController::class, 'alerts'])->name('vagas.alertas');
 });
 
 // Rotas de Categorias
-Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
+Route::get('/categorias', [CategoryController::class, 'index'])->name('categorias');
 
 // Área do Profissional
-Route::prefix('professional')->group(function () {
-    Route::get('/dashboard', [ProfessionalController::class, 'dashboard'])->name('professional.dashboard');
-    Route::get('/favorites', [ProfessionalController::class, 'favorites'])->name('favorites');
-    Route::get('/resume', [ProfessionalController::class, 'resume'])->name('resume');
+Route::prefix('profissional')->group(function () {
+    Route::get('/painel', [ProfessionalController::class, 'dashboard'])->name('profissional.painel');
+    Route::get('/favoritos', [ProfessionalController::class, 'favorites'])->name('profissional.favoritos');
+    Route::get('/curriculo', [ProfessionalController::class, 'resume'])->name('profissional.curriculo');
 });
 
 // Área da Empresa
-Route::prefix('company')->group(function () {
-    Route::get('/dashboard', [CompanyController::class, 'dashboard'])->name('company.dashboard');
-    Route::get('/professionals', [CompanyController::class, 'searchProfessionals'])->name('professionals.search');
+Route::prefix('empresa')->group(function () {
+    Route::get('/painel', [CompanyController::class, 'dashboard'])->name('empresa.painel');
+    Route::get('/profissionais', [CompanyController::class, 'searchProfessionals'])->name('empresa.profissionais');
 });
+
+// Gerenciar Vagas da Empresa
+Route::get('/empresa/gerenciar-vagas', [ManageJobsController::class, 'index'])->name('empresa.gerenciar-vagas');
 
 // Blog
 Route::get('/blog', [BlogController::class, 'index'])->name('blog');
 
 // Planos
-Route::get('/plans', [CompanyController::class, 'plans'])->name('plans');
+Route::get('/planos', [CompanyController::class, 'plans'])->name('planos');
 
 // Páginas Institucionais
-Route::prefix('pages')->group(function () {
-    Route::get('/sitemap', [PageController::class, 'sitemap'])->name('sitemap');
-    Route::get('/terms', [PageController::class, 'terms'])->name('terms');
-    Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
-    Route::get('/security', [PageController::class, 'security'])->name('security');
-    Route::get('/accessibility', [PageController::class, 'accessibility'])->name('accessibility');
+Route::prefix('paginas')->group(function () {
+    Route::get('/mapa-do-site', [PageController::class, 'sitemap'])->name('mapa-do-site');
+    Route::get('/termos', [PageController::class, 'terms'])->name('termos');
+    Route::get('/privacidade', [PageController::class, 'privacy'])->name('privacidade');
+    Route::get('/seguranca', [PageController::class, 'security'])->name('seguranca');
+    Route::get('/acessibilidade', [PageController::class, 'accessibility'])->name('acessibilidade');
 });
 
 // Página de Alterar Senha (genérica para qualquer usuário)
@@ -67,5 +71,5 @@ Route::get('/alterar-senha', [ChangePasswordController::class, 'index'])->name('
 
 // Rotas autenticadas
 // Route::middleware(['auth'])->group(function () {
-    Route::get('/help', [HelpController::class, 'index'])->name('help');
+Route::get('/ajuda', [HelpController::class, 'index'])->name('ajuda');
 // });

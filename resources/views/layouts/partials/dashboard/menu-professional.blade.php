@@ -1,37 +1,23 @@
 <li>
-    <a href="">
-        <i class="la la-user"></i>Meu Perfil
-    </a>
+    <a href="#"><i class="la la-user"></i>Meu Perfil</a>
 </li>
 <li>
-    <a href="">
-        <i class="la la-home"></i>Dashboard
-    </a>
+    <a href="{{ route('profissional.painel') }}"><i class="la la-home"></i>Painel</a>
 </li>
 <li>
-    <a href="">
-        <i class="la la-briefcase"></i>Minhas Candidaturas
-    </a>
+    <a href="#"><i class="la la-briefcase"></i>Minhas Candidaturas</a>
 </li>
 <li>
-    <a href="">
-        <i class="la la-file-text"></i>Meu Currículo
-    </a>
+    <a href="{{ route('profissional.curriculo') }}"><i class="la la-file-text"></i>Meu Currículo</a>
 </li>
 <li>
-    <a href="">
-        <i class="la la-heart-o"></i>Vagas Favoritas
-    </a>
+    <a href="{{ route('profissional.favoritos') }}"><i class="la la-heart-o"></i>Vagas Favoritas</a>
 </li>
 <li>
-    <a href="">
-        <i class="la la-bell"></i>Alertas de Vagas
-    </a>
+    <a href="{{ route('vagas.alertas') }}"><i class="la la-bell"></i>Alertas de Vagas</a>
 </li>
 <li>
-    <a href="">
-        <i class="la la-question-circle"></i>Ajuda
-    </a>
+    <a href="{{ route('ajuda') }}"><i class="la la-question-circle"></i>Ajuda</a>
 </li>
 <li>
     <form method="POST" action="" id="logout-form">
