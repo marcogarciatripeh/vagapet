@@ -51,10 +51,17 @@ Route::prefix('profissional')->group(function () {
 Route::prefix('empresa')->group(function () {
     Route::get('/painel', [CompanyDashboardController::class, 'index'])->name('empresa.painel');
     Route::get('/profissionais', [CompanyController::class, 'searchProfessionals'])->name('empresa.profissionais');
+    Route::get('/profissionais-favoritos', [CompanyController::class, 'favoriteProfessionals'])->name('empresa.profissionais-favoritos');
     Route::get('/gerenciar-vagas', [CompanyManageJobsController::class, 'index'])->name('empresa.gerenciar-vagas');
     Route::get('/candidatos', [CompanyCandidatesController::class, 'index'])->name('empresa.candidatos');
     Route::get('/pagina', [CompanyPageController::class, 'index'])->name('empresa.pagina');
     Route::get('/perfil', [CompanyProfileController::class, 'index'])->name('empresa.perfil');
+});
+
+// Rotas de Busca Pública
+Route::prefix('busca')->group(function () {
+    Route::get('/empresas', [CompanyController::class, 'searchCompanies'])->name('busca.empresas');
+    Route::get('/empresa/{id}/vagas', [CompanyController::class, 'companyJobs'])->name('empresa.vagas');
 });
 
 // Blog

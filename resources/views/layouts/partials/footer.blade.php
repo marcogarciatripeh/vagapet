@@ -39,6 +39,7 @@
                                 <h4 class="widget-title">Para Empresas</h4>
                                 <div class="widget-content">
                                     <ul class="list">
+                                        <li><a href="{{ route('busca.empresas') }}">Procurar Empresas</a></li>
                                         <li><a href="{{ route('empresa.profissionais') }}">Procurar Profissionais</a></li>
                                         <li><a href="{{ route('empresa.painel') }}">Painel da Empresa</a></li>
                                         <li><a href="{{ route('vagas.criar') }}">Adicionar Vaga</a></li>

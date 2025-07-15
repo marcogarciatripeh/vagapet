@@ -21,6 +21,21 @@ class CompanyController extends Controller
         return view('company.professionals.search');
     }
 
+    public function favoriteProfessionals()
+    {
+        return view('company.professionals.favorites');
+    }
+
+    public function searchCompanies()
+    {
+        return view('company.search');
+    }
+
+    public function companyJobs($id)
+    {
+        return view('company.jobs', compact('id'));
+    }
+
     public function plans()
     {
         return view('company.plans');

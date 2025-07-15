@@ -24,6 +24,7 @@
                                 <li><a href="{{ route('home') }}">Home</a></li>
                                 <li><a href="{{ route('sobre') }}">Sobre</a></li>
                                 <li><a href="{{ route('vagas') }}">Vagas</a></li>
+                                <li><a href="{{ route('busca.empresas') }}">Empresas</a></li>
                                 <li class="current"><a href="{{ route('faq') }}">FAQ</a></li>
                                 <li><a href="{{ route('contato') }}">Contato</a></li>
                             </ul>

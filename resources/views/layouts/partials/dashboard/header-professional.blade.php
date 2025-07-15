@@ -47,5 +47,11 @@
                 </button>
             </div>
     </div>
-    <div id="nav-mobile"></div>
+    <div id="nav-mobile" style="display:none;">
+        <ul>
+            <li><a href="">Encontrar Vagas</a></li>
+            <li><a href="">Encontrar Empresas</a></li>
+            <li><a href="">(teste) Mudar para empresa</a></li>
+        </ul>
+    </div>
 </header>

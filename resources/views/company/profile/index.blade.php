@@ -213,4 +213,42 @@
 
 @push('scripts')
     @include('layouts.partials.scripts')
+    <!-- Google Map API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaaCBm4FEmgKs5cfVrh3JYue3Chj1kJMw&loading=async&callback=initMap" async defer></script>
+    <script>
+        function initMap() {
+            // Carregar scripts dependentes do Google Maps após a API estar disponível
+            var script = document.createElement('script');
+            script.src = "{{ asset('js/map-script.js') }}";
+            script.onload = function() {
+                // Aguardar um pouco para garantir que o DOM esteja pronto
+                setTimeout(function() {
+                    if (typeof GmapInit === 'function') {
+                        try {
+                            GmapInit();
+                        } catch (error) {
+                            console.log('Erro ao inicializar mapa:', error);
+                            handleMapError();
+                        }
+                    }
+                }, 100);
+            };
+            document.head.appendChild(script);
+        }
+
+        // Função para lidar com erros da API do Google Maps
+        function handleMapError() {
+            var mapCanvas = document.querySelector('.map-canvas');
+            if (mapCanvas) {
+                mapCanvas.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; background-color: #f8f9fa; border: 2px dashed #dee2e6; color: #6c757d; font-size: 16px; text-align: center; padding: 20px;"><div><i class="la la-map" style="font-size: 48px; margin-bottom: 10px; display: block;"></i><strong>Mapa Temporariamente Indisponível</strong><br><small>Estamos trabalhando para restaurar o mapa</small></div></div>';
+            }
+        }
+
+        // Capturar erros globais da API do Google Maps
+        window.addEventListener('error', function(e) {
+            if (e.message && e.message.includes('BillingNotEnabledMapError')) {
+                handleMapError();
+            }
+        });
+    </script>
 @endpush
