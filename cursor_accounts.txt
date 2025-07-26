@@ -1,0 +1,7 @@
+
+==================================================
+Email: marcomags88claro@gmail.com
+Password: a$TLHaqNeae9
+Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhdXRoMHx1c2VyXzAxSzEyQVA5WVdXMkJLRjk4REtGU1pIWUo4IiwidGltZSI6IjE3NTM0OTg3NzMiLCJyYW5kb21uZXNzIjoiZTlmMjcxNmUtNzMwNC00Mzg0IiwiZXhwIjoxNzU4NjgyNzczLCJpc3MiOiJodHRwczovL2F1dGhlbnRpY2F0aW9uLmN1cnNvci5zaCIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwgb2ZmbGluZV9hY2Nlc3MiLCJhdWQiOiJodHRwczovL2N1cnNvci5jb20iLCJ0eXBlIjoic2Vzc2lvbiJ9.fQz56TohTrfpf4eMs7bsirB2x0gJRQBsNb3rPhy9CZE
+Usage Limit: 未知
+==================================================

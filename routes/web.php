@@ -1,127 +1,123 @@
 <?php
 
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\AboutController;
-use App\Http\Controllers\JobsController;
-use App\Http\Controllers\FaqController;
-use App\Http\Controllers\ContactController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\BlogController;
-use App\Http\Controllers\PageController;
-use App\Http\Controllers\HelpController;
-use App\Http\Controllers\Professional\ProfessionalController;
-use App\Http\Controllers\ChangePasswordController;
-use App\Http\Controllers\Company\CompanyController;
-use App\Http\Controllers\Company\ManageJobsController as CompanyManageJobsController;
-use App\Http\Controllers\Company\CandidatesController as CompanyCandidatesController;
-use App\Http\Controllers\Company\DashboardController as CompanyDashboardController;
-use App\Http\Controllers\Company\PageController as CompanyPageController;
-use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
+use App\Http\Controllers\PublicController;
+use App\Http\Controllers\JobController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\ProfessionalController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\Dashboard\ProfessionalController as DashboardProfessionalController;
+use App\Http\Controllers\Dashboard\CompanyController as DashboardCompanyController;
 use Illuminate\Support\Facades\Route;
 
-// Rotas Públicas
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/sobre', [AboutController::class, 'index'])->name('sobre');
-Route::get('/contato', [ContactController::class, 'index'])->name('contato');
-Route::get('/faq', [FaqController::class, 'index'])->name('faq');
+// ========================================
+// ROTAS PÚBLICAS
+// ========================================
 
-// Rotas de Autenticação
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-
-// Rotas de Vagas
-Route::prefix('vagas')->group(function () {
-    Route::get('/', [JobsController::class, 'index'])->name('vagas');
-    Route::get('/criar', [JobsController::class, 'create'])->name('vagas.criar');
-    Route::get('/alertas', [JobsController::class, 'alerts'])->name('vagas.alertas');
-});
-
-// Rotas de Categorias
-Route::get('/categorias', [CategoryController::class, 'index'])->name('categorias');
-
-// Área do Profissional
-Route::prefix('profissional')->group(function () {
-    Route::get('/painel', [ProfessionalController::class, 'dashboard'])->name('profissional.painel');
-    Route::get('/favoritos', [ProfessionalController::class, 'favorites'])->name('profissional.favoritos');
-    Route::get('/curriculo', [ProfessionalController::class, 'resume'])->name('profissional.curriculo');
-    Route::get('/perfil', [ProfessionalController::class, 'profile'])->name('profissional.perfil');
-});
-
-// Área da Empresa
-Route::prefix('empresa')->group(function () {
-    Route::get('/painel', [CompanyDashboardController::class, 'index'])->name('empresa.painel');
-    Route::get('/profissionais', [CompanyController::class, 'searchProfessionals'])->name('empresa.profissionais');
-    Route::get('/profissionais-favoritos', [CompanyController::class, 'favoriteProfessionals'])->name('empresa.profissionais-favoritos');
-    Route::get('/gerenciar-vagas', [CompanyManageJobsController::class, 'index'])->name('empresa.gerenciar-vagas');
-    Route::get('/gerenciar-vagas/criar', [CompanyManageJobsController::class, 'create'])->name('empresa.gerenciar-vagas.criar');
-    Route::get('/candidatos', [CompanyCandidatesController::class, 'index'])->name('empresa.candidatos');
-    Route::get('/pagina', [CompanyPageController::class, 'index'])->name('empresa.pagina');
-    Route::get('/perfil', [CompanyProfileController::class, 'index'])->name('empresa.perfil');
-});
-
-// Rotas de Busca Pública
-Route::prefix('busca')->group(function () {
-    Route::get('/empresas', [CompanyController::class, 'searchCompanies'])->name('busca.empresas');
-    Route::get('/empresa/{id}/vagas', [CompanyController::class, 'companyJobs'])->name('empresa.vagas');
-});
-
-// Blog
-Route::get('/blog', [BlogController::class, 'index'])->name('blog');
-
-// Planos
-Route::get('/planos', [CompanyController::class, 'plans'])->name('planos');
+Route::get('/', [PublicController::class, 'home'])->name('home');
+Route::get('/contato', [PublicController::class, 'contact'])->name('contact');
+Route::post('/contato', [PublicController::class, 'contactSend'])->name('contact.send');
+Route::get('/faq', [PublicController::class, 'faq'])->name('faq');
+Route::get('/ajuda', [PublicController::class, 'help'])->name('help');
+Route::post('/ajuda', [PublicController::class, 'helpSend'])->name('help.send');
+Route::get('/precos', [PublicController::class, 'pricing'])->name('pricing');
+Route::get('/checkout', [PublicController::class, 'checkout'])->name('checkout');
+Route::post('/checkout', [PublicController::class, 'checkoutProcess'])->name('checkout.process');
 
 // Páginas Institucionais
-Route::prefix('paginas')->group(function () {
-    Route::get('/mapa-do-site', [PageController::class, 'sitemap'])->name('mapa-do-site');
-    Route::get('/termos', [PageController::class, 'terms'])->name('termos');
-    Route::get('/privacidade', [PageController::class, 'privacy'])->name('privacidade');
-    Route::get('/seguranca', [PageController::class, 'security'])->name('seguranca');
-    Route::get('/acessibilidade', [PageController::class, 'accessibility'])->name('acessibilidade');
-    Route::get('/politica-cookies', [PageController::class, 'cookies'])->name('politica-cookies');
+Route::get('/termos', [PublicController::class, 'terms'])->name('terms');
+Route::get('/privacidade', [PublicController::class, 'privacy'])->name('privacy');
+Route::get('/politica-cookies', [PublicController::class, 'cookies'])->name('cookies');
+
+// Vagas
+Route::get('/vagas', [JobController::class, 'index'])->name('jobs.index');
+Route::get('/vagas/{id}', [JobController::class, 'show'])->name('jobs.show');
+
+// Empresas
+Route::get('/empresas', [CompanyController::class, 'index'])->name('companies.index');
+Route::get('/empresas/{id}', [CompanyController::class, 'show'])->name('companies.show');
+
+// Profissionais
+Route::get('/profissionais', [ProfessionalController::class, 'index'])->name('professionals.index');
+Route::get('/profissionais/{id}', [ProfessionalController::class, 'show'])->name('professionals.show');
+
+// ========================================
+// ROTAS DE AUTENTICAÇÃO
+// ========================================
+
+Route::get('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/login', [AuthController::class, 'loginProcess'])->name('login.process');
+Route::get('/alterar-senha', [AuthController::class, 'changePassword'])->name('change-password');
+Route::post('/alterar-senha', [AuthController::class, 'changePasswordUpdate'])->name('change-password.update');
+
+// ========================================
+// ROTAS DE ONBOARDING
+// ========================================
+
+Route::prefix('cadastro')->group(function () {
+    Route::get('/', [OnboardingController::class, 'step0'])->name('onboarding.step0');
+    Route::get('/passo1', [OnboardingController::class, 'step1'])->name('onboarding.step1');
+    Route::post('/passo1', [OnboardingController::class, 'step1Process'])->name('onboarding.step1.process');
+    Route::get('/passo2-profissional', [OnboardingController::class, 'step2Professional'])->name('onboarding.step2.professional');
+    Route::get('/passo2-empresa', [OnboardingController::class, 'step2Company'])->name('onboarding.step2.company');
+    Route::get('/passo3-profissional', [OnboardingController::class, 'step3Professional'])->name('onboarding.step3.professional');
+    Route::get('/passo3-empresa', [OnboardingController::class, 'step3Company'])->name('onboarding.step3.company');
+    Route::get('/passo4-profissional', [OnboardingController::class, 'step4Professional'])->name('onboarding.step4.professional');
+    Route::get('/passo4-empresa', [OnboardingController::class, 'step4Company'])->name('onboarding.step4.company');
+    Route::get('/passo5-profissional', [OnboardingController::class, 'step5Professional'])->name('onboarding.step5.professional');
+    Route::get('/passo5-empresa', [OnboardingController::class, 'step5Company'])->name('onboarding.step5.company');
+    Route::get('/passo6-profissional', [OnboardingController::class, 'step6Professional'])->name('onboarding.step6.professional');
+    Route::get('/passo6-empresa', [OnboardingController::class, 'step6Company'])->name('onboarding.step6.company');
+    Route::get('/passo7-profissional', [OnboardingController::class, 'step7Professional'])->name('onboarding.step7.professional');
+
+    // Rotas POST para processar formulários
+    Route::post('/passo2-empresa', [OnboardingController::class, 'step2CompanyProcess'])->name('onboarding.step2.company.process');
+    Route::post('/passo3-empresa', [OnboardingController::class, 'step3CompanyProcess'])->name('onboarding.step3.company.process');
+    Route::post('/passo4-empresa', [OnboardingController::class, 'step4CompanyProcess'])->name('onboarding.step4.company.process');
+    Route::post('/passo5-empresa', [OnboardingController::class, 'step5CompanyProcess'])->name('onboarding.step5.company.process');
+    Route::post('/passo6-empresa', [OnboardingController::class, 'step6CompanyProcess'])->name('onboarding.step6.company.process');
+
+    Route::post('/passo2-profissional', [OnboardingController::class, 'step2ProfessionalProcess'])->name('onboarding.step2.professional.process');
+    Route::post('/passo3-profissional', [OnboardingController::class, 'step3ProfessionalProcess'])->name('onboarding.step3.professional.process');
+    Route::post('/passo4-profissional', [OnboardingController::class, 'step4ProfessionalProcess'])->name('onboarding.step4.professional.process');
+    Route::post('/passo5-profissional', [OnboardingController::class, 'step5ProfessionalProcess'])->name('onboarding.step5.professional.process');
+    Route::post('/passo6-profissional', [OnboardingController::class, 'step6ProfessionalProcess'])->name('onboarding.step6.professional.process');
+    Route::post('/passo7-profissional', [OnboardingController::class, 'step7ProfessionalProcess'])->name('onboarding.step7.professional.process');
 });
 
-// Página de Alterar Senha (genérica para qualquer usuário)
-Route::get('/alterar-senha', [ChangePasswordController::class, 'index'])->name('alterar-senha');
+// ========================================
+// DASHBOARD PROFISSIONAL
+// ========================================
 
-// Rotas autenticadas
-// Route::middleware(['auth'])->group(function () {
-Route::get('/ajuda', [HelpController::class, 'index'])->name('ajuda');
-// });
-
-// Rota de logout temporária para evitar erro de rota indefinida
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-
-// Onboarding Passo 1 (comum)
-Route::get('/onboarding/passo1', [App\Http\Controllers\OnboardingController::class, 'passo1'])->name('onboarding.passo1');
-Route::post('/onboarding/passo1', [App\Http\Controllers\OnboardingController::class, 'passo1Post'])->name('onboarding.passo1.post');
-
-// Onboarding Empresa
-Route::prefix('onboarding/empresa')->group(function () {
-    Route::get('passo2', fn() => view('onboarding.empresa.passo2'))->name('onboarding.empresa.passo2');
-    Route::post('passo2', fn() => redirect()->route('onboarding.empresa.passo3'))->name('onboarding.empresa.passo2.post');
-    Route::get('passo3', fn() => view('onboarding.empresa.passo3'))->name('onboarding.empresa.passo3');
-    Route::post('passo3', fn() => redirect()->route('onboarding.empresa.passo4'))->name('onboarding.empresa.passo3.post');
-    Route::get('passo4', fn() => view('onboarding.empresa.passo4'))->name('onboarding.empresa.passo4');
-    Route::post('passo4', fn() => redirect()->route('onboarding.empresa.passo5'))->name('onboarding.empresa.passo4.post');
-    Route::get('passo5', fn() => view('onboarding.empresa.passo5'))->name('onboarding.empresa.passo5');
-    Route::post('passo5', fn() => redirect()->route('onboarding.empresa.passo6'))->name('onboarding.empresa.passo5.post');
-    Route::get('passo6', fn() => view('onboarding.empresa.passo6'))->name('onboarding.empresa.passo6');
-    Route::post('passo6', fn() => redirect('/'))->name('onboarding.empresa.passo6.post'); // ou para onde quiser após finalizar
+Route::prefix('profissional')->group(function () {
+    Route::get('/painel', [DashboardProfessionalController::class, 'dashboard'])->name('professional.dashboard');
+    Route::get('/perfil', [DashboardProfessionalController::class, 'profile'])->name('professional.profile');
+    Route::post('/perfil', [DashboardProfessionalController::class, 'profileUpdate'])->name('professional.profile.update');
+    Route::get('/candidaturas', [DashboardProfessionalController::class, 'applications'])->name('professional.applications');
+    Route::get('/configuracoes', [DashboardProfessionalController::class, 'settings'])->name('professional.settings');
+    Route::post('/configuracoes', [DashboardProfessionalController::class, 'settingsUpdate'])->name('professional.settings.update');
+    Route::get('/pagina', [DashboardProfessionalController::class, 'publicPage'])->name('professional.public-page');
+    Route::get('/favoritos', [DashboardProfessionalController::class, 'favorites'])->name('professional.favorites');
 });
 
-// Onboarding Profissional
-Route::prefix('onboarding/profissional')->group(function () {
-    Route::get('passo2', fn() => view('onboarding.profissional.passo2'))->name('onboarding.profissional.passo2');
-    Route::post('passo2', fn() => redirect()->route('onboarding.profissional.passo3'))->name('onboarding.profissional.passo2.post');
-    Route::get('passo3', fn() => view('onboarding.profissional.passo3'))->name('onboarding.profissional.passo3');
-    Route::post('passo3', fn() => redirect()->route('onboarding.profissional.passo4'))->name('onboarding.profissional.passo3.post');
-    Route::get('passo4', fn() => view('onboarding.profissional.passo4'))->name('onboarding.profissional.passo4');
-    Route::post('passo4', fn() => redirect()->route('onboarding.profissional.passo5'))->name('onboarding.profissional.passo4.post');
-    Route::get('passo5', fn() => view('onboarding.profissional.passo5'))->name('onboarding.profissional.passo5');
-    Route::post('passo5', fn() => redirect()->route('onboarding.profissional.passo6'))->name('onboarding.profissional.passo5.post');
-    Route::get('passo6', fn() => view('onboarding.profissional.passo6'))->name('onboarding.profissional.passo6');
-    Route::post('passo6', fn() => redirect()->route('onboarding.profissional.passo7'))->name('onboarding.profissional.passo6.post');
-    Route::get('passo7', fn() => view('onboarding.profissional.passo7'))->name('onboarding.profissional.passo7');
-    Route::post('passo7', fn() => redirect('/'))->name('onboarding.profissional.passo7.post'); // ou para onde quiser após finalizar
+// ========================================
+// DASHBOARD EMPRESA
+// ========================================
+
+Route::prefix('empresa')->group(function () {
+    Route::get('/painel', [DashboardCompanyController::class, 'dashboard'])->name('company.dashboard');
+    Route::get('/perfil', [DashboardCompanyController::class, 'profile'])->name('company.profile');
+    Route::post('/perfil', [DashboardCompanyController::class, 'profileUpdate'])->name('company.profile.update');
+    Route::get('/gerenciar-vagas', [DashboardCompanyController::class, 'manageJobs'])->name('company.manage-jobs');
+    Route::get('/candidatos', [DashboardCompanyController::class, 'candidates'])->name('company.candidates');
+    Route::get('/pagina', [DashboardCompanyController::class, 'publicPage'])->name('company.public-page');
+    Route::get('/profissionais-favoritos', [DashboardCompanyController::class, 'favoriteProfessionals'])->name('company.favorite-professionals');
+    Route::get('/criar-vaga', [DashboardCompanyController::class, 'createJob'])->name('company.create-job');
+    Route::post('/vagas', [DashboardCompanyController::class, 'storeJob'])->name('company.jobs.store');
 });
+
+// ========================================
+// ROTAS ADICIONAIS
+// ========================================
+
+Route::get('/register', [AuthController::class, 'register'])->name('register');

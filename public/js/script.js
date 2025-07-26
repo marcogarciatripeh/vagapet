@@ -1,7 +1,7 @@
 (function($) {
-
+	
 	"use strict";
-
+	
 	//Hide Loading Box (Preloader)
 	function handlePreloader() {
 		if($('.preloader').length){
@@ -11,11 +11,12 @@
 
 
 	function rellaxInit() {
-		if (document.querySelector('.rellax')) {
-			var rellax = new Rellax('.rellax', {
-				center: true
-			});
-		}
+		const target = document.querySelectorAll('.js-rellax')
+		if (!target) return;
+	
+		var rellax = new Rellax('.js-rellax', {
+			breakpoints: [576, 768, 1025]
+		});
 	}
 	rellaxInit();
 
@@ -23,7 +24,7 @@
 	function scrollToIdInit() {
 		const targets = document.querySelectorAll('.js-scroll-to-id');
 		if (!targets.length) return;
-
+	
 		targets.forEach(el => {
 			el.addEventListener('click', (e) => {
 				if (document.querySelector('.is-pin-active'))
@@ -33,14 +34,14 @@
 		});
 	}
 	scrollToIdInit();
-
+	
 
 	if($('.js-tab-menu').length) {
 		const target = document.querySelector('.js-tab-menu');
 		const SMcontroller = new ScrollMagic.Controller();
 		let sections = document.querySelectorAll(".js-tab-menu-content");
 		let sceneDuration = 0;
-
+	
 		sections.forEach(el => {
 			sceneDuration += el.offsetHeight
 		})
@@ -56,7 +57,7 @@
 		})
 		.setPin(".js-tab-menu")
 		.addTo(SMcontroller)
-
+		
 		window.addEventListener('resize', () => {
 			sections.forEach(el => {
 				sceneDuration += el.offsetHeight
@@ -114,10 +115,10 @@
 	//Jquery Knob animation  // Pie Chart Animation
 	if($('.dial').length){
           var elm = $('.dial');
-          var color = elm.attr('data-fgColor');
-          var perc = elm.attr('value');
-          elm.knob({
-               'value': 0,
+          var color = elm.attr('data-fgColor');  
+          var perc = elm.attr('value');  
+          elm.knob({ 
+               'value': 0, 
                 'min':0,
                 'max':100,
                 'skin':'tron',
@@ -138,7 +139,7 @@
           var $t = $('.pie-graph .count-box'),
 				n = $t.find(".count-text").attr("data-stop"),
 				r = parseInt($t.find(".count-text").attr("data-speed"), 10);
-
+				
 			if (!$t.hasClass("counted")) {
 				$t.addClass("counted");
 				$({
@@ -165,12 +166,12 @@
 		jQuery(function ($) {
 		  var $navbar = $('#navbar');
 		  var $mobileNav = $('#nav-mobile');
-
+		  
 		  $navbar
 		    .clone()
 		    .removeClass('navbar')
 		    .appendTo($mobileNav);
-
+		  
 		  $mobileNav.mmenu({
 		  	"counters": false,
 		  	extensions 	: [ "position-bottom", "fullscreen", "theme-black", ],
@@ -182,7 +183,7 @@
 		});
 	}
 
-	//Banner Carousel
+	//Banner Carousel 
 	if ($('.banner-carousel').length) {
 		$('.banner-carousel').owlCarousel({
 			animateOut: 'fadeOut',
@@ -198,7 +199,7 @@
 			touchDrag:false,
 			mouseDrag:false,
 			navText: [ '<span class="fa fa-arrow-left"></span>', '<span class="fa fa-arrow-right"></span>' ],
-		});
+		});    		
 	}
 
 
@@ -213,7 +214,7 @@
 			autoplay: true,
 			autoplayTimeout:10000,
 			navText: [ '<span class="flaticon-back"></span>', '<span class="flaticon-next"></span>' ],
-		});
+		});    		
 	}
 
 	//testimonial Carousel Two
@@ -230,7 +231,7 @@
 			autoplay: true,
 			autoplayTimeout:10000,
 			navText: [ '<span class="flaticon-back"></span>', '<span class="flaticon-next"></span>' ],
-		});
+		});    		
 	}
 
 	//testimonial Carousel
@@ -255,7 +256,7 @@
 					items:2
 				}
 			}
-		});
+		});  
 	}
 
 	//sponsors Carousel
@@ -290,7 +291,7 @@
 					items:7
 				}
 			}
-		});
+		});    		
 	}
 
 	//sponsors Carousel
@@ -323,7 +324,7 @@
 					items:6
 				}
 			}
-		});
+		});    		
 	}
 
 	//Candidates Carousel
@@ -349,7 +350,7 @@
 					items:4
 				}
 			}
-		});
+		});    		
 	}
 
 	//Companies Carousel
@@ -375,7 +376,7 @@
 					items:4
 				}
 			}
-		});
+		});    		
 	}
 
 	//Companies Carousel
@@ -406,7 +407,7 @@
 				}
 
 			}
-		});
+		});    		
 	}
 
 	//Job Carousel
@@ -433,7 +434,7 @@
 					items:3
 				}
 			}
-		});
+		});    		
 	}
 
 	if ($('.job-carousel-type-14').length) {
@@ -462,10 +463,10 @@
 				}
 			}
 		})
-
+			
 		for (let i = 0; i < controls.length; i++) {
 			const el = controls[i];
-
+			
 			el.addEventListener("click", () => {
 				carousel.trigger('to.owl.carousel', [i]);
 			})
@@ -486,7 +487,7 @@
 			autoplayTimeout:10000,
 			touchDrag:false,
 			navText: [ '<span class="flaticon-back"></span>', '<span class="flaticon-next"></span>' ],
-		});
+		});    		
 	}
 
 	//Three Items Carousel
@@ -512,7 +513,7 @@
 					items:3
 				}
 			}
-		});
+		});    		
 	}
 
 	//Four Items Carousel
@@ -634,13 +635,13 @@
 				        }
 				    },
 				})
-
+				
 		.on('click', '.owl-item', function () {
 			$sync1.trigger('to.owl.carousel', [$(this).index(), duration, true]);
 		})
 		.on('changed.owl.carousel', function (e) {
 			if (!flag) {
-				flag = true;
+				flag = true;		
 				$sync1.trigger('to.owl.carousel', [e.item.index, duration, true]);
 				flag = false;
 			}
@@ -688,7 +689,7 @@
         $radio.closest('label').addClass('selected');
     });
 
-	// Input Upload
+	// Input Upload 
     var uploadButton = {
         $button: $('.uploadButton-input'),
         $nameField: $('.uploadButton-file-name')
@@ -837,14 +838,14 @@
 	//Accordion Box
 	if($('.accordion-box').length){
 		$(".accordion-box").on('click', '.acc-btn', function() {
-
+			
 			var outerBox = $(this).parents('.accordion-box');
 			var target = $(this).parents('.accordion');
-
+			
 			if($(this).hasClass('active')!==true){
 				$(outerBox).find('.accordion .acc-btn').removeClass('active ');
 			}
-
+			
 			if ($(this).next('.acc-content').is(':visible')){
 				return false;
 			}else{
@@ -852,19 +853,19 @@
 				$(outerBox).children('.accordion').removeClass('active-block');
 				$(outerBox).find('.accordion').children('.acc-content').slideUp(300);
 				target.addClass('active-block');
-				$(this).next('.acc-content').slideDown(300);
+				$(this).next('.acc-content').slideDown(300);	
 			}
-		});
+		});	
 	}
 
 	//Fact Counter + Text Count
 	if($('.count-box').length){
 		$('.count-box').appear(function(){
-
+	
 			var $t = $(this),
 				n = $t.find(".count-text").attr("data-stop"),
 				r = parseInt($t.find(".count-text").attr("data-speed"), 10);
-
+				
 			if (!$t.hasClass("counted")) {
 				$t.addClass("counted");
 				$({
@@ -882,7 +883,7 @@
 					}
 				});
 			}
-
+			
 		},{accY: 0});
 	}
 
@@ -900,7 +901,7 @@
 		$('.tabs-box .tab-buttons .tab-btn').on('click', function(e) {
 			e.preventDefault();
 			var target = $($(this).attr('data-tab'));
-
+			
 			if ($(target).is(':visible')){
 				return false;
 			}else{
@@ -925,8 +926,8 @@
 			$( "input.property-amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
 			}
 		});
-
-		$( "input.property-amount" ).val( $( ".price-range-slider" ).slider( "values", 0 ) + " - $" + $( ".price-range-slider" ).slider( "values", 1 ) );
+		
+		$( "input.property-amount" ).val( $( ".price-range-slider" ).slider( "values", 0 ) + " - $" + $( ".price-range-slider" ).slider( "values", 1 ) );	
 	}
 
 	//Price Range Slider
@@ -940,8 +941,8 @@
 			$( ".range-slider-one .count" ).text( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
 			}
 		});
-
-		$( ".range-slider-one .count" ).text( $( ".range-slider" ).slider( "values", 0 ) + " - " + $( ".range-slider" ).slider( "values", 1 ) );
+		
+		$( ".range-slider-one .count" ).text( $( ".range-slider" ).slider( "values", 0 ) + " - " + $( ".range-slider" ).slider( "values", 1 ) );	
 	}
 
 	//Area Range Slider
@@ -955,8 +956,8 @@
 			$( ".area-amount" ).text( ui.values[ 1 ] );
 			}
 		});
-
-		$( ".area-amount" ).text( $( ".area-range-slider" ).slider( "values", 1 ));
+		
+		$( ".area-amount" ).text( $( ".area-range-slider" ).slider( "values", 1 ));	
 	}
 
 	//Salary Range Slider
@@ -971,9 +972,9 @@
 				$( ".salary-amount .max" ).text( ui.values[1]);
 			}
 		});
-
-		$( ".salary-amount .min" ).text( $( ".salary-range-slider" ).slider( "values", 0 ));
-		$( ".salary-amount .max" ).text( $( ".salary-range-slider" ).slider( "values", 1 ));
+		
+		$( ".salary-amount .min" ).text( $( ".salary-range-slider" ).slider( "values", 0 )); 
+		$( ".salary-amount .max" ).text( $( ".salary-range-slider" ).slider( "values", 1 )); 
 	}
 
 	//LightBox / Fancybox
@@ -986,24 +987,24 @@
 			}
 		});
 	}
-
+	
 	//Contact Form Validation
 	if($('#email-form').length){
 		$('#submit').click(function(){
-
+			
             var o = new Object();
             var form = '#email-form';
-
+			
 			var username = $('#email-form .username').val();
 			var email = $('#email-form .email').val();
 			var subject = $('#email-form .subject').val();
-
+			
 			if(username == '' || email == '' || subject == '')
 			{
 				$('#email-form .response').html('<div class="failed">Please fill the required fields.</div>');
 				return false;
 			}
-
+            
             $.ajax({
                 url:"sendemail.php",
                 method:"POST",
@@ -1033,7 +1034,7 @@
 		   $('html, body').animate({
 			   scrollTop: $(target).offset().top
 			 }, 1500);
-
+	
 		});
 	}
 
@@ -1060,7 +1061,7 @@
 	    });
 	}
 
-
+	
 	// Elements Animation
 	if($('.wow').length){
 		var wow = new WOW(
@@ -1083,7 +1084,7 @@
 	// Chosen touch support.
     if ($('.chosen-container').length > 0) {
       $('.chosen-container').on('touchstart', function(e){
-        e.stopPropagation();
+        e.stopPropagation(); 
         e.preventDefault();
         // Trigger the mousedown event.
         $(this).trigger('mousedown');
@@ -1095,7 +1096,7 @@
 /* ==========================================================================
    When document is Scrollig, do
    ========================================================================== */
-
+	
 	$(window).on('scroll', function() {
 		headerStyle();
 	});
@@ -1103,10 +1104,10 @@
 /* ==========================================================================
    When document is loading, do
    ========================================================================== */
-
+	
 	$(window).on('load', function() {
 		handlePreloader();
-	});
+	});	
 
 })(window.jQuery);
 
