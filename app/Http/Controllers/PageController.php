@@ -28,4 +28,9 @@ class PageController extends Controller
     {
         return view('pages.accessibility');
     }
+
+    public function cookies()
+    {
+        return view('politica-cookies');
+    }
 }

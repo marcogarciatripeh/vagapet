@@ -78,6 +78,7 @@ Route::prefix('paginas')->group(function () {
     Route::get('/privacidade', [PageController::class, 'privacy'])->name('privacidade');
     Route::get('/seguranca', [PageController::class, 'security'])->name('seguranca');
     Route::get('/acessibilidade', [PageController::class, 'accessibility'])->name('acessibilidade');
+    Route::get('/politica-cookies', [PageController::class, 'cookies'])->name('politica-cookies');
 });
 
 // Página de Alterar Senha (genérica para qualquer usuário)
