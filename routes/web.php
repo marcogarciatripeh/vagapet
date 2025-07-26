@@ -53,6 +53,7 @@ Route::prefix('empresa')->group(function () {
     Route::get('/profissionais', [CompanyController::class, 'searchProfessionals'])->name('empresa.profissionais');
     Route::get('/profissionais-favoritos', [CompanyController::class, 'favoriteProfessionals'])->name('empresa.profissionais-favoritos');
     Route::get('/gerenciar-vagas', [CompanyManageJobsController::class, 'index'])->name('empresa.gerenciar-vagas');
+    Route::get('/gerenciar-vagas/criar', [CompanyManageJobsController::class, 'create'])->name('empresa.gerenciar-vagas.criar');
     Route::get('/candidatos', [CompanyCandidatesController::class, 'index'])->name('empresa.candidatos');
     Route::get('/pagina', [CompanyPageController::class, 'index'])->name('empresa.pagina');
     Route::get('/perfil', [CompanyProfileController::class, 'index'])->name('empresa.perfil');
@@ -89,3 +90,37 @@ Route::get('/ajuda', [HelpController::class, 'index'])->name('ajuda');
 
 // Rota de logout temporária para evitar erro de rota indefinida
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// Onboarding Passo 1 (comum)
+Route::get('/onboarding/passo1', [App\Http\Controllers\OnboardingController::class, 'passo1'])->name('onboarding.passo1');
+Route::post('/onboarding/passo1', [App\Http\Controllers\OnboardingController::class, 'passo1Post'])->name('onboarding.passo1.post');
+
+// Onboarding Empresa
+Route::prefix('onboarding/empresa')->group(function () {
+    Route::get('passo2', fn() => view('onboarding.empresa.passo2'))->name('onboarding.empresa.passo2');
+    Route::post('passo2', fn() => redirect()->route('onboarding.empresa.passo3'))->name('onboarding.empresa.passo2.post');
+    Route::get('passo3', fn() => view('onboarding.empresa.passo3'))->name('onboarding.empresa.passo3');
+    Route::post('passo3', fn() => redirect()->route('onboarding.empresa.passo4'))->name('onboarding.empresa.passo3.post');
+    Route::get('passo4', fn() => view('onboarding.empresa.passo4'))->name('onboarding.empresa.passo4');
+    Route::post('passo4', fn() => redirect()->route('onboarding.empresa.passo5'))->name('onboarding.empresa.passo4.post');
+    Route::get('passo5', fn() => view('onboarding.empresa.passo5'))->name('onboarding.empresa.passo5');
+    Route::post('passo5', fn() => redirect()->route('onboarding.empresa.passo6'))->name('onboarding.empresa.passo5.post');
+    Route::get('passo6', fn() => view('onboarding.empresa.passo6'))->name('onboarding.empresa.passo6');
+    Route::post('passo6', fn() => redirect('/'))->name('onboarding.empresa.passo6.post'); // ou para onde quiser após finalizar
+});
+
+// Onboarding Profissional
+Route::prefix('onboarding/profissional')->group(function () {
+    Route::get('passo2', fn() => view('onboarding.profissional.passo2'))->name('onboarding.profissional.passo2');
+    Route::post('passo2', fn() => redirect()->route('onboarding.profissional.passo3'))->name('onboarding.profissional.passo2.post');
+    Route::get('passo3', fn() => view('onboarding.profissional.passo3'))->name('onboarding.profissional.passo3');
+    Route::post('passo3', fn() => redirect()->route('onboarding.profissional.passo4'))->name('onboarding.profissional.passo3.post');
+    Route::get('passo4', fn() => view('onboarding.profissional.passo4'))->name('onboarding.profissional.passo4');
+    Route::post('passo4', fn() => redirect()->route('onboarding.profissional.passo5'))->name('onboarding.profissional.passo4.post');
+    Route::get('passo5', fn() => view('onboarding.profissional.passo5'))->name('onboarding.profissional.passo5');
+    Route::post('passo5', fn() => redirect()->route('onboarding.profissional.passo6'))->name('onboarding.profissional.passo5.post');
+    Route::get('passo6', fn() => view('onboarding.profissional.passo6'))->name('onboarding.profissional.passo6');
+    Route::post('passo6', fn() => redirect()->route('onboarding.profissional.passo7'))->name('onboarding.profissional.passo6.post');
+    Route::get('passo7', fn() => view('onboarding.profissional.passo7'))->name('onboarding.profissional.passo7');
+    Route::post('passo7', fn() => redirect('/'))->name('onboarding.profissional.passo7.post'); // ou para onde quiser após finalizar
+});

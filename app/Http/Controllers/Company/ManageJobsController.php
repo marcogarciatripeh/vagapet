@@ -11,4 +11,9 @@ class ManageJobsController extends Controller
     {
         return view('company.manage-jobs.index');
     }
+
+    public function create()
+    {
+        return view('company.manage-jobs.create');
+    }
 }
