@@ -1,94 +1,165 @@
-@extends('layouts.app')
+@extends('layouts.dashboard-professional')
 
 @section('title', 'Configurações - VagaPet')
 
 @section('content')
-<div class="page-wrapper dashboard">
-
-  <!-- Preloader -->
-  <div class="preloader"></div>
-
-  <!-- Header Span -->
-  <span class="header-span"></span>
-
-  <!-- Main Header-->
-  @include('layouts.partials.header-professional')
-  <!-- End Main Header -->
-
-  <!-- Painel de Configurações -->
+  <!-- Settings Section -->
   <section class="user-dashboard">
     <div class="dashboard-outer">
       <div class="upper-title-box">
-        <h3>Configurações</h3>
-        <div class="text">Gerencie suas preferências e configurações da conta.</div>
+        <h3>Configurações de conta</h3>
       </div>
 
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="ls-widget">
-            <div class="tabs-box">
-              <div class="widget-title">
-                <h4>Configurações da Conta</h4>
-              </div>
-
-              <div class="widget-content">
-                <form class="default-form" action="{{ route('professional.settings.update') }}" method="POST">
-                  @csrf
-                  <div class="row">
-
-                    <!-- Notificações por E-mail -->
-                    <div class="form-group col-lg-12 col-md-12">
-                      <div class="field-outer">
-                        <div class="input-group checkboxes square">
-                          <input type="checkbox" name="email_notifications" id="email_notifications" checked>
-                          <label for="email_notifications" class="remember"><span class="custom-checkbox"></span> Receber notificações por e-mail</label>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Notificações por WhatsApp -->
-                    <div class="form-group col-lg-12 col-md-12">
-                      <div class="field-outer">
-                        <div class="input-group checkboxes square">
-                          <input type="checkbox" name="whatsapp_notifications" id="whatsapp_notifications">
-                          <label for="whatsapp_notifications" class="remember"><span class="custom-checkbox"></span> Receber notificações por WhatsApp</label>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Perfil Público -->
-                    <div class="form-group col-lg-12 col-md-12">
-                      <div class="field-outer">
-                        <div class="input-group checkboxes square">
-                          <input type="checkbox" name="public_profile" id="public_profile" checked>
-                          <label for="public_profile" class="remember"><span class="custom-checkbox"></span> Tornar perfil público para empresas</label>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Botão Salvar -->
-                    <div class="form-group col-lg-12 col-md-12">
-                      <button class="theme-btn btn-style-one">Salvar Configurações</button>
-                    </div>
+      <ul class="accordion-box">
+        <!-- Minha Conta -->
+        <li class="accordion block active-block">
+          <div class="acc-btn active">Minha Conta <span class="icon flaticon-add"></span></div>
+          <div class="acc-content current">
+            <div class="content">
+              <form>
+                <div class="form-group pb-4 border-bottom">
+                  <label>E-mail cadastrado</label>
+                  <div class="d-flex">
+                    <input type="email" class="form-control rounded-end-0" value="usuario@exemplo.com" readonly>
+                    <button class="btn btn-outline-primary rounded-start-0"><span class="la la-pencil"></span></button>
                   </div>
-                </form>
-              </div>
+                </div>
+                <div class="form-group pt-4 pb-4 border-bottom">
+                  <label>Telefone / WhatsApp</label>
+                  <div class="d-flex">
+                    <input type="text" class="form-control rounded-end-0" value="(11) 91234-5678" readonly>
+                    <button class="btn btn-outline-primary rounded-start-0"><span class="la la-pencil"></span></button>
+                  </div>
+                </div>
+                <div class="form-group pt-4">
+                  <label>Senha</label>
+                  <div class="d-flex">
+                    <input type="password" class="form-control rounded-end-0" value="********" readonly>
+                    <button class="btn btn-outline-primary rounded-start-0"><span class="la la-pencil"></span></button>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
-        </div>
-      </div>
+        </li>
+
+        <!-- Perfil & Privacidade -->
+        <li class="accordion block">
+          <div class="acc-btn">Perfil & Privacidade <span class="icon flaticon-add"></span></div>
+          <div class="acc-content">
+            <div class="content">
+              <form>
+                <div class="form-group">
+                  <label>Visibilidade do perfil</label><br>
+                  <!-- Switchbox Outer -->
+                  <div class="switchbox-outer margin-top-10 mb-30 border-bottom">
+                    <ul class="switchbox">
+                      <li>
+                        <label class="switch">
+                          <input type="checkbox">
+                          <span class="slider round"></span>
+                          <span class="title">Perfil público</span>
+                        </label>
+                      </li>
+                      <li>
+                        <label class="switch">
+                          <input type="checkbox" checked>
+                          <span class="slider round"></span>
+                          <span class="title">Aparecer nas buscas</span>
+                        </label>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="form-group border-bottom">
+                  <label>Status de Preenchimento: <strong>80%</strong></label>
+                  <div class="progress">
+                    <div class="progress-bar" style="width: 80%;"></div>
+                  </div>
+                  <a href="{{ route('professional.profile') }}" class="btn btn-link mt-2 mb-30">Completar Perfil</a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </li>
+
+        <!-- Notificações -->
+        <li class="accordion block">
+          <div class="acc-btn">Notificações <span class="icon flaticon-add"></span></div>
+          <div class="acc-content">
+            <div class="content">
+              <form>
+                <div class="form-group">
+                  <label>Preferências de notificação</label><br>
+                  <div class="switchbox-outer margin-top-10">
+                    <ul class="switchbox">
+                      <li>
+                        <label class="switch">
+                          <input type="checkbox" checked>
+                          <span class="slider round"></span>
+                          <span class="title">E-mail</span>
+                        </label>
+                      </li>
+                      <li>
+                        <label class="switch">
+                          <input type="checkbox" checked>
+                          <span class="slider round"></span>
+                          <span class="title">WhatsApp</span>
+                        </label>
+                      </li>
+                      <li>
+                        <label class="switch">
+                          <input type="checkbox">
+                          <span class="slider round"></span>
+                          <span class="title">SMS</span>
+                        </label>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </li>
+
+        <!-- Privacidade -->
+        <li class="accordion block">
+          <div class="acc-btn">Privacidade <span class="icon flaticon-add"></span></div>
+          <div class="acc-content">
+            <div class="content">
+              <form>
+                <div class="form-group">
+                  <label>Configurações de privacidade</label><br>
+                  <div class="switchbox-outer margin-top-10">
+                    <ul class="switchbox">
+                      <li>
+                        <label class="switch">
+                          <input type="checkbox" checked>
+                          <span class="slider round"></span>
+                          <span class="title">Permitir contato direto</span>
+                        </label>
+                      </li>
+                      <li>
+                        <label class="switch">
+                          <input type="checkbox">
+                          <span class="slider round"></span>
+                          <span class="title">Mostrar salário atual</span>
+                        </label>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
   </section>
-  <!-- End Painel de Configurações -->
-
-  <!-- Rodapé -->
-  @include('layouts.partials.copyright')
-  <!-- Fim do Rodapé -->
-
-</div>
-<!-- Fim Page Wrapper -->
 @endsection
 
 @push('scripts')
 @include('layouts.partials.scripts')
 @endpush
+

@@ -20,9 +20,9 @@ Route::post('/contato', [PublicController::class, 'contactSend'])->name('contact
 Route::get('/faq', [PublicController::class, 'faq'])->name('faq');
 Route::get('/ajuda', [PublicController::class, 'help'])->name('help');
 Route::post('/ajuda', [PublicController::class, 'helpSend'])->name('help.send');
-Route::get('/precos', [PublicController::class, 'pricing'])->name('pricing');
-Route::get('/checkout', [PublicController::class, 'checkout'])->name('checkout');
-Route::post('/checkout', [PublicController::class, 'checkoutProcess'])->name('checkout.process');
+Route::get('/manual-usuario', [PublicController::class, 'manual'])->name('manual');
+
+
 
 // Páginas Institucionais
 Route::get('/termos', [PublicController::class, 'terms'])->name('terms');
@@ -113,6 +113,8 @@ Route::prefix('empresa')->group(function () {
     Route::get('/pagina', [DashboardCompanyController::class, 'publicPage'])->name('company.public-page');
     Route::get('/profissionais-favoritos', [DashboardCompanyController::class, 'favoriteProfessionals'])->name('company.favorite-professionals');
     Route::get('/criar-vaga', [DashboardCompanyController::class, 'createJob'])->name('company.create-job');
+    Route::post('/criar-vaga', [DashboardCompanyController::class, 'createJobProcess'])->name('company.create-job.process');
+    Route::get('/vagas', [DashboardCompanyController::class, 'jobs'])->name('company.jobs');
     Route::post('/vagas', [DashboardCompanyController::class, 'storeJob'])->name('company.jobs.store');
 });
 

@@ -1,109 +1,235 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
 
 @section('title', 'Perfil da Empresa - VagaPet')
 
 @section('content')
-<div class="page-wrapper dashboard">
-
-  <!-- Preloader -->
-  <div class="preloader"></div>
-
-  <!-- Header Span -->
-  <span class="header-span"></span>
-
-  <!-- Main Header-->
-  @include('layouts.partials.header-company')
-  <!-- End Main Header -->
-
   <!-- Painel de Perfil da Empresa -->
   <section class="user-dashboard">
     <div class="dashboard-outer">
       <div class="upper-title-box">
         <h3>Perfil da Empresa</h3>
-        <div class="text">Gerencie as informações da sua empresa.</div>
       </div>
 
       <div class="row">
         <div class="col-lg-12">
+          <!-- Ls widget (Seção de Informações Básicas) -->
           <div class="ls-widget">
             <div class="tabs-box">
               <div class="widget-title">
-                <h4>Informações da Empresa</h4>
+                <h4>Meu Perfil</h4>
               </div>
 
               <div class="widget-content">
-                <form class="default-form" action="{{ route('company.profile.update') }}" method="POST">
-                  @csrf
+
+                <div class="uploading-outer">
+                  <div class="uploadButton">
+                    <input class="uploadButton-input" type="file" name="attachments[]" accept="image/*, application/pdf" id="upload" multiple />
+                    <label class="uploadButton-button ripple-effect" for="upload">Subir logo</label>
+                    <span class="uploadButton-file-name"></span>
+                  </div>
+                  <div class="text">Tamanho máximo do arquivo: 1MB, dimensão mínima: 330x300, arquivos suportados: .jpg e .png</div>
+                </div>
+
+                <form class="default-form">
                   <div class="row">
-
-                    <!-- Nome da Empresa -->
+                    <!-- Nome Empresa -->
                     <div class="form-group col-lg-6 col-md-12">
-                      <label>Nome da Empresa*</label>
-                      <input type="text" name="company_name" placeholder="Nome da empresa" value="{{ old('company_name', 'Dogs, Cats and Love') }}" required>
-                    </div>
-
-                    <!-- CNPJ -->
-                    <div class="form-group col-lg-6 col-md-12">
-                      <label>CNPJ*</label>
-                      <input type="text" name="cnpj" placeholder="00.000.000/0000-00" value="{{ old('cnpj', '12.345.678/0001-90') }}" required>
-                    </div>
-
-                    <!-- E-mail -->
-                    <div class="form-group col-lg-6 col-md-12">
-                      <label>E-mail*</label>
-                      <input type="email" name="email" placeholder="contato@empresa.com" value="{{ old('email', 'contato@dogsandcats.com') }}" required>
+                      <label>Nome da empresa*</label>
+                      <input type="text" name="name" placeholder="Nome do meu negócio">
                     </div>
 
                     <!-- Telefone -->
                     <div class="form-group col-lg-6 col-md-12">
                       <label>Telefone*</label>
-                      <input type="text" name="phone" placeholder="(11) 98765-4321" value="{{ old('phone', '(11) 98765-4321') }}" required>
+                      <input type="text" name="phone" placeholder="(11) 98765-4321">
                     </div>
 
-                    <!-- Endereço -->
-                    <div class="form-group col-lg-12 col-md-12">
-                      <label>Endereço</label>
-                      <input type="text" name="address" placeholder="Rua Exemplo, 123" value="{{ old('address', 'Rua das Flores, 123') }}">
-                    </div>
-
-                    <!-- Cidade e Estado -->
+                    <!-- Endereço de E-mail -->
                     <div class="form-group col-lg-6 col-md-12">
-                      <label>Cidade</label>
-                      <input type="text" name="city" placeholder="São Paulo" value="{{ old('city', 'São Paulo') }}">
+                      <label>Endereço de E-mail*</label>
+                      <input type="email" name="email" placeholder="maria@exemplo.com">
                     </div>
 
+                    <!-- Site -->
                     <div class="form-group col-lg-6 col-md-12">
-                      <label>Estado</label>
-                      <input type="text" name="state" placeholder="SP" value="{{ old('state', 'SP') }}">
+                      <label>Site</label>
+                      <input type="text" name="website" placeholder="www.meuservicos.com.br">
+                    </div>
+
+                    <!-- Experiência -->
+                    <div class="form-group col-lg-6 col-md-12">
+                      <label>Quantidade de funcionários</label>
+                      <select class="chosen-select">
+                        <option>Selecione</option>
+                        <option>Até 4</option>
+                        <option>De 5 a 10</option>
+                        <option>De 11 a 20</option>
+                        <option>Acima de 21</option>
+                      </select>
+                    </div>
+
+                    <!-- Educação -->
+                    <div class="form-group col-lg-6 col-md-12">
+                      <label>Educação</label>
+                      <select class="chosen-select">
+                        <option>Ensino Fundamental</option>
+                        <option>Ensino Médio</option>
+                        <option>Ensino Superior</option>
+                        <option>Pós-graduação (Mestrado ou doutorado)</option>
+                      </select>
+                    </div>
+
+                    <!-- Área de trabalho -->
+                    <div class="form-group col-lg-6 col-md-12">
+                      <label>Serviços*</label>
+                      <p>Você pode incluir mais de uma opção</p>
+                      <select data-placeholder="Escolha" class="chosen-select multiple" multiple tabindex="4">
+                        <option value="BanhoTosa">Banho & Tosa</option>
+                        <option value="Recepcao">Recepção</option>
+                        <option value="Vendas">Vendas</option>
+                        <option value="Veterinario">Veterinário</option>
+                        <option value="AuxiliarVeterinario">Auxiliar Veterinário</option>
+                        <option value="Limpeza">Limpeza</option>
+                        <option value="Gerente">Gerente</option>
+                        <option value="Estoque">Estoque</option>
+                        <option value="Motorista">Motorista</option>
+                      </select>
+                    </div>
+
+                    <!-- Portfólio -->
+                    <div class="form-group col-lg-6 col-md-12">
+                      <div class="uploading-outer">
+                        <div class="uploadButton">
+                          <input class="uploadButton-input" type="file"
+                            name="attachments[]" accept="image/*, application/pdf"
+                            id="upload" multiple />
+                          <label class="uploadButton-button ripple-effect" for="upload">
+                            Fotos do espaço
+                          </label>
+                          <span class="uploadButton-file-name"></span>
+                        </div>
+                      </div>
                     </div>
 
                     <!-- Descrição -->
                     <div class="form-group col-lg-12 col-md-12">
-                      <label>Descrição da Empresa</label>
-                      <textarea name="description" placeholder="Descreva sua empresa...">{{ old('description', 'Empresa especializada em produtos e serviços para pets.') }}</textarea>
+                      <label>Descrição</label>
+                      <textarea placeholder="Fale sobre sua experiência com animais, aptidões em pet shops, serviços oferecidos (banho, tosa, recepção, etc.) e qualquer outro detalhe relevante."></textarea>
                     </div>
 
                     <!-- Botão Salvar -->
-                    <div class="form-group col-lg-12 col-md-12">
-                      <button class="theme-btn btn-style-one">Salvar Alterações</button>
+                    <div class="form-group col-lg-6 col-md-12">
+                      <button class="theme-btn btn-style-one">Salvar</button>
                     </div>
                   </div>
                 </form>
               </div>
             </div>
           </div>
+
+          <!-- Ls widget (Seção Redes Sociais) -->
+          <div class="ls-widget">
+            <div class="tabs-box">
+              <div class="widget-title">
+                <h4>Redes Sociais</h4>
+                <p>Inclua suas redes sociais se quiser que outros vejam seu perfil e possam te seguir.</p>
+              </div>
+
+              <div class="widget-content">
+                <form class="default-form">
+                  <div class="row">
+                    <!-- Facebook -->
+                    <div class="form-group col-lg-6 col-md-12">
+                      <label>Facebook</label>
+                      <input type="text" name="facebook" placeholder="www.facebook.com/MeuPerfil">
+                    </div>
+
+                    <!-- Twitter -->
+                    <div class="form-group col-lg-6 col-md-12">
+                      <label>X (antigo Twitter)</label>
+                      <input type="text" name="twitter" placeholder="twitter.com/MeuPerfil">
+                    </div>
+
+                    <!-- Linkedin -->
+                    <div class="form-group col-lg-6 col-md-12">
+                      <label>TikTok</label>
+                      <input type="text" name="linkedin" placeholder="www.tiktok.com/meuperfil">
+                    </div>
+
+                    <!-- Instagram -->
+                    <div class="form-group col-lg-6 col-md-12">
+                      <label>Instagram</label>
+                      <input type="text" name="instagram" placeholder="instagram.com/meuperfil">
+                    </div>
+
+                    <!-- Botão Salvar -->
+                    <div class="form-group col-lg-6 col-md-12">
+                      <button class="theme-btn btn-style-one">Salvar</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ls widget (Seção Informações de Contato) -->
+          <div class="ls-widget">
+            <div class="tabs-box">
+              <div class="widget-title">
+                <h4>Localização</h4>
+                <p>Só o bairro e cidade ficarão visíveis na plataforma para ajudar na busca por vagas releventes.</p>
+              </div>
+
+              <div class="widget-content">
+                <form class="default-form">
+                  <div class="row">
+
+                    <!-- Endereço Completo -->
+                    <div class="form-group col-lg-12 col-md-12">
+                      <label>Endereço Completo (aparece no mapa)*</label>
+                      <input type="text" name="address" placeholder="Rua Exemplo, 123, Bairro, Cidade - Estado">
+                    </div>
+
+                    <!-- Encontrar no Mapa - Bairro -->
+                    <div class="form-group col-lg-6 col-md-12">
+                      <label>Bairro e cidade</label>
+                      <input type="text" name="map" placeholder="Vila Clementina, São Paulo - SP">
+                    </div>
+
+                    <!-- Botão de Buscar Localização -->
+                    <div class="form-group col-lg-12 col-md-12">
+                      <button class="theme-btn btn-style-three">Buscar Localização</button>
+                    </div>
+
+                    <!-- Mapa -->
+                    <div class="form-group col-lg-12 col-md-12">
+                      <div class="map-outer">
+                        <div class="map-canvas map-height" data-zoom="12"
+                          data-lat="-23.550520" data-lng="-46.633308"
+                          data-type="roadmap" data-hue="#ffc400"
+                          data-title="Localização"
+                          data-icon-path="images/resource/map-marker.png"
+                          data-content="São Paulo - SP, Brasil<br><a href='mailto:info@meuservicos.com'>info@meuservicos.com</a>">
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Botão Salvar -->
+                    <div class="form-group col-lg-12 col-md-12">
+                      <button class="theme-btn btn-style-one">Salvar</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <!-- Fim Ls widget -->
+
         </div>
       </div>
     </div>
   </section>
-  <!-- End Painel de Perfil da Empresa -->
-
-  <!-- Rodapé -->
-  @include('layouts.partials.copyright')
-  <!-- Fim do Rodapé -->
-
-</div>
-<!-- Fim Page Wrapper -->
+  <!-- Fim Painel (Meu Perfil) -->
 @endsection
 
 @push('scripts')

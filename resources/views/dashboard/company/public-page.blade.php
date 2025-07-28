@@ -3,7 +3,7 @@
 @section('title', 'Página Pública da Empresa - VagaPet')
 
 @section('content')
-<div class="page-wrapper dashboard">
+<div class="page-wrapper">
 
   <!-- Preloader -->
   <div class="preloader"></div>
@@ -11,66 +11,163 @@
   <!-- Header Span -->
   <span class="header-span"></span>
 
-  <!-- Main Header-->
+  <!-- Main Header -->
   @include('layouts.partials.header-company')
   <!-- End Main Header -->
 
-  <!-- Página Pública da Empresa -->
-  <section class="user-dashboard">
-    <div class="dashboard-outer">
-      <div class="upper-title-box">
-        <h3>Página Pública da Empresa</h3>
-        <div class="text">Como os profissionais veem sua empresa.</div>
-      </div>
+  <!-- includes/sidebar.html -->
+  <div class="sidebar-backdrop"></div>
 
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="ls-widget">
-            <div class="tabs-box">
-              <div class="widget-title">
-                <h4>Visualização Pública</h4>
+  <div class="user-sidebar d-lg-none">
+    <div class="sidebar-inner">
+      <ul class="navigation">
+        @include('layouts.partials.menu-company')
+      </ul>
+    </div>
+  </div>
+
+  <!-- Seção de Detalhes da Empresa -->
+  <section class="candidate-detail-section style-three">
+
+    <!-- Box Superior -->
+    <div class="upper-box">
+      <div class="auto-container">
+        <!-- Bloco da Empresa -->
+        <div class="job-block-seven style-three">
+          <div class="inner-box">
+            <figure class="image">
+              <img src="{{ asset('images/resource/candidate-4.png') }}" alt="Logotipo Dogs, Cats & Love">
+            </figure>
+            <h4 class="name"><a href="#">Dogs, Cats & Love</a></h4>
+
+            <div class="btn-box">
+              <a href="{{ route('company.manage-jobs') }}" type="button" class="theme-btn btn-style-one position-relative">
+                Ver vagas abertas: 3
+              </a>
+              <button class="bookmark-btn"><i class="flaticon-bookmark"></i></button>
+            </div>
+
+            <div class="content">
+              <!-- poderia vir um resumo curto aqui -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="candidate-detail-outer">
+      <div class="auto-container">
+        <div class="row">
+          <!-- Conteúdo Principal -->
+          <div class="content-column col-lg-8 col-md-12 order-2">
+            <div class="job-detail">
+              <h4>Perfil da Empresa</h4>
+              <p>A <strong>Dogs, Cats & Love</strong> é um pet shop completo em São Bernardo do Campo, com mais de 10 anos de tradição no cuidado de cães e gatos. Oferecemos:</p>
+              <ul>
+                <li>Banho e Tosa com produtos de qualidade;</li>
+                <li>Day Care com espaço climatizado e recreação;</li>
+                <li>Hotelzinho com acompanhamento 24h;</li>
+                <li>Adestramento básico e avançado.</li>
+              </ul>
+              <p></p>
+              <p>Nosso time de groomers é formado por profissionais certificados, treinados em primeiros socorros e técnicas de bem-estar animal.</p>
+
+              <!-- Portfólio -->
+              <div class="portfolio-outer">
+                <div class="row">
+                  <div class="col-lg-3 col-md-3 col-sm-6">
+                    <figure class="image">
+                      <a href="{{ asset('images/resource/pet-portfolio-1.jpg') }}" class="lightbox-image">
+                        <img src="{{ asset('images/resource/pet-portfolio-1.jpg') }}" alt="Banho e Tosa">
+                      </a>
+                      <span class="icon flaticon-plus"></span>
+                    </figure>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-6">
+                    <figure class="image">
+                      <a href="{{ asset('images/resource/pet-portfolio-2.jpg') }}" class="lightbox-image">
+                        <img src="{{ asset('images/resource/pet-portfolio-2.jpg') }}" alt="Day Care">
+                      </a>
+                      <span class="icon flaticon-plus"></span>
+                    </figure>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-6">
+                    <figure class="image">
+                      <a href="{{ asset('images/resource/pet-portfolio-3.jpg') }}" class="lightbox-image">
+                        <img src="{{ asset('images/resource/pet-portfolio-3.jpg') }}" alt="Hotelzinho">
+                      </a>
+                      <span class="icon flaticon-plus"></span>
+                    </figure>
+                  </div>
+                  <div class="col-lg-3 col-md-3 col-sm-6">
+                    <figure class="image">
+                      <a href="{{ asset('images/resource/pet-portfolio-4.jpg') }}" class="lightbox-image">
+                        <img src="{{ asset('images/resource/pet-portfolio-4.jpg') }}" alt="Adestramento">
+                      </a>
+                      <span class="icon flaticon-plus"></span>
+                    </figure>
+                  </div>
+                </div>
               </div>
 
-              <div class="widget-content">
-                <div class="company-preview">
-                  <div class="company-header" style="display: flex; align-items: center; margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
-                    <div class="company-logo" style="margin-right: 20px;">
-                      <img src="{{ asset('images/resource/company-logo/1-1.png') }}" alt="Logo da Empresa" style="width: 80px; height: 80px; object-fit: cover; border-radius: 10px;">
-                    </div>
-                    <div class="company-info">
-                      <h3 style="margin: 0 0 10px 0; color: #333;">Dogs, Cats and Love</h3>
-                      <p class="title" style="margin: 0 0 5px 0; color: #666; font-weight: 500;">Pet Shop e Clínica Veterinária</p>
-                      <p class="location" style="margin: 0; color: #888;"><i class="icon flaticon-map-locator"></i> Vila Clementino, São Paulo, SP</p>
+              <!-- Vídeo Institucional -->
+              <div class="video-outer">
+                <h4>Vídeo Institucional</h4>
+                <div class="video-box">
+                  <figure class="image">
+                    <a href="https://www.youtube.com/watch?v=Fvae8nxzVz4" class="play-now" data-fancybox="gallery">
+                      <img src="{{ asset('images/resource/pet-video.jpg') }}" alt="Vídeo Dogs, Cats & Love">
+                      <span class="icon flaticon-play-button-2"></span>
+                    </a>
+                  </figure>
+                </div>
+              </div>
+
+              <!-- Serviços -->
+              <div class="services-outer">
+                <h4>Nossos Serviços</h4>
+                <div class="row">
+                  <div class="col-lg-6 col-md-6 col-sm-12">
+                    <div class="service-block">
+                      <div class="inner-box">
+                        <div class="icon-box">
+                          <span class="icon flaticon-bath"></span>
+                        </div>
+                        <h5>Banho e Tosa</h5>
+                        <p>Banho completo com produtos hipoalergênicos e tosa higiênica ou estilizada.</p>
+                      </div>
                     </div>
                   </div>
-
-                  <div class="company-details">
-                    <div style="margin-bottom: 30px;">
-                      <h4 style="color: #333; margin-bottom: 15px;">Sobre a Empresa</h4>
-                      <p style="line-height: 1.6; color: #666;">Empresa especializada em produtos e serviços para pets, com mais de 10 anos de experiência no mercado. Oferecemos banho e tosa, consultas veterinárias e produtos de qualidade.</p>
-                    </div>
-
-                    <div style="margin-bottom: 30px;">
-                      <h4 style="color: #333; margin-bottom: 15px;">Serviços Oferecidos</h4>
-                      <ul style="list-style: none; padding: 0;">
-                        <li style="padding: 8px 0; border-bottom: 1px solid #eee;"><i class="la la-check" style="color: #28a745; margin-right: 10px;"></i>Banho e Tosa</li>
-                        <li style="padding: 8px 0; border-bottom: 1px solid #eee;"><i class="la la-check" style="color: #28a745; margin-right: 10px;"></i>Consulta Veterinária</li>
-                        <li style="padding: 8px 0; border-bottom: 1px solid #eee;"><i class="la la-check" style="color: #28a745; margin-right: 10px;"></i>Venda de Produtos Pet</li>
-                        <li style="padding: 8px 0;"><i class="la la-check" style="color: #28a745; margin-right: 10px;"></i>Hotelaria para Pets</li>
-                      </ul>
-                    </div>
-
-                    <div>
-                      <h4 style="color: #333; margin-bottom: 15px;">Vagas Ativas</h4>
-                      <div class="active-jobs">
-                        <div class="job-item" style="background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 15px;">
-                          <h5 style="margin: 0 0 10px 0; color: #333;">Atendente de Banho e Tosa</h5>
-                          <p style="margin: 0; color: #666;"><i class="la la-money-bill" style="color: #28a745; margin-right: 5px;"></i>R$ 1.800 - R$ 2.200 | <i class="la la-map-marker" style="color: #007bff; margin-right: 5px;"></i>São Paulo, SP</p>
+                  <div class="col-lg-6 col-md-6 col-sm-12">
+                    <div class="service-block">
+                      <div class="inner-box">
+                        <div class="icon-box">
+                          <span class="icon flaticon-home"></span>
                         </div>
-                        <div class="job-item" style="background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 15px;">
-                          <h5 style="margin: 0 0 10px 0; color: #333;">Vendedor de Produtos Pet</h5>
-                          <p style="margin: 0; color: #666;"><i class="la la-money-bill" style="color: #28a745; margin-right: 5px;"></i>R$ 1.500 - R$ 1.800 | <i class="la la-map-marker" style="color: #007bff; margin-right: 5px;"></i>São Paulo, SP</p>
+                        <h5>Day Care</h5>
+                        <p>Creche para cães com espaço climatizado, recreação e socialização.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6 col-sm-12">
+                    <div class="service-block">
+                      <div class="inner-box">
+                        <div class="icon-box">
+                          <span class="icon flaticon-hotel"></span>
                         </div>
+                        <h5>Hotelzinho</h5>
+                        <p>Hospedagem com acompanhamento 24h e cuidados personalizados.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6 col-sm-12">
+                    <div class="service-block">
+                      <div class="inner-box">
+                        <div class="icon-box">
+                          <span class="icon flaticon-training"></span>
+                        </div>
+                        <h5>Adestramento</h5>
+                        <p>Treinamento básico e avançado com métodos positivos.</p>
                       </div>
                     </div>
                   </div>
@@ -78,20 +175,72 @@
               </div>
             </div>
           </div>
+
+          <!-- Sidebar -->
+          <div class="sidebar-column col-lg-4 col-md-12">
+            <aside class="sidebar">
+
+              <div class="sidebar-widget m-0">
+                <h4 class="widget-title">Informações</h4>
+                <div class="widget-content">
+                  <ul class="job-overview">
+                    <li>
+                      <i class="las la-briefcase icon"></i>
+                      <h5>Serviços:</h5>
+                      <span>Day Care, Hotelzinho, Banho e Tosa, Adestramento</span>
+                    </li>
+                    <li>
+                      <i class="las la-users icon"></i>
+                      <h5>Equipe:</h5>
+                      <span>8 funcionários</span>
+                    </li>
+                    <li>
+                      <i class="las la-calendar-check icon"></i>
+                      <h5>Fundação:</h5>
+                      <span>2012</span>
+                    </li>
+                    <li>
+                      <i class="las la-map-marker icon"></i>
+                      <h5>Endereço:</h5>
+                      <span>Rua Guilherme Dumont Villares, 1234</span>
+                    </li>
+                    <li>
+                      <i class="las la-globe-americas icon"></i>
+                      <h5>Cidade:</h5>
+                      <span>São Bernardo do Campo – SP</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="sidebar-widget social-media-widget">
+                <h4 class="widget-title">Redes Sociais</h4>
+                <div class="widget-content">
+                  <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                  </div>
+                </div>
+              </div>
+
+            </aside>
+          </div>
         </div>
       </div>
     </div>
   </section>
-  <!-- End Página Pública da Empresa -->
+  <!-- End Seção de Detalhes da Empresa -->
 
-  <!-- Rodapé -->
-  @include('layouts.partials.copyright')
-  <!-- Fim do Rodapé -->
+  <!-- Main Footer -->
+  @include('layouts.partials.footer')
+  <!-- End Main Footer -->
 
 </div>
-<!-- Fim Page Wrapper -->
+<!-- End Page Wrapper -->
 @endsection
 
 @push('scripts')
 @include('layouts.partials.scripts')
 @endpush
+

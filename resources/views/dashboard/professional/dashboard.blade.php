@@ -1,19 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.dashboard-professional')
 
 @section('title', 'Dashboard Profissional - VagaPet')
 
 @section('content')
-<div class="page-wrapper dashboard">
-
-  <!-- Preloader -->
-  <div class="preloader"></div>
-
-  <!-- Header Span -->
-  <span class="header-span"></span>
-
-  <!-- Main Header-->
-  @include('layouts.partials.header-professional')
-  <!-- End Main Header -->
 
   <!-- Painel de Vagas -->
   <section class="user-dashboard">
@@ -122,13 +111,6 @@
     </div>
   </section>
   <!-- End Painel de Vagas -->
-
-  <!-- Rodapé -->
-  @include('layouts.partials.copyright')
-  <!-- Fim do Rodapé -->
-
-</div>
-<!-- Fim Page Wrapper -->
 @endsection
 
 @push('scripts')

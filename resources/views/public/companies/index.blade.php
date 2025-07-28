@@ -8,7 +8,7 @@
   <span class="header-span"></span>
 
   <!-- Main Header -->
-  @include('layouts.partials.header-company')
+  @include('layouts.partials.header-professional')
   <!-- Listing Section -->
 
   <section class="ls-section map-layout">

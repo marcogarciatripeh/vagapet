@@ -12,7 +12,7 @@
   <span class="header-span"></span>
 
   <!-- Cabeçalho Principal -->
-  @include('layouts.partials.header-professional')
+  @include('layouts.partials.header-company')
   <!-- Fim do Cabeçalho Principal -->
 
   <!-- Seção de Listagem (Layout com Mapa) -->
@@ -195,9 +195,9 @@
   </section>
   <!-- Fim da Seção de Listagem -->
 
-  <!-- Main Footer -->
-  @include('layouts.partials.footer')
-  <!-- End Main Footer -->
+  <!-- Rodapé -->
+  @include('layouts.partials.copyright')
+  <!-- Fim do Rodapé -->
 
 </div>
 <!-- Fim Page Wrapper -->

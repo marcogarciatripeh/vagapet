@@ -18,7 +18,7 @@
   <div class="user-sidebar d-lg-none">
     <div class="sidebar-inner">
       <ul class="navigation">
-        <!-- Menu mobile aqui se necessário -->
+        @include('layouts.partials.menu-professional')
       </ul>
     </div>
   </div>

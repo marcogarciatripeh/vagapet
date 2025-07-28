@@ -42,7 +42,7 @@
                     <li><a href="{{ route('professionals.index') }}">Procurar Profissionais</a></li>
                     <li><a href="{{ route('company.dashboard') }}">Painel da Empresa</a></li>
                     <li><a href="{{ route('company.create-job') }}">Adicionar Vaga</a></li>
-                    <li><a href="{{ route('pricing') }}">Planos de Vaga</a></li>
+
                   </ul>
                 </div>
               </div>

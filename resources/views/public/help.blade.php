@@ -1,19 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.dashboard-professional')
 
 @section('title', 'Ajuda - VagaPet')
 
 @section('content')
-<div class="page-wrapper dashboard">
-
-  <!-- Preloader -->
-  <div class="preloader"></div>
-
-  <!-- Header Span -->
-  <span class="header-span"></span>
-
-  <!-- Cabeçalho Principal -->
-  @include('layouts.partials.header-logout')
-  <!-- Fim do Cabeçalho Principal -->
 
   <!-- Painel (Ajuda) -->
   <section class="user-dashboard">
@@ -65,13 +54,6 @@
     </div>
   </section>
   <!-- Fim Painel (Ajuda) -->
-
-  <!-- Main Footer -->
-  @include('layouts.partials.footer')
-  <!-- End Main Footer -->
-
-</div>
-<!-- Fim Page Wrapper -->
 @endsection
 
 @push('scripts')

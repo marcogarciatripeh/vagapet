@@ -1,62 +1,57 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
 
 @section('title', 'Dashboard Empresa - VagaPet')
 
 @section('content')
-<div class="page-wrapper dashboard">
-
-  <!-- Preloader -->
-  <div class="preloader"></div>
-
-  <!-- Header Span -->
-  <span class="header-span"></span>
-
-  <!-- Main Header-->
-  @include('layouts.partials.header-company')
-  <!-- End Main Header -->
 
   <!-- Painel da Empresa -->
   <section class="user-dashboard">
     <div class="dashboard-outer">
       <div class="upper-title-box">
-        <h3>Olá, Empresa!</h3>
-        <div class="text">Aqui você vê o resumo das suas vagas e candidatos.</div>
+        <div class="row">
+          <div class="col-lg-9">
+            <h3>Olá, Empresa!</h3>
+          </div>
+          <div class="col-lg-3">
+            <a href="{{ route('company.create-job') }}" type="button" class="theme-btn btn-style-one medium">Publicar Vaga</a>
+          </div>
+        </div>
       </div>
 
       <div class="row">
-        <div class="ui-block col-xl-3 col-lg-6 col-md-6 col-sm-12">
+        <div class="ui-block col-xl-3 col-lg-6 col-md-6 col-sm-6">
           <div class="ui-item ui-blue">
             <div class="left"><i class="icon flaticon-briefcase"></i></div>
             <div class="right">
-              <h4>8</h4>
-              <p>Vagas Ativas</p>
+              <h4>22</h4>
+              <p>Vagas Publicadas</p>
             </div>
           </div>
         </div>
-        <div class="ui-block col-xl-3 col-lg-6 col-md-6 col-sm-12">
+        <div class="ui-block col-xl-3 col-lg-6 col-md-6 col-sm-6">
           <div class="ui-item ui-red">
             <div class="left"><i class="icon la la-file-invoice"></i></div>
             <div class="right">
-              <h4>156</h4>
+              <h4>9.382</h4>
               <p>Candidaturas</p>
             </div>
           </div>
         </div>
-        <div class="ui-block col-xl-3 col-lg-6 col-md-6 col-sm-12">
+        <div class="ui-block col-xl-3 col-lg-6 col-md-6 col-sm-6">
           <div class="ui-item ui-yellow">
             <div class="left"><i class="icon la la-comment-o"></i></div>
             <div class="right">
-              <h4>23</h4>
+              <h4>74</h4>
               <p>Mensagens</p>
             </div>
           </div>
         </div>
-        <div class="ui-block col-xl-3 col-lg-6 col-md-6 col-sm-12">
+        <div class="ui-block col-xl-3 col-lg-6 col-md-6 col-sm-6">
           <div class="ui-item ui-green">
             <div class="left"><i class="icon la la-bookmark-o"></i></div>
             <div class="right">
-              <h4>12</h4>
-              <p>Profissionais Favoritos</p>
+              <h4>32</h4>
+              <p>Favoritos</p>
             </div>
           </div>
         </div>
@@ -65,17 +60,19 @@
       <!-- Widgets -->
       <div class="row">
 
-        <!-- Gráfico de Candidaturas -->
+        <!-- Gráfico de Visualizações -->
         <div class="col-xl-7 col-lg-12">
           <div class="graph-widget ls-widget">
             <div class="tabs-box">
               <div class="widget-title">
-                <h4>Candidaturas por Vaga</h4>
+                <h4>Visualizações do Perfil</h4>
                 <div class="chosen-outer">
                   <select class="chosen-select">
-                    <option>Últimos 30 Dias</option>
-                    <option>Últimos 60 Dias</option>
-                    <option>Últimos 90 Dias</option>
+                    <option>Últimos 6 Meses</option>
+                    <option>Últimos 12 Meses</option>
+                    <option>Últimos 16 Meses</option>
+                    <option>Últimos 24 Meses</option>
+                    <option>Últimos 5 Anos</option>
                   </select>
                 </div>
               </div>
@@ -86,31 +83,17 @@
           </div>
         </div>
 
-        <!-- Candidaturas Recentes -->
+        <!-- Notificações Rápidas -->
         <div class="col-xl-5 col-lg-12">
           <div class="notification-widget ls-widget">
-            <div class="widget-title"><h4>Candidaturas Recentes</h4></div>
+            <div class="widget-title"><h4>Notificações</h4></div>
             <div class="widget-content">
               <ul class="notification-list">
-                <li><span class="icon flaticon-briefcase"></span> <strong>Maria Santos</strong> se candidatou à vaga <span class="colored">Atendente de Loja</span></li>
-                <li><span class="icon flaticon-briefcase"></span> <strong>Pedro Oliveira</strong> se candidatou à vaga <span class="colored">Vendedor de Produtos Pet</span></li>
-                <li class="success"><span class="icon flaticon-briefcase"></span> <strong>Ana Costa</strong> se candidatou à vaga <span class="colored">Auxiliar de Serviços Gerais</span></li>
-                <li><span class="icon flaticon-briefcase"></span> <strong>Carlos Lima</strong> se candidatou à vaga <span class="colored">Atendente de Banho e Tosa</span></li>
-                <li class="success"><span class="icon flaticon-briefcase"></span> <strong>Fernanda Silva</strong> se candidatou à vaga <span class="colored">Vendedor de Ração</span></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- Vagas Ativas -->
-        <div class="col-lg-12">
-          <div class="vagas-widget ls-widget">
-            <div class="widget-title"><h4>Suas Vagas Ativas</h4></div>
-            <div class="widget-content">
-              <ul class="vaga-lista">
-                <li><span class="icon flaticon-briefcase"></span> <strong>Atendente de Loja</strong> - 15 candidaturas <span class="colored">Ativa</span></li>
-                <li><span class="icon flaticon-briefcase"></span> <strong>Vendedor de Produtos Pet</strong> - 8 candidaturas <span class="colored">Ativa</span></li>
-                <li><span class="icon flaticon-briefcase"></span> <strong>Auxiliar de Serviços Gerais</strong> - 23 candidaturas <span class="colored">Ativa</span></li>
+                <li><span class="icon flaticon-briefcase"></span> <strong>Lucas Silva</strong> se candidatou à vaga <span class="colored">Atendente de Loja (Cobasi - Tatuapé)</span></li>
+                <li><span class="icon flaticon-briefcase"></span> <strong>Ana Oliveira</strong> se candidatou à vaga <span class="colored">Vendedor de Produtos Pet (Petz - Morumbi)</span></li>
+                <li class="success"><span class="icon flaticon-briefcase"></span> <strong>Bruno Santos</strong> se candidatou à vaga <span class="colored">Auxiliar de Serviços Gerais (Pet Center - Vila Olímpia)</span></li>
+                <li><span class="icon flaticon-briefcase"></span> <strong>Fernanda Lima</strong> se candidatou à vaga <span class="colored">Vendedor de Ração (Cobasi - Moema)</span></li>
+                <li class="success"><span class="icon flaticon-briefcase"></span> <strong>Rafael Souza</strong> se candidatou à vaga <span class="colored">Atendente de Banho e Tosa (Petz - Itaim)</span></li>
               </ul>
             </div>
           </div>
@@ -119,33 +102,32 @@
       </div>
     </div>
   </section>
-  <!-- End Painel da Empresa -->
-
-  <!-- Rodapé -->
-  @include('layouts.partials.copyright')
-  <!-- Fim do Rodapé -->
-
-</div>
-<!-- Fim Page Wrapper -->
+  <!-- End Painel de Vagas -->
 @endsection
 
 @push('scripts')
 @include('layouts.partials.scripts')
 <script>
-  Chart.defaults.global.defaultFontFamily = "Sofia Pro";
+  Chart.defaults.global.defaultFontFamily = "Poppins";
   Chart.defaults.global.defaultFontColor = '#888';
   Chart.defaults.global.defaultFontSize = 14;
   var ctx = document.getElementById('chart').getContext('2d');
   var chart = new Chart(ctx, {
-    type: 'bar',
+    type: 'line',
     data: {
-      labels: ["Atendente", "Vendedor", "Auxiliar", "Banho/Tosa"],
+      labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
       datasets: [{
-        label: "Candidaturas",
-        backgroundColor: '#1967D2',
+        label: "Visualizações",
+        backgroundColor: 'transparent',
         borderColor: '#1967D2',
         borderWidth: 1,
-        data: [15, 8, 23, 12],
+        data: [196, 132, 215, 362, 210, 252],
+        pointRadius: 3,
+        pointHoverRadius: 3,
+        pointHitRadius: 10,
+        pointBackgroundColor: "#1967D2",
+        pointHoverBackgroundColor: "#1967D2",
+        pointBorderWidth: 2
       }]
     },
     options: {

@@ -1,18 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.dashboard-professional')
 
 @section('title', 'Contato - VagaPet')
 
 @section('content')
-<div class="page-wrapper dashboard">
-  <!-- Preloader -->
-  <div class="preloader"></div>
-
-  <!-- Header Span -->
-  <span class="header-span"></span>
-
-  <!-- Cabeçalho Principal -->
-  @include('layouts.partials.header-logout')
-  <!-- Fim do Cabeçalho Principal -->
 
   <!-- Painel (Contato) -->
   <section class="user-dashboard">
@@ -62,12 +52,6 @@
     </div>
   </section>
   <!-- Fim Painel (Contato) -->
-
-  <!-- Rodapé -->
-  @include('layouts.partials.footer')
-  <!-- Fim do Rodapé -->
-</div>
-<!-- Fim Page Wrapper -->
 @endsection
 
 @push('scripts')

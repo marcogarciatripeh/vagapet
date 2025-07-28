@@ -106,9 +106,9 @@
   </section>
   <!-- Fim Painel (Privacidade) -->
 
-  <!-- Main Footer -->
-  @include('layouts.partials.footer')
-  <!-- End Main Footer -->
+  <!-- Rodapé -->
+  @include('layouts.partials.copyright')
+  <!-- Fim do Rodapé -->
 
 </div>
 <!-- Fim Page Wrapper -->

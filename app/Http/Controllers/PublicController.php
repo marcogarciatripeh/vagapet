@@ -26,6 +26,11 @@ class PublicController extends Controller
         return view('public.help');
     }
 
+    public function manual()
+    {
+        return view('public.manual');
+    }
+
     public function terms()
     {
         return view('public.terms');
@@ -41,13 +46,5 @@ class PublicController extends Controller
         return view('public.cookies');
     }
 
-    public function pricing()
-    {
-        return view('public.pricing');
-    }
 
-    public function checkout()
-    {
-        return view('public.checkout');
-    }
 }

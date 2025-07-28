@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="page-wrapper dashboard">
-
   <!-- Preloader -->
   <div class="preloader"></div>
 
@@ -28,7 +27,6 @@
               </div>
 
               <div class="widget-content">
-
                 <h2>1. Introdução</h2>
                 <p>Estes Termos e Condições ("Termos") regulam o uso das plataformas, sites, aplicativos, produtos, conteúdos e serviços (coletivamente, "Serviços") oferecidos pela VagaPet Plataforma Digital Ltda. ("VagaPet").</p>
                 <p>Ao acessar ou utilizar os Serviços, você concorda com estes Termos, estabelecendo relação contratual com a VagaPet. Caso não concorde, não poderá usar os Serviços. A VagaPet poderá alterar estes Termos a qualquer momento, sendo sua responsabilidade revisá-los periodicamente. O uso contínuo após alterações implica aceitação.</p>
@@ -102,26 +100,23 @@
                 <ul>
                   <li><a href="{{ route('privacy') }}">Aviso de Privacidade</a></li>
                   <li><a href="{{ route('cookies') }}">Política de Cookies</a></li>
-                  <li><a href="{{ route('help') }}">Manual do Usuário</a></li>
+                  <li><a href="{{ route('manual') }}">Manual do Usuário</a></li>
                 </ul>
 
                 <p><strong>Data da última atualização:</strong> 29/05/2025</p>
-
               </div>
             </div>
           </div>
           <!-- Fim Ls widget -->
-
         </div>
       </div>
     </div>
   </section>
   <!-- Fim Painel (Termos) -->
 
-  <!-- Main Footer -->
-  @include('layouts.partials.footer')
-  <!-- End Main Footer -->
-
+  <!-- Rodapé -->
+  @include('layouts.partials.copyright')
+  <!-- Fim do Rodapé -->
 </div>
 <!-- Fim Page Wrapper -->
 @endsection

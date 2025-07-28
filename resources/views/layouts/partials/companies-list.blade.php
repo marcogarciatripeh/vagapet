@@ -1,39 +1,65 @@
-<div class="company-block-seven">
-  <div class="inner-box">
-    <div class="content">
-      <figure class="image">
-        <img src="{{ asset('images/resource/company-logo/1-1.png') }}" alt="Empresa">
-      </figure>
-      <h4><a href="{{ route('companies.show', 1) }}">Dogs, Cats and Love</a></h4>
-      <span class="designation">Pet Shop e Clínica Veterinária</span>
-      <ul class="company-info">
-        <li><span class="icon flaticon-map-locator"></span> Vila Clementino, São Paulo, SP</li>
-        <li><span class="icon flaticon-briefcase"></span> 3 vagas ativas</li>
-      </ul>
-    </div>
-    <div class="btn-box">
-      <a href="{{ route('companies.show', 1) }}" class="theme-btn btn-style-one">Ver Empresa</a>
-      <button class="bookmark-btn"><i class="flaticon-bookmark"></i></button>
+<div class="row">
+  <div class="job-block col-lg-12">
+    <div class="inner-box">
+      <div class="content">
+        <span class="company-logo"><img src="{{ asset('images/logo-petz.png') }}" alt="Petz"></span>
+        <h4><a href="{{ route('company.public-page') }}">Petz (Itaim Bibi)</a></h4>
+        <ul class="job-info">
+          <li><span class="icon flaticon-briefcase"></span> De 5 a 10 funcionários</li>
+          <li><span class="icon flaticon-map-locator"></span> São Paulo, SP</li>
+          <li><span class="icon flaticon-clock-3"></span> 3 horas atrás</li>
+        </ul>
+        <ul class="job-other-info">
+          <li class="time">Banho e tosa</li>
+          <li class="time">Creche e hotel</li>
+        </ul>
+        <button class="bookmark-btn"><span class="flaticon-bookmark"></span></button>
+      </div>
     </div>
   </div>
-</div>
+  <div class="job-block col-lg-12">
+    <div class="inner-box">
+      <div class="content">
+        <span class="company-logo"><img src="{{ asset('images/logo-petz.png') }}" alt="Petz"></span>
+        <h4><a href="{{ route('company.public-page') }}">Dogs, Cats and Love</a></h4>
+        <ul class="job-info">
+          <li><span class="icon flaticon-briefcase"></span> De 11 a 15 funcionários</li>
+          <li><span class="icon flaticon-map-locator"></span> São Paulo, SP</li>
+          <li><span class="icon flaticon-clock-3"></span> 15 dias atrás</li>
+        </ul>
+        <ul class="job-other-info">
+          <li class="time">Veterinário</li>
+          <li class="time">Creche e hotel</li>
+        </ul>
+        <button class="bookmark-btn"><span class="flaticon-bookmark"></span></button>
+      </div>
+    </div>
+  </div>
+  <div class="job-block col-lg-12">
+    <div class="inner-box">
+      <div class="content">
+        <span class="company-logo"><img src="{{ asset('images/logo-petz.png') }}" alt="Petz"></span>
+        <h4><a href="{{ route('company.public-page') }}">Pata, pet, Dog</a></h4>
+        <ul class="job-info">
+          <li><span class="icon flaticon-briefcase"></span> De 5 a 10 funcionários</li>
+          <li><span class="icon flaticon-map-locator"></span> São Paulo, SP</li>
+          <li><span class="icon flaticon-clock-3"></span> 3 horas atrás</li>
+        </ul>
+        <ul class="job-other-info">
+          <li class="time">Adestramento</li>
+          <li class="time">Banho e tosa</li>
+        </ul>
+        <button class="bookmark-btn"><span class="flaticon-bookmark"></span></button>
+      </div>
+    </div>
+  </div>
 
-<div class="company-block-seven">
-  <div class="inner-box">
-    <div class="content">
-      <figure class="image">
-        <img src="{{ asset('images/resource/company-logo/2-1.png') }}" alt="Empresa">
-      </figure>
-      <h4><a href="{{ route('companies.show', 2) }}">Petz Morumbi</a></h4>
-      <span class="designation">Pet Shop</span>
-      <ul class="company-info">
-        <li><span class="icon flaticon-map-locator"></span> Morumbi, São Paulo, SP</li>
-        <li><span class="icon flaticon-briefcase"></span> 2 vagas ativas</li>
-      </ul>
+  <!-- Pagination -->
+  <div class="ls-show-more">
+    <p>Mostrando 3 de 497 Vagas</p>
+    <div class="bar">
+      <span class="bar-inner" style="width:20%"></span>
     </div>
-    <div class="btn-box">
-      <a href="{{ route('companies.show', 2) }}" class="theme-btn btn-style-one">Ver Empresa</a>
-      <button class="bookmark-btn"><i class="flaticon-bookmark"></i></button>
-    </div>
+    <button class="show-more">Carregar mais vagas</button>
   </div>
 </div>
