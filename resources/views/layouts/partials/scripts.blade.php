@@ -14,6 +14,7 @@
 <script src="{{ asset('js/wow.js') }}"></script>
 <script src="{{ asset('js/script.js') }}"></script>
 <script src="{{ asset('js/chart.min.js') }}"></script>
+<script src="{{ asset('js/phone-mask.js') }}"></script>
 
 <!-- Google Map API -->
 <!-- Google Maps -->

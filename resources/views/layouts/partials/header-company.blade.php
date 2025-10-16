@@ -18,8 +18,12 @@
         <button class="menu-btn"><span class="icon la la-bell"></span></button>
         <div class="dropdown dashboard-option">
           <a class="dropdown-toggle" role="button" data-toggle="dropdown">
-            <img src="{{ asset('images/resource/company-6.png') }}" alt="avatar" class="thumb">
-            <span class="name">Dogs, cats and Love</span>
+            @if(Auth::user()->companyProfile && Auth::user()->companyProfile->logo)
+              <img src="{{ Auth::user()->companyProfile->logo_url }}" alt="{{ Auth::user()->companyProfile->company_name }}" class="thumb">
+            @else
+              <img src="{{ asset('images/resource/default-company.png') }}" alt="Logo" class="thumb">
+            @endif
+            <span class="name">{{ Auth::user()->companyProfile ? Auth::user()->companyProfile->company_name : Auth::user()->name }}</span>
           </a>
           <ul class="dropdown-menu">
             @include('layouts.partials.menu-company')
@@ -34,8 +38,12 @@
     <div class="logo"><a href="{{ route('company.dashboard') }}"><img src="{{ asset('images/logo-empresa.svg') }}" alt="Logo VagaPet"></a></div>
     <div class="outer-box">
       <button id="toggle-user-sidebar">
-         <img src="{{ asset('images/resource/company-6.png') }}" alt="avatar" class="thumb">
-         <i class="la la-angle-down"></i></button>
+        @if(Auth::user()->companyProfile && Auth::user()->companyProfile->logo)
+          <img src="{{ Auth::user()->companyProfile->logo_url }}" alt="{{ Auth::user()->companyProfile->company_name }}" class="thumb">
+        @else
+          <img src="{{ asset('images/resource/default-company.png') }}" alt="Logo" class="thumb">
+        @endif
+        <i class="la la-angle-down"></i></button>
     </div>
   </div>
   <div id="nav-mobile"></div>

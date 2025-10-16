@@ -81,7 +81,7 @@
 
                     <div class="form-group col-lg-12 col-md-12">
                       <label>Título profissional</label>
-                      <input type="text" name="title" placeholder="Ex.: Banhista, tosador, monitor de creche, etc">
+                      <input type="text" name="title" placeholder="Ex.: Banhista, tosador, monitor de creche, etc" value="{{ old('title', session('onboarding.step3_data.title')) }}">
                     </div>
 
                     <!-- Experiência -->
@@ -89,10 +89,10 @@
                       <label>Experiência profissional</label>
                       <select name="experience" class="chosen-select">
                         <option value="">Selecione</option>
-                        <option value="estagio">Estágio</option>
-                        <option value="junior">Junior (até 2 anos)</option>
-                        <option value="pleno">Pleno (de 3 a 5 anos)</option>
-                        <option value="senior">Sênior (mais de 5 anos)</option>
+                        <option value="estagio" {{ old('experience', session('onboarding.step3_data.experience')) == 'estagio' ? 'selected' : '' }}>Estágio</option>
+                        <option value="junior" {{ old('experience', session('onboarding.step3_data.experience')) == 'junior' ? 'selected' : '' }}>Junior (até 2 anos)</option>
+                        <option value="pleno" {{ old('experience', session('onboarding.step3_data.experience')) == 'pleno' ? 'selected' : '' }}>Pleno (de 3 a 5 anos)</option>
+                        <option value="senior" {{ old('experience', session('onboarding.step3_data.experience')) == 'senior' ? 'selected' : '' }}>Sênior (mais de 5 anos)</option>
                       </select>
                     </div>
 
@@ -101,22 +101,22 @@
                       <label>Área de trabalho*</label>
                       <p>Você pode incluir mais de uma opção</p>
                       <select data-placeholder="Escolha" name="work_areas[]" class="chosen-select multiple" multiple tabindex="4">
-                        <option value="BanhoTosa">Banho & Tosa</option>
-                        <option value="Recepcao">Recepção</option>
-                        <option value="Vendas">Vendas</option>
-                        <option value="Veterinario">Veterinário</option>
-                        <option value="AuxiliarVeterinario">Auxiliar Veterinário</option>
-                        <option value="Limpeza">Limpeza</option>
-                        <option value="Gerente">Gerente</option>
-                        <option value="Estoque">Estoque</option>
-                        <option value="Motorista">Motorista</option>
+                        <option value="BanhoTosa" {{ in_array('BanhoTosa', old('work_areas', session('onboarding.step3_data.work_areas', []))) ? 'selected' : '' }}>Banho & Tosa</option>
+                        <option value="Recepcao" {{ in_array('Recepcao', old('work_areas', session('onboarding.step3_data.work_areas', []))) ? 'selected' : '' }}>Recepção</option>
+                        <option value="Vendas" {{ in_array('Vendas', old('work_areas', session('onboarding.step3_data.work_areas', []))) ? 'selected' : '' }}>Vendas</option>
+                        <option value="Veterinario" {{ in_array('Veterinario', old('work_areas', session('onboarding.step3_data.work_areas', []))) ? 'selected' : '' }}>Veterinário</option>
+                        <option value="AuxiliarVeterinario" {{ in_array('AuxiliarVeterinario', old('work_areas', session('onboarding.step3_data.work_areas', []))) ? 'selected' : '' }}>Auxiliar Veterinário</option>
+                        <option value="Limpeza" {{ in_array('Limpeza', old('work_areas', session('onboarding.step3_data.work_areas', []))) ? 'selected' : '' }}>Limpeza</option>
+                        <option value="Gerente" {{ in_array('Gerente', old('work_areas', session('onboarding.step3_data.work_areas', []))) ? 'selected' : '' }}>Gerente</option>
+                        <option value="Estoque" {{ in_array('Estoque', old('work_areas', session('onboarding.step3_data.work_areas', []))) ? 'selected' : '' }}>Estoque</option>
+                        <option value="Motorista" {{ in_array('Motorista', old('work_areas', session('onboarding.step3_data.work_areas', []))) ? 'selected' : '' }}>Motorista</option>
                       </select>
                     </div>
 
                     <!-- Descrição -->
                     <div class="form-group col-lg-12 col-md-12">
                       <label>Descrição</label>
-                      <textarea name="description" placeholder="Fale sobre você, sua experiência, serviços oferecidos (banho, tosa, etc.) e qualquer outro detalhe relevante."></textarea>
+                      <textarea name="description" placeholder="Fale sobre você, sua experiência, serviços oferecidos (banho, tosa, etc.) e qualquer outro detalhe relevante.">{{ old('description', session('onboarding.step3_data.description')) }}</textarea>
                     </div>
                   </div>
 

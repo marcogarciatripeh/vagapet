@@ -3,6 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use App\Models\User;
+use App\Models\ProfessionalProfile;
+use App\Models\CompanyProfile;
 
 class OnboardingController extends Controller
 {
@@ -18,53 +25,224 @@ class OnboardingController extends Controller
 
     public function step1Process(Request $request)
     {
-        $profileType = $request->input('profile_type');
+        \Log::info('Step1 Process - Request received:', $request->all());
 
-        if ($profileType === 'company') {
+        try {
+            $request->validate([
+                'whatsapp' => 'required|string|max:20',
+                'email' => 'required|email',
+            ]);
+
+            // Verificar se já existe um usuário com este email
+            $existingUser = User::where('email', $request->email)->first();
+
+            if ($existingUser) {
+                if ($existingUser->isCompleted()) {
+                    // Usuário já completou o cadastro
+                    return redirect()->back()->withErrors(['email' => 'Este e-mail já está sendo usado por uma conta completa.'])->withInput();
+                } elseif ($existingUser->isPending()) {
+                    // Usuário existe mas não completou o cadastro - pode continuar
+                    \Log::info('Step1 Process - Found pending user, allowing continuation:', ['user_id' => $existingUser->id]);
+                }
+            }
+
+            // Salvar dados na sessão para próximos passos
+            session([
+                'onboarding.whatsapp' => $request->whatsapp,
+                'onboarding.email' => $request->email,
+            ]);
+
+            \Log::info('Step1 Process - Session data saved:', session('onboarding', []));
+
+            return redirect()->route('onboarding.step1');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Step1 Process - Validation error:', $e->errors());
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Step1 Process - General error:', ['message' => $e->getMessage()]);
+            return redirect()->back()->withErrors(['error' => 'Erro ao processar cadastro: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    public function step1ProfileProcess(Request $request)
+    {
+        $request->validate([
+            'profile_type' => 'required|in:professional,company',
+        ]);
+
+        // Salvar o tipo de perfil na sessão
+        session(['onboarding.profile_type' => $request->profile_type]);
+
+        if ($request->profile_type === 'company') {
             return redirect()->route('onboarding.step2.company');
         } else {
             return redirect()->route('onboarding.step2.professional');
         }
     }
 
+    // ========================================
+    // ONBOARDING PROFISSIONAL
+    // ========================================
+
     public function step2Professional()
     {
+        // Debug: verificar dados da sessão
+        \Log::info('Step2 Professional GET - Session data:', session('onboarding', []));
+
         return view('onboarding.professional.step2');
     }
 
-    public function step2Company()
+    public function step2ProfessionalProcess(Request $request)
     {
-        return view('onboarding.company.step2');
+        try {
+            $request->validate([
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+
+            // Usar email da sessão
+            $email = session('onboarding.email');
+            if (!$email) {
+                return redirect()->route('onboarding.step0')->with('error', 'Sessão expirada. Tente novamente.');
+            }
+
+            // Verificar se já existe um usuário com este email
+            $existingUser = User::where('email', $email)->first();
+
+            if ($existingUser && $existingUser->isCompleted()) {
+                return redirect()->route('onboarding.step0')->with('error', 'Este e-mail já está sendo usado por uma conta completa.');
+            }
+
+            if ($existingUser && $existingUser->isPending()) {
+                // Atualizar usuário existente
+                $existingUser->update([
+                    'name' => $request->first_name . ' ' . $request->last_name,
+                    'password' => Hash::make($request->password),
+                    'active_profile' => 'professional',
+                    'status' => 'pending',
+                ]);
+                $user = $existingUser;
+                \Log::info('Step2 Professional Process - Updated existing pending user:', ['user_id' => $user->id]);
+            } else {
+                // Criar novo usuário
+                $user = User::create([
+                    'name' => $request->first_name . ' ' . $request->last_name,
+                    'email' => $email,
+                    'password' => Hash::make($request->password),
+                    'active_profile' => 'professional',
+                    'status' => 'pending',
+                ]);
+                \Log::info('Step2 Professional Process - Created new user:', ['user_id' => $user->id]);
+            }
+
+            // Salvar dados na sessão para próximos passos
+            session([
+                'onboarding.user_id' => $user->id,
+                'onboarding.step2_data' => $request->except(['password', 'password_confirmation']),
+            ]);
+
+            Auth::login($user);
+
+            return redirect()->route('onboarding.step3.professional');
+        } catch (\Exception $e) {
+            \Log::error('Step2 Professional Process - Error:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return redirect()->back()->withErrors(['error' => 'Erro ao processar cadastro: ' . $e->getMessage()])->withInput();
+        }
     }
 
     public function step3Professional()
     {
+        // Debug: verificar dados da sessão
+        \Log::info('Step3 Professional GET - Session data:', session('onboarding', []));
+
         return view('onboarding.professional.step3');
     }
 
-    public function step3Company()
+    public function step3ProfessionalProcess(Request $request)
     {
-        return view('onboarding.company.step3');
+        $request->validate([
+            'title' => 'nullable|string|max:255',
+            'experience' => 'nullable|string|max:255',
+            'work_areas' => 'nullable|array',
+            'description' => 'nullable|string|max:1000',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'nullable|string',
+        ]);
+
+        // Processar upload de foto se houver
+        $photoPath = null;
+        if ($request->hasFile('attachments')) {
+            $file = $request->file('attachments')[0]; // Primeiro arquivo
+            if ($file && $file->isValid()) {
+                $photoPath = $file->store('professionals/photos', 'public');
+                \Log::info('Step3 Professional Process - Photo uploaded:', ['path' => $photoPath]);
+            }
+        }
+
+        $step3Data = $request->except(['attachments']);
+        if ($photoPath) {
+            $step3Data['photo'] = $photoPath;
+        }
+
+        session(['onboarding.step3_data' => $step3Data]);
+        \Log::info('Step3 Professional Process - Session step3_data saved:', $step3Data);
+
+        return redirect()->route('onboarding.step4.professional');
     }
 
     public function step4Professional()
     {
-        return view('onboarding.professional.step4');
+        // Debug: verificar dados da sessão
+        \Log::info('Step4 Professional GET - Session data:', session('onboarding', []));
+
+        $step4Data = session('onboarding.step4_data', []);
+        return view('onboarding.professional.step4', compact('step4Data'));
     }
 
-    public function step4Company()
+    public function step4ProfessionalProcess(Request $request)
     {
-        return view('onboarding.company.step4');
+        $request->validate([
+            'formations' => 'nullable|array',
+            'formations.*.title' => 'nullable|string|max:255',
+            'formations.*.institution' => 'nullable|string|max:255',
+            'formations.*.period' => 'nullable|string|max:50',
+            'formations.*.description' => 'nullable|string|max:500',
+        ]);
+
+        session(['onboarding.step4_data' => $request->all()]);
+        \Log::info('Step4 Professional Process - Session step4_data saved:', $request->all());
+
+        return redirect()->route('onboarding.step5.professional');
     }
 
     public function step5Professional()
     {
-        return view('onboarding.professional.step5');
+        // Debug: verificar dados da sessão
+        \Log::info('Step5 Professional GET - Session data:', session('onboarding', []));
+
+        $step5Data = session('onboarding.step5_data', []);
+        return view('onboarding.professional.step5', compact('step5Data'));
     }
 
-    public function step5Company()
+    public function step5ProfessionalProcess(Request $request)
     {
-        return view('onboarding.company.step5');
+        $request->validate([
+            'bio' => 'nullable|string|max:1000',
+            'areas' => 'nullable|array',
+            'skills' => 'nullable|array',
+            'years_experience' => 'nullable|integer|min:0',
+            'experiences' => 'nullable|array',
+            'experiences.*.title' => 'nullable|string|max:255',
+            'experiences.*.company' => 'nullable|string|max:255',
+            'experiences.*.period' => 'nullable|string|max:50',
+            'experiences.*.description' => 'nullable|string|max:500',
+        ]);
+
+        session(['onboarding.step5_data' => $request->all()]);
+        \Log::info('Step5 Professional Process - Session step5_data saved:', $request->all());
+
+        return redirect()->route('onboarding.step6.professional');
     }
 
     public function step6Professional()
@@ -72,9 +250,36 @@ class OnboardingController extends Controller
         return view('onboarding.professional.step6');
     }
 
-    public function step6Company()
+    public function step6ProfessionalProcess(Request $request)
     {
-        return view('onboarding.company.step6');
+        $request->validate([
+            'education' => 'nullable|array',
+            'experience' => 'nullable|array',
+            'photo' => 'nullable|image|max:2048',
+            'resume' => 'nullable|file|mimes:pdf|max:5120',
+            'address' => 'nullable|string|max:500',
+            'map' => 'nullable|string|max:500',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+        ]);
+
+        session(['onboarding.step6_data' => $request->except(['photo', 'resume'])]);
+        \Log::info('Step6 Professional Process - Session step6_data saved:', $request->except(['photo', 'resume']));
+
+        // Upload de arquivos
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('profiles/photos', 'public');
+            session(['onboarding.photo' => $photoPath]);
+            \Log::info('Step6 Professional Process - Photo uploaded:', ['path' => $photoPath]);
+        }
+
+        if ($request->hasFile('resume')) {
+            $resumePath = $request->file('resume')->store('profiles/resumes', 'public');
+            session(['onboarding.resume' => $resumePath]);
+            \Log::info('Step6 Professional Process - Resume uploaded:', ['path' => $resumePath]);
+        }
+
+        return redirect()->route('onboarding.step7.professional');
     }
 
     public function step7Professional()
@@ -82,71 +287,276 @@ class OnboardingController extends Controller
         return view('onboarding.professional.step7');
     }
 
-    // Métodos de processamento para Empresa
+    public function step7ProfessionalProcess(Request $request)
+    {
+        try {
+            $request->validate([
+                'linkedin' => 'nullable|url',
+                'instagram' => 'nullable|string|max:255',
+                'facebook' => 'nullable|string|max:255',
+                'website' => 'nullable|url',
+            ]);
+
+            // Debug: verificar dados da sessão
+            \Log::info('Step7 Professional Process - Session data:', session('onboarding', []));
+            \Log::info('Step7 Professional Process - Request data:', $request->all());
+
+            // Criar perfil profissional com todos os dados
+            $userId = session('onboarding.user_id');
+            if (!$userId) {
+                \Log::error('Step7 Professional Process - No user_id in session');
+                return redirect()->route('onboarding.step0')->with('error', 'Sessão expirada. Tente novamente.');
+            }
+
+            $user = User::findOrFail($userId);
+            \Log::info('Step7 Professional Process - User found:', ['id' => $user->id, 'email' => $user->email]);
+
+            $profileData = array_merge(
+                session('onboarding.step2_data', []),
+                session('onboarding.step3_data', []),
+                session('onboarding.step4_data', []),
+                session('onboarding.step5_data', []),
+                session('onboarding.step6_data', []),
+                $request->all(),
+                [
+                    'user_id' => $userId,
+                    'phone' => session('onboarding.whatsapp'), // Mapear WhatsApp para phone
+                    'photo' => session('onboarding.photo'),
+                    'resume' => session('onboarding.resume'),
+                ]
+            );
+
+            \Log::info('Step7 Professional Process - Profile data to create:', $profileData);
+
+            $profile = ProfessionalProfile::create($profileData);
+            \Log::info('Step7 Professional Process - Profile created:', ['id' => $profile->id]);
+
+            // Marcar usuário como completed
+            $user->markAsCompleted();
+            \Log::info('Step7 Professional Process - User marked as completed:', ['user_id' => $user->id]);
+
+            // Fazer login automático
+            Auth::login($user);
+            \Log::info('Step7 Professional Process - User logged in automatically:', ['user_id' => $user->id]);
+
+            // Limpar sessão
+            $this->clearOnboardingSession();
+
+            return redirect()->route('professional.dashboard')->with('success', 'Perfil profissional criado com sucesso!');
+        } catch (\Exception $e) {
+            \Log::error('Step7 Professional Process - Error:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return redirect()->back()->withErrors(['error' => 'Erro ao processar cadastro: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    // ========================================
+    // ONBOARDING EMPRESA
+    // ========================================
+
+    public function step2Company()
+    {
+        return view('onboarding.company.step2');
+    }
+
     public function step2CompanyProcess(Request $request)
     {
-        // Processar dados do step2 da empresa
-        return redirect()->route('onboarding.step3.company');
+        try {
+            $request->validate([
+                'company_name' => 'required|string|max:255',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+
+            // Usar email da sessão
+            $email = session('onboarding.email');
+            if (!$email) {
+                return redirect()->route('onboarding.step0')->with('error', 'Sessão expirada. Tente novamente.');
+            }
+
+            // Verificar se já existe um usuário com este email
+            $existingUser = User::where('email', $email)->first();
+
+            if ($existingUser && $existingUser->isCompleted()) {
+                return redirect()->route('onboarding.step0')->with('error', 'Este e-mail já está sendo usado por uma conta completa.');
+            }
+
+            if ($existingUser && $existingUser->isPending()) {
+                // Atualizar usuário existente
+                $existingUser->update([
+                    'name' => $request->company_name,
+                    'password' => Hash::make($request->password),
+                    'active_profile' => 'company',
+                    'status' => 'pending',
+                ]);
+                $user = $existingUser;
+                \Log::info('Step2 Company Process - Updated existing pending user:', ['user_id' => $user->id]);
+            } else {
+                // Criar novo usuário
+                $user = User::create([
+                    'name' => $request->company_name,
+                    'email' => $email,
+                    'password' => Hash::make($request->password),
+                    'active_profile' => 'company',
+                    'status' => 'pending',
+                ]);
+                \Log::info('Step2 Company Process - Created new user:', ['user_id' => $user->id]);
+            }
+
+            // Salvar dados na sessão para próximos passos
+            session([
+                'onboarding.user_id' => $user->id,
+                'onboarding.step2_data' => $request->except(['password', 'password_confirmation']),
+            ]);
+
+            Auth::login($user);
+
+            return redirect()->route('onboarding.step3.company');
+        } catch (\Exception $e) {
+            \Log::error('Step2 Company Process - Error:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return redirect()->back()->withErrors(['error' => 'Erro ao processar cadastro: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    public function step3Company()
+    {
+        return view('onboarding.company.step3');
     }
 
     public function step3CompanyProcess(Request $request)
     {
-        // Processar dados do step3 da empresa
+        $request->validate([
+            'company_name' => 'required|string|max:255',
+            'cnpj' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20',
+            'website' => 'nullable|url',
+        ]);
+
+        session(['onboarding.step3_data' => $request->all()]);
+
         return redirect()->route('onboarding.step4.company');
+    }
+
+    public function step4Company()
+    {
+        return view('onboarding.company.step4');
     }
 
     public function step4CompanyProcess(Request $request)
     {
-        // Processar dados do step4 da empresa
+        $request->validate([
+            'description' => 'nullable|string|max:1000',
+            'address' => 'nullable|string|max:500',
+            'city' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:2',
+            'zip_code' => 'nullable|string|max:10',
+        ]);
+
+        session(['onboarding.step4_data' => $request->all()]);
+
         return redirect()->route('onboarding.step5.company');
+    }
+
+    public function step5Company()
+    {
+        return view('onboarding.company.step5');
     }
 
     public function step5CompanyProcess(Request $request)
     {
-        // Processar dados do step5 da empresa
+        $request->validate([
+            'services' => 'nullable|array',
+            'specialties' => 'nullable|array',
+            'employees_count' => 'nullable|integer|min:1',
+            'company_size' => 'nullable|in:micro,small,medium,large',
+        ]);
+
+        session(['onboarding.step5_data' => $request->all()]);
+
         return redirect()->route('onboarding.step6.company');
+    }
+
+    public function step6Company()
+    {
+        return view('onboarding.company.step6');
     }
 
     public function step6CompanyProcess(Request $request)
     {
-        // Processar dados do step6 da empresa e finalizar cadastro
-        return redirect()->route('company.dashboard');
+        $request->validate([
+            'logo' => 'nullable|image|max:2048',
+            'photos' => 'nullable|array|max:5',
+            'photos.*' => 'image|max:2048',
+            'linkedin' => 'nullable|url',
+            'instagram' => 'nullable|string|max:255',
+            'facebook' => 'nullable|string|max:255',
+            'youtube' => 'nullable|url',
+        ]);
+
+        // Upload de logo
+        $logoPath = null;
+        if ($request->hasFile('logo')) {
+            $logoPath = $request->file('logo')->store('companies/logos', 'public');
+        }
+
+        // Upload de fotos
+        $photos = [];
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                $photos[] = $photo->store('companies/photos', 'public');
+            }
+        }
+
+        // Criar perfil da empresa com todos os dados
+        $userId = session('onboarding.user_id');
+        $user = User::findOrFail($userId);
+
+        $profileData = array_merge(
+            session('onboarding.step2_data', []),
+            session('onboarding.step3_data', []),
+            session('onboarding.step4_data', []),
+            session('onboarding.step5_data', []),
+            $request->except(['logo', 'photos']),
+            [
+                'user_id' => $userId,
+                'phone' => session('onboarding.whatsapp'), // Mapear WhatsApp para phone
+                'logo' => $logoPath,
+                'photos' => $photos,
+            ]
+        );
+
+        CompanyProfile::create($profileData);
+
+        // Marcar usuário como completed
+        $user->markAsCompleted();
+        \Log::info('Step6 Company Process - User marked as completed:', ['user_id' => $user->id]);
+
+        // Fazer login automático
+        Auth::login($user);
+        \Log::info('Step6 Company Process - User logged in automatically:', ['user_id' => $user->id]);
+
+        // Limpar sessão
+        $this->clearOnboardingSession();
+
+        return redirect()->route('company.dashboard')->with('success', 'Perfil da empresa criado com sucesso!');
     }
 
-    // Métodos de processamento para Profissional
-    public function step2ProfessionalProcess(Request $request)
-    {
-        // Processar dados do step2 do profissional
-        return redirect()->route('onboarding.step3.professional');
-    }
+    // ========================================
+    // MÉTODOS AUXILIARES
+    // ========================================
 
-    public function step3ProfessionalProcess(Request $request)
+    private function clearOnboardingSession()
     {
-        // Processar dados do step3 do profissional
-        return redirect()->route('onboarding.step4.professional');
-    }
-
-    public function step4ProfessionalProcess(Request $request)
-    {
-        // Processar dados do step4 do profissional
-        return redirect()->route('onboarding.step5.professional');
-    }
-
-    public function step5ProfessionalProcess(Request $request)
-    {
-        // Processar dados do step5 do profissional
-        return redirect()->route('onboarding.step6.professional');
-    }
-
-    public function step6ProfessionalProcess(Request $request)
-    {
-        // Processar dados do step6 do profissional
-        return redirect()->route('onboarding.step7.professional');
-    }
-
-    public function step7ProfessionalProcess(Request $request)
-    {
-        // Processar dados do step7 do profissional e finalizar cadastro
-        return redirect()->route('professional.dashboard');
+        session()->forget([
+            'onboarding.user_id',
+            'onboarding.profile_type',
+            'onboarding.whatsapp',
+            'onboarding.email',
+            'onboarding.step2_data',
+            'onboarding.step3_data',
+            'onboarding.step4_data',
+            'onboarding.step5_data',
+            'onboarding.step6_data',
+            'onboarding.photo',
+            'onboarding.resume',
+        ]);
     }
 }

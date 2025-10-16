@@ -18,8 +18,12 @@
         <button class="menu-btn"><span class="icon la la-bell"></span></button>
         <div class="dropdown dashboard-option">
           <a class="dropdown-toggle" role="button" data-toggle="dropdown">
-            <img src="{{ asset('images/resource/company-6.png') }}" alt="avatar" class="thumb">
-            <span class="name">Luiza</span>
+            @if(Auth::user()->professionalProfile && Auth::user()->professionalProfile->photo)
+              <img src="{{ Auth::user()->professionalProfile->photo_url }}" alt="{{ Auth::user()->professionalProfile->full_name }}" class="thumb">
+            @else
+              <img src="{{ asset('images/resource/default-avatar.png') }}" alt="Avatar" class="thumb">
+            @endif
+            <span class="name">{{ Auth::user()->professionalProfile ? Auth::user()->professionalProfile->first_name : Auth::user()->name }}</span>
           </a>
           <ul class="dropdown-menu">
             @include('layouts.partials.menu-professional')
@@ -34,7 +38,11 @@
     <div class="logo"><a href="{{ route('professional.dashboard') }}"><img src="{{ asset('images/logo-empresa.svg') }}" alt="Logo VagaPet"></a></div>
     <div class="outer-box">
       <button id="toggle-user-sidebar">
-        <img src="{{ asset('images/resource/company-6.png') }}" alt="avatar" class="thumb">
+        @if(Auth::user()->professionalProfile && Auth::user()->professionalProfile->photo)
+          <img src="{{ Auth::user()->professionalProfile->photo_url }}" alt="{{ Auth::user()->professionalProfile->full_name }}" class="thumb">
+        @else
+          <img src="{{ asset('images/resource/default-avatar.png') }}" alt="Avatar" class="thumb">
+        @endif
         <i class="la la-angle-down"></i></button>
     </div>
   </div>

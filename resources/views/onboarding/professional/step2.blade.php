@@ -2,6 +2,10 @@
 
 @section('title', 'Cadastro do Profissional - VagaPet')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/validation-warnings.css') }}">
+@endpush
+
 @section('content')
 <div class="page-wrapper">
 
@@ -68,24 +72,41 @@
 
                 <form class="default-form" action="{{ route('onboarding.step2.professional.process') }}" method="post">
                   @csrf
+
+                  @if($errors->any())
+                    <div class="alert alert-danger">
+                      <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                          <li>{{ $error }}</li>
+                        @endforeach
+                      </ul>
+                    </div>
+                  @endif
+
                   <div class="row">
                     <!-- Dados básicos -->
                     <div class="form-group col-lg-6 col-md-12">
                       <label>Nome*</label>
-                      <input type="text" name="first_name" placeholder="Digite aqui o seu nome" required>
+                      <input type="text" name="first_name" placeholder="Digite aqui o seu nome" required value="{{ old('first_name', session('onboarding.step2_data.first_name')) }}">
                     </div>
                     <div class="form-group col-lg-6 col-md-12">
                       <label>Sobrenome*</label>
-                      <input type="text" name="last_name" placeholder="Digite aqui o seu sobrenome" required>
+                      <input type="text" name="last_name" placeholder="Digite aqui o seu sobrenome" required value="{{ old('last_name', session('onboarding.step2_data.last_name')) }}">
                     </div>
 
                     <div class="form-group col-lg-6 col-md-12">
                       <label>Crie uma senha</label>
                       <input id="password-field" type="password" name="password" placeholder="Digite sua senha" required>
+                      <small class="form-text text-muted">
+                        <i class="la la-info-circle"></i> A senha deve ter pelo menos 8 caracteres
+                      </small>
                     </div>
                     <div class="form-group col-lg-6 col-md-12">
                       <label>Confirme a senha</label>
                       <input id="password-field" type="password" name="password_confirmation" placeholder="Digite a mesma senha para confirmar" required>
+                      <small class="form-text text-muted">
+                        <i class="la la-info-circle"></i> Digite a mesma senha para confirmar
+                      </small>
                     </div>
                   </div>
 

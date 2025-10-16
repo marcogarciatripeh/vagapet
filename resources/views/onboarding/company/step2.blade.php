@@ -2,6 +2,10 @@
 
 @section('title', 'Cadastro da Empresa - VagaPet')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/validation-warnings.css') }}">
+@endpush
+
 @section('content')
 <div class="page-wrapper">
 
@@ -68,6 +72,17 @@
 
                 <form class="default-form" action="{{ route('onboarding.step2.company.process') }}" method="post">
                   @csrf
+
+                  @if($errors->any())
+                    <div class="alert alert-danger">
+                      <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                          <li>{{ $error }}</li>
+                        @endforeach
+                      </ul>
+                    </div>
+                  @endif
+
                   <div class="row">
                     <!-- Nome Empresa -->
                     <div class="form-group col-lg-12 col-md-12">
@@ -78,10 +93,16 @@
                     <div class="form-group col-lg-6 col-md-12">
                       <label>Crie uma senha</label>
                       <input id="password-field" type="password" name="password" placeholder="Digite sua senha" required>
+                      <small class="form-text text-muted">
+                        <i class="la la-info-circle"></i> A senha deve ter pelo menos 8 caracteres
+                      </small>
                     </div>
                     <div class="form-group col-lg-6 col-md-12">
                       <label>Confirme a senha</label>
                       <input id="password-field" type="password" name="password_confirmation" placeholder="Digite a mesma senha para confirmar" required>
+                      <small class="form-text text-muted">
+                        <i class="la la-info-circle"></i> Digite a mesma senha para confirmar
+                      </small>
                     </div>
                   </div>
 

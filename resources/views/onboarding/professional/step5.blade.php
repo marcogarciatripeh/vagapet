@@ -2,6 +2,10 @@
 
 @section('title', 'Experiência Profissional - VagaPet')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/onboarding-improvements.css') }}">
+@endpush
+
 @section('content')
 <div class="page-wrapper">
 
@@ -91,6 +95,39 @@
 
                               <div id="experiences-container">
                                 <!-- Experiências serão adicionadas aqui dinamicamente -->
+                                @if(isset($step5Data['experiences']) && is_array($step5Data['experiences']))
+                                  @foreach($step5Data['experiences'] as $key => $experience)
+                                    <div class="resume-block" id="experience-{{ $key }}">
+                                      <div class="inner">
+                                        <div class="title-box">
+                                          <div class="info-box">
+                                            <div class="row">
+                                              <div class="col-md-6">
+                                                <input type="text" name="experiences[{{ $key }}][title]" placeholder="Cargo" class="form-control mb-3" value="{{ old('experiences.'.$key.'.title', $experience['title'] ?? '') }}">
+                                              </div>
+                                              <div class="col-md-6">
+                                                <input type="text" name="experiences[{{ $key }}][company]" placeholder="Empresa" class="form-control mb-3" value="{{ old('experiences.'.$key.'.company', $experience['company'] ?? '') }}">
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div class="edit-box">
+                                            <div class="row">
+                                              <div class="col-md-8">
+                                                <input type="text" name="experiences[{{ $key }}][period]" placeholder="Período (ex: 2021-2022)" class="form-control mb-3" value="{{ old('experiences.'.$key.'.period', $experience['period'] ?? '') }}">
+                                              </div>
+                                              <div class="col-md-4">
+                                                <div class="edit-btns">
+                                                  <button type="button" onclick="removeExperience({{ $key }})" class="btn btn-danger btn-sm"><span class="la la-trash"></span></button>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <textarea name="experiences[{{ $key }}][description]" placeholder="Descrição das atividades" class="form-control" rows="3">{{ old('experiences.'.$key.'.description', $experience['description'] ?? '') }}</textarea>
+                                      </div>
+                                    </div>
+                                  @endforeach
+                                @endif
                               </div>
                             </div>
 
@@ -134,7 +171,7 @@
 @push('scripts')
 @include('layouts.partials.scripts')
 <script>
-let experienceCount = 0;
+let experienceCount = {{ isset($step5Data['experiences']) ? max(array_keys($step5Data['experiences'])) + 1 : 0 }};
 
 function addExperience() {
     experienceCount++;
@@ -144,13 +181,25 @@ function addExperience() {
             <div class="inner">
                 <div class="title-box">
                     <div class="info-box">
-                        <input type="text" name="experiences[${experienceCount}][title]" placeholder="Cargo" class="form-control mb-2">
-                        <input type="text" name="experiences[${experienceCount}][company]" placeholder="Empresa" class="form-control mb-2">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input type="text" name="experiences[${experienceCount}][title]" placeholder="Cargo" class="form-control mb-3">
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" name="experiences[${experienceCount}][company]" placeholder="Empresa" class="form-control mb-3">
+                            </div>
+                        </div>
                     </div>
                     <div class="edit-box">
-                        <input type="text" name="experiences[${experienceCount}][period]" placeholder="Período (ex: 2021-2022)" class="form-control mb-2">
-                        <div class="edit-btns">
-                            <button type="button" onclick="removeExperience(${experienceCount})"><span class="la la-trash"></span></button>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="text" name="experiences[${experienceCount}][period]" placeholder="Período (ex: 2021-2022)" class="form-control mb-3">
+                            </div>
+                            <div class="col-md-4">
+                                <div class="edit-btns">
+                                    <button type="button" onclick="removeExperience(${experienceCount})" class="btn btn-danger btn-sm"><span class="la la-trash"></span></button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

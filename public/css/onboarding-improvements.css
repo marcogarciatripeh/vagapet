@@ -1,0 +1,78 @@
+/* Melhorias de alinhamento para inputs do onboarding */
+.form-control {
+    border-radius: 6px;
+    border: 1px solid #e1e5e9;
+    padding: 12px 15px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+.mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+/* Alinhamento específico para campos de formação e experiência */
+.resume-block .row {
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+.resume-block .row > [class*="col-"] {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/* Melhorar botões de remoção */
+.btn-danger.btn-sm {
+    padding: 8px 12px;
+    font-size: 12px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+}
+
+.btn-danger.btn-sm .la {
+    font-size: 14px;
+}
+
+/* Melhorar textarea */
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Espaçamento entre blocos */
+.resume-block {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.resume-block:last-child {
+    margin-bottom: 0;
+}
+
+/* Botão de adicionar mantido no padrão original */
+
+/* Responsividade melhorada */
+@media (max-width: 768px) {
+    .resume-block .row > [class*="col-"] {
+        margin-bottom: 15px;
+    }
+
+    .btn-danger.btn-sm {
+        width: 100%;
+        margin-top: 10px;
+    }
+}

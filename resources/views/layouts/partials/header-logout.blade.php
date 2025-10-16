@@ -15,7 +15,7 @@
         </nav>
       </div>
       <div class="outer-box">
-        <a href="{{ route('login') }}" class="btn btn-md btn-outline-dark menu-btn"><span>Criar conta</span></a>
+        <a href="{{ route('onboarding.step0') }}" class="btn btn-md btn-outline-dark menu-btn"><span>Criar conta</span></a>
         <a href="{{ route('login') }}" class="btn btn-md btn-primary menu-btn text-white"><span>Entrar</span></a>
       </div>
     </div>
@@ -26,7 +26,7 @@
     <a href="#nav-mobile" class="mobile-nav-toggler navbar-trigger"><span class="flaticon-menu-1"></span></a>
     <div class="logo pull-left"><a href="{{ route('home') }}"><img src="{{ asset('images/logo-empresa.svg') }}" alt="Logo VagaPet"></a></div>
     <div class="outer-box pull-right">
-      <a href="{{ route('login') }}" class="btn btn-sm btn-outline-dark menu-btn"><span>Criar conta</span></a>
+      <a href="{{ route('onboarding.step0') }}" class="btn btn-sm btn-outline-dark menu-btn"><span>Criar conta</span></a>
       <a href="{{ route('login') }}" class="btn btn-sm btn-primary menu-btn text-white"><span>Entrar</span></a>
     </div>
   </div>

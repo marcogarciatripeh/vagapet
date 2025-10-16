@@ -23,5 +23,9 @@
 </li>
 
 <li>
-  <a href=""><i class="la la-sign-out"></i> Sair</a>
+  <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="la la-sign-out"></i> Sair</a>
 </li>
+
+<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+    @csrf
+</form>

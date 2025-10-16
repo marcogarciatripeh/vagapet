@@ -25,9 +25,7 @@
                 <div class="widget-content">
                   <ul class="list">
                     <li><a href="{{ route('jobs.index') }}">Procurar Vagas</a></li>
-                    <li><a href="#">Categorias</a></li>
                     <li><a href="{{ route('professional.dashboard') }}">Painel do Profissional</a></li>
-                    <li><a href="#">Alertas de Vagas</a></li>
                     <li><a href="{{ route('professional.favorites') }}">Favoritas</a></li>
                   </ul>
                 </div>
@@ -55,7 +53,6 @@
                   <ul class="list">
                     <li><a href="{{ route('jobs.index') }}">Página de Vagas</a></li>
                     <li><a href="{{ route('professionals.index') }}">Página de Currículo</a></li>
-                    <li><a href="#">Blog</a></li>
                     <li><a href="{{ route('contact') }}">Contato</a></li>
                   </ul>
                 </div>
@@ -67,11 +64,8 @@
                 <h4 class="widget-title">Recursos Úteis</h4>
                 <div class="widget-content">
                   <ul class="list">
-                    <li><a href="#">Mapa do Site</a></li>
                     <li><a href="{{ route('terms') }}">Termos de Uso</a></li>
                     <li><a href="{{ route('privacy') }}">Política de Privacidade</a></li>
-                    <li><a href="#">Central de Segurança</a></li>
-                    <li><a href="#">Acessibilidade</a></li>
                   </ul>
                 </div>
               </div>

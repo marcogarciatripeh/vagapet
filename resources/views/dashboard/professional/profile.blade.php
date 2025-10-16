@@ -53,7 +53,7 @@
                     <!-- Telefone -->
                     <div class="form-group col-lg-6 col-md-12">
                       <label>Telefone*</label>
-                      <input type="text" name="phone" placeholder="(11) 98765-4321">
+                      <input type="text" name="phone" id="phone" placeholder="(11) 98765-4321">
                     </div>
 
                     <!-- Endereço de E-mail -->

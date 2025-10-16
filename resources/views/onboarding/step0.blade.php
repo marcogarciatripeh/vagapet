@@ -49,13 +49,13 @@
 
           <div class="btn-box row">
             <div class="col-lg-12 col-md-12">
-              <a href="#" class="theme-btn social-btn-two facebook-btn"><i class="fab fa-facebook-f"></i> Criar conta com Facebook</a>
+              <a href="{{ route('auth.facebook') }}" class="theme-btn social-btn-two facebook-btn"><i class="fab fa-facebook-f"></i> Criar conta com Facebook</a>
             </div>
             <div class="col-lg-12 col-md-12">
-              <a href="#" class="theme-btn social-btn-two google-btn"><i class="fab fa-google"></i> Criar conta com Google</a>
+              <a href="{{ route('auth.google') }}" class="theme-btn social-btn-two google-btn"><i class="fab fa-google"></i> Criar conta com Google</a>
             </div>
             <div class="col-lg-12 col-md-12">
-              <a href="#" class="theme-btn social-btn-two bg-dark text-white"><i class="fab fa-apple"></i> Criar conta com Apple</a>
+              <a href="{{ route('auth.apple') }}" class="theme-btn social-btn-two bg-dark text-white"><i class="fab fa-apple"></i> Criar conta com Apple</a>
             </div>
           </div>
 
@@ -63,17 +63,27 @@
             <div class="divider"><span>ou</span></div>
 
             <!--Login Form-->
-            <form action="{{ route('onboarding.step1') }}" method="post">
+            <form action="{{ route('onboarding.step1.process') }}" method="post">
               @csrf
+
+              @if($errors->any())
+                <div class="alert alert-danger">
+                  <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                      <li>{{ $error }}</li>
+                    @endforeach
+                  </ul>
+                </div>
+              @endif
 
               <div class="form-group">
                 <label>WhatsApp</label>
-                <input type="text" name="whatsapp" placeholder="Digite seu telefone" required>
+                <input type="text" name="whatsapp" id="whatsapp" placeholder="(11) 99999-9999" required value="{{ old('whatsapp') }}">
               </div>
 
               <div class="form-group">
                 <label>E-mail</label>
-                <input type="email" name="email" placeholder="Digite o e-mail" required>
+                <input type="email" name="email" placeholder="Digite o e-mail" required value="{{ old('email') }}">
               </div>
 
               <div class="form-group">

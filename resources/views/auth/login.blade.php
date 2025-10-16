@@ -45,12 +45,38 @@
       <div class="login-form default-form">
         <div class="form-inner">
           <h3>Entrar no VagaPet</h3>
+          
+          <!-- Exibir erros de validação -->
+          @if($errors->any())
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+              </ul>
+            </div>
+          @endif
+          
+          <!-- Exibir mensagens de erro da sessão -->
+          @if(session('error'))
+            <div class="alert alert-danger">
+              {{ session('error') }}
+            </div>
+          @endif
+          
+          <!-- Exibir mensagens de sucesso -->
+          @if(session('success'))
+            <div class="alert alert-success">
+              {{ session('success') }}
+            </div>
+          @endif
+          
           <!--Login Form-->
           <form method="post" action="{{ route('login') }}">
             @csrf
             <div class="form-group">
-              <label>Usuário</label>
-              <input type="text" name="username" placeholder="Digite seu usuário" required>
+              <label>E-mail</label>
+              <input type="email" name="email" placeholder="Digite seu e-mail" required>
             </div>
 
             <div class="form-group">
@@ -74,14 +100,17 @@
           </form>
 
           <div class="bottom-box">
-            <div class="text">Não tem uma conta? <a href="{{ route('register') }}" class="signup">Criar conta</a></div>
+            <div class="text">Não tem uma conta? <a href="{{ route('onboarding.step0') }}" class="signup">Criar conta</a></div>
             <div class="divider"><span>ou</span></div>
             <div class="btn-box row">
               <div class="col-lg-6 col-md-12">
-                <a href="#" class="theme-btn social-btn-two facebook-btn"><i class="fab fa-facebook-f"></i> Entrar com Facebook</a>
+                <a href="{{ route('auth.facebook') }}" class="theme-btn social-btn-two facebook-btn"><i class="fab fa-facebook-f"></i> Entrar com Facebook</a>
               </div>
               <div class="col-lg-6 col-md-12">
-                <a href="#" class="theme-btn social-btn-two google-btn"><i class="fab fa-google"></i> Entrar com Google</a>
+                <a href="{{ route('auth.google') }}" class="theme-btn social-btn-two google-btn"><i class="fab fa-google"></i> Entrar com Google</a>
+              </div>
+              <div class="col-lg-12 col-md-12">
+                <a href="{{ route('auth.apple') }}" class="theme-btn social-btn-two bg-dark text-white"><i class="fab fa-apple"></i> Entrar com Apple</a>
               </div>
             </div>
           </div>
@@ -94,6 +123,42 @@
   <!-- End Login Section -->
 
 </div><!-- End Page Wrapper -->
+
+<style>
+.alert {
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.alert ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.alert li {
+  margin-bottom: 5px;
+}
+
+.alert li:last-child {
+  margin-bottom: 0;
+}
+</style>
+
 @endsection
 
 @push('scripts')

@@ -81,7 +81,8 @@
                           <div class="row">
 
                             <!-- Portfólio -->
-                            <div class="form-group col-lg-6 col-md-12">
+                            <div class="form-group col-lg-12 col-md-12 mb-3">
+                              <label>Portfólio</label>
                               <div class="uploading-outer">
                                 <div class="uploadButton">
                                   <input class="uploadButton-input" type="file"
@@ -96,26 +97,24 @@
                             </div>
 
                             <!-- Endereço Completo -->
-                            <div class="form-group col-lg-6 col-md-12">
+                            <div class="form-group col-lg-12 col-md-12 mb-3">
                               <label>Endereço Completo (não será divulgado)*</label>
-                              <input type="text" name="address" placeholder="Rua Exemplo, 123, Bairro, Cidade - Estado">
+                              <input type="text" name="address" placeholder="Rua Exemplo, 123, Bairro, Cidade - Estado"
+                                     value="{{ old('address', session('onboarding.step6_data.address')) }}" class="form-control">
                             </div>
 
                             <!-- Encontrar no Mapa - Bairro -->
-                            <div class="form-group col-lg-6 col-md-12">
+                            <div class="form-group col-lg-12 col-md-12 mb-3">
                               <label>Bairro e cidade (aparece no mapa)*</label>
-                              <input type="text" name="map" placeholder="Vila Clementina, São Paulo - SP">
+                              <input type="text" name="map" placeholder="Vila Clementina, São Paulo - SP"
+                                     value="{{ old('map', session('onboarding.step6_data.map')) }}" class="form-control">
                             </div>
 
                             <!-- Mapa -->
-                            <div class="form-group col-lg-12 col-md-12">
+                            <div class="form-group col-lg-12 col-md-12 mb-3">
+                              <label>Localização no Mapa</label>
                               <div class="map-outer">
-                                <div class="map-canvas map-height" data-zoom="12"
-                                  data-lat="-23.550520" data-lng="-46.633308"
-                                  data-type="roadmap" data-hue="#ffc400"
-                                  data-title="Localização"
-                                  data-icon-path="images/resource/map-marker.png"
-                                  data-content="São Paulo - SP, Brasil<br><a href='mailto:info@meuservicos.com'>info@meuservicos.com</a>">
+                                <div id="map-canvas" class="map-canvas map-height" style="height: 400px; width: 100%;">
                                 </div>
                               </div>
                             </div>
@@ -123,12 +122,12 @@
                           </div>
 
                           <!-- Área botão -->
-                          <div class="row">
+                          <div class="row mt-4">
                             <div class="form-group col-lg-6 col-md-12">
                               <a href="{{ route('onboarding.step5.professional') }}" class="theme-btn btn-style-one text-white">Voltar</a>
                             </div>
                             <div class="form-group col-lg-6 col-md-12 d-flex justify-content-end">
-                              <button class="theme-btn btn-style-one text-white">Próximo</button>
+                              <a href="{{ route('onboarding.step7.professional') }}" class="theme-btn btn-style-one text-white">Próximo</a>
                             </div>
                           </div>
                           <!-- Fim área botão -->
@@ -157,7 +156,12 @@
 <!-- Fim Page Wrapper -->
 @endsection
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/onboarding-improvements.css') }}">
+@endpush
+
 @push('scripts')
 @include('layouts.partials.scripts')
-
+<script src="{{ asset('js/address-map.js') }}"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap"></script>
 @endpush

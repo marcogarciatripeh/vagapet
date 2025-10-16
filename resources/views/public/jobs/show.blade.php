@@ -51,7 +51,7 @@
               </ul>
             </div>
             <div class="btn-box">
-              <a href="#" class="theme-btn btn-style-one">Quero me condidatar</a>
+              <a href="{{ route('professional.apply-job', $job->id) }}" class="theme-btn btn-style-one">Quero me candidatar</a>
               <button class="bookmark-btn"><i class="flaticon-bookmark"></i></button>
             </div>
           </div>
@@ -192,10 +192,10 @@
                 <div class="links-widget">
                   <h4 class="widget-title">Para Profissionais</h4>
                   <ul class="list">
-                    <li><a href="#">Buscar Vagas</a></li>
-                    <li><a href="#">Meu Perfil</a></li>
-                    <li><a href="#">Minhas Vagas</a></li>
-                    <li><a href="#">Favoritos</a></li>
+                    <li><a href="{{ route('jobs.index') }}">Buscar Vagas</a></li>
+                    <li><a href="{{ route('professional.profile') }}">Meu Perfil</a></li>
+                    <li><a href="{{ route('professional.applications') }}">Minhas Candidaturas</a></li>
+                    <li><a href="{{ route('professional.favorites') }}">Favoritos</a></li>
                   </ul>
                 </div>
               </div>
@@ -203,9 +203,9 @@
                 <div class="links-widget">
                   <h4 class="widget-title">Para Empresas</h4>
                   <ul class="list">
-                    <li><a href="#">Buscar Profissionais</a></li>
-                    <li><a href="#">Publicar Vaga</a></li>
-                    <li><a href="#">Planos</a></li>
+                    <li><a href="{{ route('professionals.index') }}">Buscar Profissionais</a></li>
+                    <li><a href="{{ route('company.create-job') }}">Publicar Vaga</a></li>
+                    <li><a href="{{ route('company.dashboard') }}">Painel da Empresa</a></li>
                   </ul>
                 </div>
               </div>
@@ -213,9 +213,8 @@
                 <div class="links-widget">
                   <h4 class="widget-title">Sobre</h4>
                   <ul class="list">
-                    <li><a href="#">Quem Somos</a></li>
-                    <li><a href="#">Blog</a></li>
-                    <li><a href="#">Contato</a></li>
+                    <li><a href="{{ route('home') }}">Home</a></li>
+                    <li><a href="{{ route('contact') }}">Contato</a></li>
                   </ul>
                 </div>
               </div>
@@ -223,9 +222,9 @@
                 <div class="links-widget">
                   <h4 class="widget-title">Ajuda</h4>
                   <ul class="list">
-                    <li><a href="#">Termos de Uso</a></li>
-                    <li><a href="#">Política de Privacidade</a></li>
-                    <li><a href="#">FAQ</a></li>
+                    <li><a href="{{ route('terms') }}">Termos de Uso</a></li>
+                    <li><a href="{{ route('privacy') }}">Política de Privacidade</a></li>
+                    <li><a href="{{ route('faq') }}">FAQ</a></li>
                   </ul>
                 </div>
               </div>

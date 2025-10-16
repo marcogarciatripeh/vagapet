@@ -11,7 +11,7 @@
   <span class="header-span"></span>
 
   <!-- Cabeçalho Principal -->
-  @include('layouts.partials.header-logout')
+  @include('layouts.partials.header-dynamic')
   <!-- Fim do Cabeçalho Principal -->
 
   <!-- Painel (Termos) -->

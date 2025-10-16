@@ -2,6 +2,10 @@
 
 @section('title', 'Formação Profissional - VagaPet')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/onboarding-improvements.css') }}">
+@endpush
+
 @section('content')
 <div class="page-wrapper">
 
@@ -92,6 +96,39 @@
 
                               <div id="formations-container">
                                 <!-- Formações serão adicionadas aqui dinamicamente -->
+                                @if(isset($step4Data['formations']) && is_array($step4Data['formations']))
+                                  @foreach($step4Data['formations'] as $key => $formation)
+                                    <div class="resume-block" id="formation-{{ $key }}">
+                                      <div class="inner">
+                                        <div class="title-box">
+                                          <div class="info-box">
+                                            <div class="row">
+                                              <div class="col-md-6">
+                                                <input type="text" name="formations[{{ $key }}][title]" placeholder="Nome do curso" class="form-control mb-3" value="{{ old('formations.'.$key.'.title', $formation['title'] ?? '') }}">
+                                              </div>
+                                              <div class="col-md-6">
+                                                <input type="text" name="formations[{{ $key }}][institution]" placeholder="Instituição" class="form-control mb-3" value="{{ old('formations.'.$key.'.institution', $formation['institution'] ?? '') }}">
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div class="edit-box">
+                                            <div class="row">
+                                              <div class="col-md-8">
+                                                <input type="text" name="formations[{{ $key }}][period]" placeholder="Período (ex: 2021-2022)" class="form-control mb-3" value="{{ old('formations.'.$key.'.period', $formation['period'] ?? '') }}">
+                                              </div>
+                                              <div class="col-md-4">
+                                                <div class="edit-btns">
+                                                  <button type="button" onclick="removeFormation({{ $key }})" class="btn btn-danger btn-sm"><span class="la la-trash"></span></button>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <textarea name="formations[{{ $key }}][description]" placeholder="Descrição da formação" class="form-control" rows="3">{{ old('formations.'.$key.'.description', $formation['description'] ?? '') }}</textarea>
+                                      </div>
+                                    </div>
+                                  @endforeach
+                                @endif
                               </div>
                             </div>
 
@@ -135,7 +172,7 @@
 @push('scripts')
 @include('layouts.partials.scripts')
 <script>
-let formationCount = 0;
+let formationCount = {{ isset($step4Data['formations']) ? max(array_keys($step4Data['formations'])) + 1 : 0 }};
 
 function addFormation() {
     formationCount++;
@@ -145,13 +182,25 @@ function addFormation() {
             <div class="inner">
                 <div class="title-box">
                     <div class="info-box">
-                        <input type="text" name="formations[${formationCount}][title]" placeholder="Nome do curso" class="form-control mb-2">
-                        <input type="text" name="formations[${formationCount}][institution]" placeholder="Instituição" class="form-control mb-2">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input type="text" name="formations[${formationCount}][title]" placeholder="Nome do curso" class="form-control mb-3">
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" name="formations[${formationCount}][institution]" placeholder="Instituição" class="form-control mb-3">
+                            </div>
+                        </div>
                     </div>
                     <div class="edit-box">
-                        <input type="text" name="formations[${formationCount}][period]" placeholder="Período (ex: 2021-2022)" class="form-control mb-2">
-                        <div class="edit-btns">
-                            <button type="button" onclick="removeFormation(${formationCount})"><span class="la la-trash"></span></button>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="text" name="formations[${formationCount}][period]" placeholder="Período (ex: 2021-2022)" class="form-control mb-3">
+                            </div>
+                            <div class="col-md-4">
+                                <div class="edit-btns">
+                                    <button type="button" onclick="removeFormation(${formationCount})" class="btn btn-danger btn-sm"><span class="la la-trash"></span></button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

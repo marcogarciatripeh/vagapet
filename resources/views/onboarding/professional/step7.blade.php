@@ -66,19 +66,51 @@
                   </div>
                 </div>
 
-                <div class="text-center">
-                  <div class="success-icon" style="font-size: 80px; color: #28a745; margin: 30px 0;">
-                    <i class="la la-check-circle"></i>
+                <form class="default-form" action="{{ route('onboarding.step7.professional.process') }}" method="post">
+                  @csrf
+
+                  <div class="row">
+                    <div class="form-group col-lg-12 col-md-12 mb-3">
+                      <h4>Redes Sociais (Opcional)</h4>
+                      <p class="text-muted">Adicione suas redes sociais para aumentar sua visibilidade</p>
+                    </div>
+
+                    <div class="form-group col-lg-6 col-md-12 mb-3">
+                      <label>LinkedIn</label>
+                      <input type="url" name="linkedin" placeholder="https://linkedin.com/in/seu-perfil"
+                             value="{{ old('linkedin', session('onboarding.step7_data.linkedin')) }}" class="form-control">
+                    </div>
+
+                    <div class="form-group col-lg-6 col-md-12 mb-3">
+                      <label>Instagram</label>
+                      <input type="text" name="instagram" placeholder="@seu_usuario"
+                             value="{{ old('instagram', session('onboarding.step7_data.instagram')) }}" class="form-control">
+                    </div>
+
+                    <div class="form-group col-lg-6 col-md-12 mb-3">
+                      <label>Facebook</label>
+                      <input type="text" name="facebook" placeholder="facebook.com/seu-perfil"
+                             value="{{ old('facebook', session('onboarding.step7_data.facebook')) }}" class="form-control">
+                    </div>
+
+                    <div class="form-group col-lg-6 col-md-12 mb-3">
+                      <label>Website</label>
+                      <input type="url" name="website" placeholder="https://seu-site.com"
+                             value="{{ old('website', session('onboarding.step7_data.website')) }}" class="form-control">
+                    </div>
                   </div>
 
-                  <h3 style="margin-bottom: 20px;">Cadastro Concluído!</h3>
-                  <p style="margin-bottom: 30px; color: #666;">Sua conta foi criada com sucesso. Agora você pode começar a usar a plataforma.</p>
-
-                  <div class="btn-box">
-                    <a href="{{ route('onboarding.step6.professional') }}" class="theme-btn btn-style-one text-white">Voltar</a>
-                    <a href="{{ route('professional.dashboard') }}" class="theme-btn btn-style-one text-white">Encontrar vaga</a>
+                  <!-- Área botão -->
+                  <div class="row mt-4">
+                    <div class="form-group col-lg-6 col-md-12">
+                      <a href="{{ route('onboarding.step6.professional') }}" class="theme-btn btn-style-one text-white">Voltar</a>
+                    </div>
+                    <div class="form-group col-lg-6 col-md-12 d-flex justify-content-end">
+                      <button class="theme-btn btn-style-one text-white">Finalizar Cadastro</button>
+                    </div>
                   </div>
-                </div>
+                  <!-- Fim área botão -->
+                </form>
               </div>
             </div>
           </div>
@@ -96,6 +128,10 @@
 </div>
 <!-- Fim Page Wrapper -->
 @endsection
+
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/onboarding-improvements.css') }}">
+@endpush
 
 @push('scripts')
 @include('layouts.partials.scripts')

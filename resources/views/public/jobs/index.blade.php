@@ -9,7 +9,7 @@
   <span class="header-span"></span>
 
   <!-- Main Header -->
-  @include('layouts.partials.header-logout')
+  @include('layouts.partials.header-dynamic')
   <!-- Listing Section -->
 
   <!-- includes/sidebar.html -->

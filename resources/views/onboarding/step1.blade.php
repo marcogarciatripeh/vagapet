@@ -49,12 +49,15 @@
             <div class="tabs-box">
               <div class="widget-title">
                 <h4>Escolha o seu perfil</h4>
+                @if(session('onboarding.email'))
+                  <p class="text-muted">Conta: {{ session('onboarding.email') }}</p>
+                @endif
               </div>
 
               <div class="widget-content">
 
                 <!--Login Form-->
-                <form method="post" action="{{ route('onboarding.step1.process') }}" id="profileForm">
+                <form method="post" action="{{ route('onboarding.step1.profile.process') }}" id="profileForm">
                   @csrf
                   <input type="hidden" name="profile_type" id="profileType" value="professional">
 
