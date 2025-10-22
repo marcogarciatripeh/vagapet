@@ -68,14 +68,17 @@ class ProfessionalController extends Controller
             'birth_date' => 'nullable|date',
             'gender' => 'nullable|in:male,female,other',
             'address' => 'nullable|string|max:500',
+            'neighborhood' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:2',
             'zip_code' => 'nullable|string|max:10',
             'bio' => 'nullable|string|max:1000',
+            'title' => 'nullable|string|max:255',
+            'experience_level' => 'nullable|in:estagio,junior,pleno,senior',
             'areas' => 'nullable|array',
             'skills' => 'nullable|array',
             'education' => 'nullable|array',
-            'experience' => 'nullable|array',
+            'experiences' => 'nullable|array',
             'years_experience' => 'nullable|integer|min:0',
             'photo' => 'nullable|image|max:2048',
             'resume' => 'nullable|file|mimes:pdf|max:5120',
@@ -92,7 +95,7 @@ class ProfessionalController extends Controller
             if ($profile->photo) {
                 Storage::disk('public')->delete($profile->photo);
             }
-            $data['photo'] = $request->file('photo')->store('profiles/photos', 'public');
+            $data['photo'] = $request->file('photo')->store('professionals/photos', 'public');
         }
 
         // Upload de currículo
@@ -100,7 +103,7 @@ class ProfessionalController extends Controller
             if ($profile->resume) {
                 Storage::disk('public')->delete($profile->resume);
             }
-            $data['resume'] = $request->file('resume')->store('profiles/resumes', 'public');
+            $data['resume'] = $request->file('resume')->store('professionals/resumes', 'public');
         }
 
         $profile->update($data);

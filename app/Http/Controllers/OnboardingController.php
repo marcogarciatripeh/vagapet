@@ -25,7 +25,6 @@ class OnboardingController extends Controller
 
     public function step1Process(Request $request)
     {
-        \Log::info('Step1 Process - Request received:', $request->all());
 
         try {
             $request->validate([
@@ -42,7 +41,6 @@ class OnboardingController extends Controller
                     return redirect()->back()->withErrors(['email' => 'Este e-mail já está sendo usado por uma conta completa.'])->withInput();
                 } elseif ($existingUser->isPending()) {
                     // Usuário existe mas não completou o cadastro - pode continuar
-                    \Log::info('Step1 Process - Found pending user, allowing continuation:', ['user_id' => $existingUser->id]);
                 }
             }
 
@@ -52,14 +50,11 @@ class OnboardingController extends Controller
                 'onboarding.email' => $request->email,
             ]);
 
-            \Log::info('Step1 Process - Session data saved:', session('onboarding', []));
 
             return redirect()->route('onboarding.step1');
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Step1 Process - Validation error:', $e->errors());
             return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
-            \Log::error('Step1 Process - General error:', ['message' => $e->getMessage()]);
             return redirect()->back()->withErrors(['error' => 'Erro ao processar cadastro: ' . $e->getMessage()])->withInput();
         }
     }
@@ -87,7 +82,6 @@ class OnboardingController extends Controller
     public function step2Professional()
     {
         // Debug: verificar dados da sessão
-        \Log::info('Step2 Professional GET - Session data:', session('onboarding', []));
 
         return view('onboarding.professional.step2');
     }
@@ -123,7 +117,6 @@ class OnboardingController extends Controller
                     'status' => 'pending',
                 ]);
                 $user = $existingUser;
-                \Log::info('Step2 Professional Process - Updated existing pending user:', ['user_id' => $user->id]);
             } else {
                 // Criar novo usuário
                 $user = User::create([
@@ -133,7 +126,6 @@ class OnboardingController extends Controller
                     'active_profile' => 'professional',
                     'status' => 'pending',
                 ]);
-                \Log::info('Step2 Professional Process - Created new user:', ['user_id' => $user->id]);
             }
 
             // Salvar dados na sessão para próximos passos
@@ -146,7 +138,6 @@ class OnboardingController extends Controller
 
             return redirect()->route('onboarding.step3.professional');
         } catch (\Exception $e) {
-            \Log::error('Step2 Professional Process - Error:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return redirect()->back()->withErrors(['error' => 'Erro ao processar cadastro: ' . $e->getMessage()])->withInput();
         }
     }
@@ -154,7 +145,6 @@ class OnboardingController extends Controller
     public function step3Professional()
     {
         // Debug: verificar dados da sessão
-        \Log::info('Step3 Professional GET - Session data:', session('onboarding', []));
 
         return view('onboarding.professional.step3');
     }
@@ -166,27 +156,18 @@ class OnboardingController extends Controller
             'experience' => 'nullable|string|max:255',
             'work_areas' => 'nullable|array',
             'description' => 'nullable|string|max:1000',
-            'attachments' => 'nullable|array',
-            'attachments.*' => 'nullable|string',
+            'photo' => 'nullable|image|max:2048',
         ]);
 
         // Processar upload de foto se houver
         $photoPath = null;
-        if ($request->hasFile('attachments')) {
-            $file = $request->file('attachments')[0]; // Primeiro arquivo
-            if ($file && $file->isValid()) {
-                $photoPath = $file->store('professionals/photos', 'public');
-                \Log::info('Step3 Professional Process - Photo uploaded:', ['path' => $photoPath]);
-            }
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('professionals/photos', 'public');
+            session(['onboarding.photo' => $photoPath]);
         }
 
-        $step3Data = $request->except(['attachments']);
-        if ($photoPath) {
-            $step3Data['photo'] = $photoPath;
-        }
-
+        $step3Data = $request->except(['photo']);
         session(['onboarding.step3_data' => $step3Data]);
-        \Log::info('Step3 Professional Process - Session step3_data saved:', $step3Data);
 
         return redirect()->route('onboarding.step4.professional');
     }
@@ -194,7 +175,6 @@ class OnboardingController extends Controller
     public function step4Professional()
     {
         // Debug: verificar dados da sessão
-        \Log::info('Step4 Professional GET - Session data:', session('onboarding', []));
 
         $step4Data = session('onboarding.step4_data', []);
         return view('onboarding.professional.step4', compact('step4Data'));
@@ -211,7 +191,6 @@ class OnboardingController extends Controller
         ]);
 
         session(['onboarding.step4_data' => $request->all()]);
-        \Log::info('Step4 Professional Process - Session step4_data saved:', $request->all());
 
         return redirect()->route('onboarding.step5.professional');
     }
@@ -219,7 +198,6 @@ class OnboardingController extends Controller
     public function step5Professional()
     {
         // Debug: verificar dados da sessão
-        \Log::info('Step5 Professional GET - Session data:', session('onboarding', []));
 
         $step5Data = session('onboarding.step5_data', []);
         return view('onboarding.professional.step5', compact('step5Data'));
@@ -240,7 +218,6 @@ class OnboardingController extends Controller
         ]);
 
         session(['onboarding.step5_data' => $request->all()]);
-        \Log::info('Step5 Professional Process - Session step5_data saved:', $request->all());
 
         return redirect()->route('onboarding.step6.professional');
     }
@@ -253,31 +230,16 @@ class OnboardingController extends Controller
     public function step6ProfessionalProcess(Request $request)
     {
         $request->validate([
-            'education' => 'nullable|array',
-            'experience' => 'nullable|array',
-            'photo' => 'nullable|image|max:2048',
-            'resume' => 'nullable|file|mimes:pdf|max:5120',
             'address' => 'nullable|string|max:500',
-            'map' => 'nullable|string|max:500',
+            'neighborhood' => 'nullable|string|max:255',
+            'city' => 'required|string|max:255',
+            'state' => 'required|string|max:2',
+            'zip_code' => 'nullable|string|max:10',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
         ]);
 
-        session(['onboarding.step6_data' => $request->except(['photo', 'resume'])]);
-        \Log::info('Step6 Professional Process - Session step6_data saved:', $request->except(['photo', 'resume']));
-
-        // Upload de arquivos
-        if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('profiles/photos', 'public');
-            session(['onboarding.photo' => $photoPath]);
-            \Log::info('Step6 Professional Process - Photo uploaded:', ['path' => $photoPath]);
-        }
-
-        if ($request->hasFile('resume')) {
-            $resumePath = $request->file('resume')->store('profiles/resumes', 'public');
-            session(['onboarding.resume' => $resumePath]);
-            \Log::info('Step6 Professional Process - Resume uploaded:', ['path' => $resumePath]);
-        }
+        session(['onboarding.step6_data' => $request->all()]);
 
         return redirect()->route('onboarding.step7.professional');
     }
@@ -298,18 +260,14 @@ class OnboardingController extends Controller
             ]);
 
             // Debug: verificar dados da sessão
-            \Log::info('Step7 Professional Process - Session data:', session('onboarding', []));
-            \Log::info('Step7 Professional Process - Request data:', $request->all());
 
             // Criar perfil profissional com todos os dados
             $userId = session('onboarding.user_id');
             if (!$userId) {
-                \Log::error('Step7 Professional Process - No user_id in session');
                 return redirect()->route('onboarding.step0')->with('error', 'Sessão expirada. Tente novamente.');
             }
 
             $user = User::findOrFail($userId);
-            \Log::info('Step7 Professional Process - User found:', ['id' => $user->id, 'email' => $user->email]);
 
             $profileData = array_merge(
                 session('onboarding.step2_data', []),
@@ -326,25 +284,48 @@ class OnboardingController extends Controller
                 ]
             );
 
-            \Log::info('Step7 Professional Process - Profile data to create:', $profileData);
 
-            $profile = ProfessionalProfile::create($profileData);
-            \Log::info('Step7 Professional Process - Profile created:', ['id' => $profile->id]);
+            // Mapear nomes dos campos do site para os nomes do banco
+            $mappedData = [
+                'user_id' => $profileData['user_id'] ?? null,
+                'first_name' => $profileData['first_name'] ?? null,
+                'last_name' => $profileData['last_name'] ?? null,
+                'phone' => $profileData['phone'] ?? null,
+                'title' => $profileData['title'] ?? null,
+                'experience_level' => $profileData['experience'] ?? null, // Mapear 'experience' → 'experience_level'
+                'areas' => $profileData['work_areas'] ?? null, // Mapear 'work_areas' → 'areas'
+                'bio' => $profileData['description'] ?? null, // Mapear 'description' → 'bio'
+                'education' => $profileData['formations'] ?? null, // Mapear 'formations' → 'education'
+                'experiences' => $profileData['experiences'] ?? null,
+                'photo' => $profileData['photo'] ?? null,
+                'resume' => $profileData['resume'] ?? null,
+                'address' => $profileData['address'] ?? null,
+                'neighborhood' => $profileData['neighborhood'] ?? null,
+                'city' => $profileData['city'] ?? null,
+                'state' => $profileData['state'] ?? null,
+                'zip_code' => $profileData['zip_code'] ?? null,
+                'latitude' => $profileData['latitude'] ?? null,
+                'longitude' => $profileData['longitude'] ?? null,
+                'linkedin' => $profileData['linkedin'] ?? null,
+                'instagram' => $profileData['instagram'] ?? null,
+                'facebook' => $profileData['facebook'] ?? null,
+                'website' => $profileData['website'] ?? null,
+            ];
+
+
+            $profile = ProfessionalProfile::create($mappedData);
 
             // Marcar usuário como completed
             $user->markAsCompleted();
-            \Log::info('Step7 Professional Process - User marked as completed:', ['user_id' => $user->id]);
 
             // Fazer login automático
             Auth::login($user);
-            \Log::info('Step7 Professional Process - User logged in automatically:', ['user_id' => $user->id]);
 
             // Limpar sessão
             $this->clearOnboardingSession();
 
             return redirect()->route('professional.dashboard')->with('success', 'Perfil profissional criado com sucesso!');
         } catch (\Exception $e) {
-            \Log::error('Step7 Professional Process - Error:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return redirect()->back()->withErrors(['error' => 'Erro ao processar cadastro: ' . $e->getMessage()])->withInput();
         }
     }
@@ -388,7 +369,6 @@ class OnboardingController extends Controller
                     'status' => 'pending',
                 ]);
                 $user = $existingUser;
-                \Log::info('Step2 Company Process - Updated existing pending user:', ['user_id' => $user->id]);
             } else {
                 // Criar novo usuário
                 $user = User::create([
@@ -398,7 +378,6 @@ class OnboardingController extends Controller
                     'active_profile' => 'company',
                     'status' => 'pending',
                 ]);
-                \Log::info('Step2 Company Process - Created new user:', ['user_id' => $user->id]);
             }
 
             // Salvar dados na sessão para próximos passos
@@ -411,7 +390,6 @@ class OnboardingController extends Controller
 
             return redirect()->route('onboarding.step3.company');
         } catch (\Exception $e) {
-            \Log::error('Step2 Company Process - Error:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return redirect()->back()->withErrors(['error' => 'Erro ao processar cadastro: ' . $e->getMessage()])->withInput();
         }
     }
@@ -527,11 +505,9 @@ class OnboardingController extends Controller
 
         // Marcar usuário como completed
         $user->markAsCompleted();
-        \Log::info('Step6 Company Process - User marked as completed:', ['user_id' => $user->id]);
 
         // Fazer login automático
         Auth::login($user);
-        \Log::info('Step6 Company Process - User logged in automatically:', ['user_id' => $user->id]);
 
         // Limpar sessão
         $this->clearOnboardingSession();

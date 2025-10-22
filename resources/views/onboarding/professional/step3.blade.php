@@ -66,14 +66,25 @@
                   </div>
                 </div>
 
-                <form class="default-form" action="{{ route('onboarding.step3.professional.process') }}" method="post">
+                <form class="default-form" action="{{ route('onboarding.step3.professional.process') }}" method="post" enctype="multipart/form-data">
                   @csrf
+
+                  @if ($errors->any())
+                    <div class="alert alert-danger">
+                      <ul>
+                        @foreach ($errors->all() as $error)
+                          <li>{{ $error }}</li>
+                        @endforeach
+                      </ul>
+                    </div>
+                  @endif
+
                   <div class="row">
                     <!-- Upload de foto -->
                     <div class="uploading-outer">
                       <div class="uploadButton">
-                        <input class="uploadButton-input" type="file" name="attachments[]" accept="image/*, application/pdf" id="upload" multiple />
-                        <label class="uploadButton-button ripple-effect" for="upload">Subir foto de perfil</label>
+                        <input class="uploadButton-input" type="file" name="photo" accept="image/*" id="upload-photo" />
+                        <label class="uploadButton-button ripple-effect" for="upload-photo">Subir foto de perfil</label>
                         <span class="uploadButton-file-name"></span>
                       </div>
                       <div class="text">Tamanho máximo do arquivo: 1MB, dimensão mínima: 330x300, arquivos suportados: .jpg e .png</div>

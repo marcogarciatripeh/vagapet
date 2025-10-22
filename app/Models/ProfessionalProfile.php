@@ -21,6 +21,7 @@ class ProfessionalProfile extends Model
         'birth_date',
         'gender',
         'address',
+        'neighborhood',
         'city',
         'state',
         'zip_code',

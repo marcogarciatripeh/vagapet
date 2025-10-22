@@ -41,7 +41,17 @@ class ProfessionalProfileResource extends Resource
     {
         return $form
             ->schema([
+                // Usuário (oculto ou select)
+                Select::make('user_id')
+                    ->label('Usuário')
+                    ->relationship('user', 'name')
+                    ->required()
+                    ->searchable()
+                    ->preload(),
+
+                // 1. Dados Pessoais
                 Forms\Components\Section::make('Dados Pessoais')
+                    ->description('Informações básicas do profissional')
                     ->schema([
                         TextInput::make('first_name')
                             ->label('Nome')
@@ -56,35 +66,35 @@ class ProfessionalProfileResource extends Resource
                         TextInput::make('phone')
                             ->label('Telefone')
                             ->tel()
+                            ->mask('(99) 99999-9999')
                             ->maxLength(20),
+
+                        DatePicker::make('birth_date')
+                            ->label('Data de Nascimento')
+                            ->maxDate(now()->subYears(16))
+                            ->displayFormat('d/m/Y'),
+
+                        Select::make('gender')
+                            ->label('Gênero')
+                            ->options([
+                                'male' => 'Masculino',
+                                'female' => 'Feminino',
+                                'other' => 'Outro',
+                            ]),
                     ])
-                    ->columns(2),
+                    ->columns(3),
 
-                Forms\Components\Section::make('Localização')
-                    ->schema([
-                        Textarea::make('address')
-                            ->label('Endereço Completo')
-                            ->rows(2)
-                            ->maxLength(500),
-
-                        TextInput::make('city')
-                            ->label('Cidade')
-                            ->maxLength(100),
-
-                        TextInput::make('state')
-                            ->label('Estado')
-                            ->maxLength(2),
-                    ])
-                    ->columns(2),
-
+                // 2. Informações Profissionais
                 Forms\Components\Section::make('Informações Profissionais')
+                    ->description('Título, experiência e áreas de atuação')
                     ->schema([
                         TextInput::make('title')
                             ->label('Título Profissional')
+                            ->placeholder('Ex.: Banhista, tosador, monitor de creche, etc')
                             ->maxLength(255),
 
                         Select::make('experience_level')
-                            ->label('Nível de Experiência')
+                            ->label('Experiência profissional')
                             ->options([
                                 'estagio' => 'Estágio',
                                 'junior' => 'Junior (até 2 anos)',
@@ -92,96 +102,188 @@ class ProfessionalProfileResource extends Resource
                                 'senior' => 'Sênior (mais de 5 anos)',
                             ]),
 
-                        Textarea::make('description')
+                        Select::make('areas')
+                            ->label('Área de trabalho')
+                            ->helperText('Você pode incluir mais de uma opção')
+                            ->multiple()
+                            ->options([
+                                'BanhoTosa' => 'Banho & Tosa',
+                                'Recepcao' => 'Recepção',
+                                'Vendas' => 'Vendas',
+                                'Veterinario' => 'Veterinário',
+                                'AuxiliarVeterinario' => 'Auxiliar Veterinário',
+                                'Limpeza' => 'Limpeza',
+                                'Gerente' => 'Gerente',
+                                'Estoque' => 'Estoque',
+                                'Motorista' => 'Motorista',
+                            ])
+                            ->searchable(),
+
+                        Textarea::make('bio')
                             ->label('Descrição')
-                            ->rows(3)
-                            ->maxLength(1000),
-
-                        Repeater::make('areas')
-                            ->label('Áreas de Trabalho')
-                            ->simple(TextInput::make('area')
-                                ->label('Área')
-                                ->required()),
+                            ->placeholder('Fale sobre você, sua experiência, serviços oferecidos (banho, tosa, etc.) e qualquer outro detalhe relevante.')
+                            ->rows(4)
+                            ->maxLength(1000)
+                            ->columnSpanFull(),
                     ])
-                    ->columns(1),
+                    ->columns(2),
 
-                Forms\Components\Section::make('Formação')
+                // 3. Formação Profissional
+                Forms\Components\Section::make('Formação Profissional')
+                    ->description('Cursos e formações acadêmicas')
                     ->schema([
                         Repeater::make('education')
                             ->label('Formações')
                             ->schema([
                                 TextInput::make('title')
                                     ->label('Nome do Curso')
+                                    ->placeholder('Ex.: Curso de Auxiliar Veterinário')
                                     ->required(),
                                 TextInput::make('institution')
                                     ->label('Instituição')
+                                    ->placeholder('Ex.: Instituto PetCare')
                                     ->required(),
                                 TextInput::make('period')
-                                    ->label('Período'),
+                                    ->label('Período')
+                                    ->placeholder('Ex.: 2021 - 2022'),
                                 Textarea::make('description')
                                     ->label('Descrição')
+                                    ->placeholder('Descreva o conteúdo do curso e aprendizados')
                                     ->rows(2),
                             ])
-                            ->columns(2),
+                            ->columns(2)
+                            ->collapsible()
+                            ->defaultItems(0)
+                            ->addActionLabel('Adicionar Formação'),
                     ]),
 
-                Forms\Components\Section::make('Experiência Profissional')
+                // 4. Experiência de Trabalho
+                Forms\Components\Section::make('Experiência de Trabalho')
+                    ->description('Experiências profissionais anteriores')
                     ->schema([
                         Repeater::make('experiences')
                             ->label('Experiências')
                             ->schema([
                                 TextInput::make('title')
                                     ->label('Cargo')
+                                    ->placeholder('Ex.: Groomer Sênior')
                                     ->required(),
                                 TextInput::make('company')
                                     ->label('Empresa')
+                                    ->placeholder('Ex.: Pet4U')
                                     ->required(),
                                 TextInput::make('period')
-                                    ->label('Período'),
+                                    ->label('Período')
+                                    ->placeholder('Ex.: 2022 - Atual'),
                                 Textarea::make('description')
                                     ->label('Descrição')
+                                    ->placeholder('Descreva suas responsabilidades e realizações')
                                     ->rows(2),
                             ])
-                            ->columns(2),
+                            ->columns(2)
+                            ->collapsible()
+                            ->defaultItems(0)
+                            ->addActionLabel('Adicionar Experiência'),
                     ]),
 
-                Forms\Components\Section::make('Arquivos')
+                // 5. Arquivos
+                Forms\Components\Section::make('Foto de Perfil e Portfólio')
+                    ->description('Upload de imagens profissionais')
                     ->schema([
                         FileUpload::make('photo')
                             ->label('Foto de Perfil')
+                            ->helperText('Tamanho máximo: 1MB. Dimensão mínima: 330x300. Formatos: .jpg e .png')
                             ->image()
+                            ->imageEditor()
+                            ->maxSize(1024)
                             ->directory('professionals/photos')
-                            ->visibility('public'),
+                            ->visibility('public')
+                            ->columnSpanFull(),
 
-                        FileUpload::make('resume')
-                            ->label('Currículo')
-                            ->acceptedFileTypes(['application/pdf'])
-                            ->directory('professionals/resumes')
-                            ->visibility('public'),
+                        Forms\Components\Placeholder::make('portfolio_info')
+                            ->label('Portfólio')
+                            ->content('Recurso de múltiplas fotos de portfólio será implementado em versão futura.')
+                            ->columnSpanFull(),
                     ])
                     ->columns(2),
 
+                // 6. Redes Sociais
                 Forms\Components\Section::make('Redes Sociais')
+                    ->description('Inclua suas redes sociais se quiser que outros vejam seu perfil')
                     ->schema([
-                        TextInput::make('linkedin')
-                            ->label('LinkedIn')
-                            ->url()
+                        TextInput::make('facebook')
+                            ->label('Facebook')
+                            ->placeholder('www.facebook.com/MeuPerfil')
                             ->maxLength(255),
 
                         TextInput::make('instagram')
                             ->label('Instagram')
+                            ->placeholder('instagram.com/meuperfil')
                             ->maxLength(255),
 
-                        TextInput::make('facebook')
-                            ->label('Facebook')
+                        TextInput::make('linkedin')
+                            ->label('LinkedIn')
+                            ->placeholder('www.linkedin.com/in/meuperfil')
                             ->maxLength(255),
 
                         TextInput::make('website')
-                            ->label('Website')
+                            ->label('Site Pessoal')
+                            ->placeholder('www.meuservicos.com.br')
                             ->url()
                             ->maxLength(255),
                     ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->collapsed(),
+
+                // 7. Localização
+                Forms\Components\Section::make('Localização')
+                    ->description('Endereço e localização no mapa')
+                    ->schema([
+                        Textarea::make('address')
+                            ->label('Endereço Completo (não será divulgado)')
+                            ->placeholder('Rua Exemplo, 123')
+                            ->helperText('Este endereço não ficará público, é apenas para referência')
+                            ->rows(2)
+                            ->maxLength(500)
+                            ->columnSpanFull(),
+
+                        TextInput::make('neighborhood')
+                            ->label('Bairro')
+                            ->placeholder('Vila Clementina')
+                            ->maxLength(255),
+
+                        TextInput::make('city')
+                            ->label('Cidade')
+                            ->placeholder('São Paulo')
+                            ->helperText('Bairro e cidade ficarão visíveis na plataforma')
+                            ->required()
+                            ->maxLength(100),
+
+                        TextInput::make('state')
+                            ->label('Estado (UF)')
+                            ->placeholder('SP')
+                            ->maxLength(2)
+                            ->extraInputAttributes(['style' => 'text-transform: uppercase;']),
+
+                        TextInput::make('zip_code')
+                            ->label('CEP')
+                            ->mask('99999-999')
+                            ->maxLength(10),
+
+                        TextInput::make('latitude')
+                            ->label('Latitude')
+                            ->numeric()
+                            ->step(0.00000001)
+                            ->placeholder('-23.550520'),
+
+                        TextInput::make('longitude')
+                            ->label('Longitude')
+                            ->numeric()
+                            ->step(0.00000001)
+                            ->placeholder('-46.633308'),
+                    ])
+                    ->columns(3)
+                    ->collapsed(),
             ]);
     }
 
@@ -231,6 +333,11 @@ class ProfessionalProfileResource extends Resource
                         'senior' => 'Sênior',
                         default => $state,
                     }),
+
+                TextColumn::make('neighborhood')
+                    ->label('Bairro')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('city')
                     ->label('Cidade')

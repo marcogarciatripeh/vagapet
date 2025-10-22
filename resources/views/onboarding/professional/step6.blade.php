@@ -66,58 +66,70 @@
                   </div>
                 </div>
 
-                <form class="default-form" action="{{ route('onboarding.step6.professional.process') }}" method="post">
+                <form class="default-form" action="{{ route('onboarding.step6.professional.process') }}" method="post" enctype="multipart/form-data">
                   @csrf
+
+                  @if ($errors->any())
+                    <div class="alert alert-danger">
+                      <ul>
+                        @foreach ($errors->all() as $error)
+                          <li>{{ $error }}</li>
+                        @endforeach
+                      </ul>
+                    </div>
+                  @endif
+
                   <div class="row">
 
-                    <!-- Ls widget (Seção Experiência Profissional) -->
+                    <!-- Ls widget (Seção Localização) -->
                     <div class="ls-widget">
                       <div class="tabs-box">
                         <div class="widget-title">
-                          <h4>Portfólio e localização</h4>
+                          <h4>Localização</h4>
                         </div>
 
                         <div class="widget-content">
                           <div class="row">
 
-                            <!-- Portfólio -->
-                            <div class="form-group col-lg-12 col-md-12 mb-3">
-                              <label>Portfólio</label>
-                              <div class="uploading-outer">
-                                <div class="uploadButton">
-                                  <input class="uploadButton-input" type="file"
-                                    name="attachments[]" accept="image/*, application/pdf"
-                                    id="upload" multiple />
-                                  <label class="uploadButton-button ripple-effect" for="upload">
-                                    Adicionar Portfólio
-                                  </label>
-                                  <span class="uploadButton-file-name"></span>
-                                </div>
-                              </div>
-                            </div>
-
                             <!-- Endereço Completo -->
                             <div class="form-group col-lg-12 col-md-12 mb-3">
-                              <label>Endereço Completo (não será divulgado)*</label>
-                              <input type="text" name="address" placeholder="Rua Exemplo, 123, Bairro, Cidade - Estado"
+                              <label>Endereço Completo (não será divulgado)</label>
+                              <input type="text" name="address" placeholder="Rua Exemplo, 123"
                                      value="{{ old('address', session('onboarding.step6_data.address')) }}" class="form-control">
                             </div>
 
-                            <!-- Encontrar no Mapa - Bairro -->
-                            <div class="form-group col-lg-12 col-md-12 mb-3">
-                              <label>Bairro e cidade (aparece no mapa)*</label>
-                              <input type="text" name="map" placeholder="Vila Clementina, São Paulo - SP"
-                                     value="{{ old('map', session('onboarding.step6_data.map')) }}" class="form-control">
+                            <!-- Bairro -->
+                            <div class="form-group col-lg-6 col-md-12 mb-3">
+                              <label>Bairro</label>
+                              <input type="text" name="neighborhood" placeholder="Vila Clementina"
+                                     value="{{ old('neighborhood', session('onboarding.step6_data.neighborhood')) }}" class="form-control">
                             </div>
 
-                            <!-- Mapa -->
-                            <div class="form-group col-lg-12 col-md-12 mb-3">
-                              <label>Localização no Mapa</label>
-                              <div class="map-outer">
-                                <div id="map-canvas" class="map-canvas map-height" style="height: 400px; width: 100%;">
-                                </div>
-                              </div>
+                            <!-- Cidade -->
+                            <div class="form-group col-lg-6 col-md-12 mb-3">
+                              <label>Cidade *</label>
+                              <input type="text" name="city" placeholder="São Paulo" required
+                                     value="{{ old('city', session('onboarding.step6_data.city')) }}" class="form-control">
                             </div>
+
+                            <!-- Estado -->
+                            <div class="form-group col-lg-4 col-md-12 mb-3">
+                              <label>Estado (UF) *</label>
+                              <input type="text" name="state" placeholder="SP" maxlength="2" required
+                                     style="text-transform: uppercase;"
+                                     value="{{ old('state', session('onboarding.step6_data.state')) }}" class="form-control">
+                            </div>
+
+                            <!-- CEP -->
+                            <div class="form-group col-lg-4 col-md-12 mb-3">
+                              <label>CEP</label>
+                              <input type="text" name="zip_code" placeholder="01234-567"
+                                     value="{{ old('zip_code', session('onboarding.step6_data.zip_code')) }}" class="form-control">
+                            </div>
+
+                            <!-- Campos ocultos para latitude e longitude -->
+                            <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude', session('onboarding.step6_data.latitude', -23.550520)) }}">
+                            <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude', session('onboarding.step6_data.longitude', -46.633308)) }}">
 
                           </div>
 
@@ -127,7 +139,7 @@
                               <a href="{{ route('onboarding.step5.professional') }}" class="theme-btn btn-style-one text-white">Voltar</a>
                             </div>
                             <div class="form-group col-lg-6 col-md-12 d-flex justify-content-end">
-                              <a href="{{ route('onboarding.step7.professional') }}" class="theme-btn btn-style-one text-white">Próximo</a>
+                              <button type="submit" class="theme-btn btn-style-one text-white">Próximo</button>
                             </div>
                           </div>
                           <!-- Fim área botão -->
@@ -162,6 +174,4 @@
 
 @push('scripts')
 @include('layouts.partials.scripts')
-<script src="{{ asset('js/address-map.js') }}"></script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap"></script>
 @endpush
