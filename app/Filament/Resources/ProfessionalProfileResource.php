@@ -187,8 +187,8 @@ class ProfessionalProfileResource extends Resource
                     ]),
 
                 // 5. Arquivos
-                Forms\Components\Section::make('Foto de Perfil e Portfólio')
-                    ->description('Upload de imagens profissionais')
+                Forms\Components\Section::make('Foto de Perfil')
+                    ->description('Upload de imagem profissional')
                     ->schema([
                         FileUpload::make('photo')
                             ->label('Foto de Perfil')
@@ -198,11 +198,6 @@ class ProfessionalProfileResource extends Resource
                             ->maxSize(1024)
                             ->directory('professionals/photos')
                             ->visibility('public')
-                            ->columnSpanFull(),
-
-                        Forms\Components\Placeholder::make('portfolio_info')
-                            ->label('Portfólio')
-                            ->content('Recurso de múltiplas fotos de portfólio será implementado em versão futura.')
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
