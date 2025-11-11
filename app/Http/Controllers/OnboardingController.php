@@ -35,14 +35,8 @@ class OnboardingController extends Controller
             // Verificar se já existe um usuário com este email
             $existingUser = User::where('email', $request->email)->first();
 
-            if ($existingUser) {
-                if ($existingUser->isCompleted()) {
-                    // Usuário já completou o cadastro
-                    return redirect()->back()->withErrors(['email' => 'Este e-mail já está sendo usado por uma conta completa.'])->withInput();
-                } elseif ($existingUser->isPending()) {
-                    // Usuário existe mas não completou o cadastro - pode continuar
-                }
-            }
+            // Permite continuar mesmo se o usuário já existe (pode estar criando segundo perfil)
+            // A validação se já tem o perfil será feita no step2 específico
 
             // Salvar dados na sessão para próximos passos
             session([
@@ -65,6 +59,26 @@ class OnboardingController extends Controller
             'profile_type' => 'required|in:professional,company',
         ]);
 
+        // Verificar se o usuário já possui o perfil escolhido
+        $email = session('onboarding.email');
+        if ($email) {
+            $existingUser = User::where('email', $email)->first();
+
+            if ($existingUser) {
+                if ($request->profile_type === 'professional' && $existingUser->hasProfessionalProfile()) {
+                    return redirect()->route('onboarding.step1')
+                        ->withErrors(['profile_type' => 'Você já possui um perfil profissional cadastrado.'])
+                        ->withInput();
+                }
+
+                if ($request->profile_type === 'company' && $existingUser->hasCompanyProfile()) {
+                    return redirect()->route('onboarding.step1')
+                        ->withErrors(['profile_type' => 'Você já possui um perfil de empresa cadastrado.'])
+                        ->withInput();
+                }
+            }
+        }
+
         // Salvar o tipo de perfil na sessão
         session(['onboarding.profile_type' => $request->profile_type]);
 
@@ -81,20 +95,22 @@ class OnboardingController extends Controller
 
     public function step2Professional()
     {
-        // Debug: verificar dados da sessão
+        // Verificar se já existe usuário completo (criando segundo perfil)
+        $email = session('onboarding.email');
+        $existingUser = null;
+        if ($email) {
+            $existingUser = User::where('email', $email)->first();
+        }
 
-        return view('onboarding.professional.step2');
+        return view('onboarding.professional.step2', [
+            'existingUser' => $existingUser,
+            'needsPassword' => !$existingUser || !$existingUser->isCompleted(),
+        ]);
     }
 
     public function step2ProfessionalProcess(Request $request)
     {
         try {
-            $request->validate([
-                'first_name' => 'required|string|max:255',
-                'last_name' => 'required|string|max:255',
-                'password' => 'required|string|min:8|confirmed',
-            ]);
-
             // Usar email da sessão
             $email = session('onboarding.email');
             if (!$email) {
@@ -103,13 +119,29 @@ class OnboardingController extends Controller
 
             // Verificar se já existe um usuário com este email
             $existingUser = User::where('email', $email)->first();
+            $needsPassword = !$existingUser || !$existingUser->isCompleted();
 
-            if ($existingUser && $existingUser->isCompleted()) {
-                return redirect()->route('onboarding.step0')->with('error', 'Este e-mail já está sendo usado por uma conta completa.');
+            // Validação condicional: só exige senha se não tem usuário completo
+            $validationRules = [
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+            ];
+
+            if ($needsPassword) {
+                $validationRules['password'] = 'required|string|min:8|confirmed';
             }
 
-            if ($existingUser && $existingUser->isPending()) {
-                // Atualizar usuário existente
+            $request->validate($validationRules);
+
+            if ($existingUser && $existingUser->isCompleted()) {
+                // Usuário já existe e está completo - apenas atualizar nome e perfil ativo, não alterar senha
+                $existingUser->update([
+                    'name' => $request->first_name . ' ' . $request->last_name,
+                    'active_profile' => 'professional',
+                ]);
+                $user = $existingUser;
+            } elseif ($existingUser) {
+                // Usuário existe mas está pendente - atualizar com senha
                 $existingUser->update([
                     'name' => $request->first_name . ' ' . $request->last_name,
                     'password' => Hash::make($request->password),
@@ -315,8 +347,11 @@ class OnboardingController extends Controller
 
             $profile = ProfessionalProfile::create($mappedData);
 
-            // Marcar usuário como completed
-            $user->markAsCompleted();
+            // Marcar usuário como completed apenas se ainda não está (primeiro perfil)
+            // Se já está completed, significa que está criando o segundo perfil
+            if ($user->isPending()) {
+                $user->markAsCompleted();
+            }
 
             // Fazer login automático
             Auth::login($user);
@@ -336,17 +371,25 @@ class OnboardingController extends Controller
 
     public function step2Company()
     {
-        return view('onboarding.company.step2');
+        // Verificar se já existe usuário completo (criando segundo perfil)
+        $email = session('onboarding.email');
+        $existingUser = null;
+        if ($email) {
+            $existingUser = User::where('email', $email)->first();
+        }
+
+        $step2Data = session('onboarding.step2_data', []);
+
+        return view('onboarding.company.step2', [
+            'existingUser' => $existingUser,
+            'needsPassword' => !$existingUser || !$existingUser->isCompleted(),
+            'step2Data' => $step2Data,
+        ]);
     }
 
     public function step2CompanyProcess(Request $request)
     {
         try {
-            $request->validate([
-                'company_name' => 'required|string|max:255',
-                'password' => 'required|string|min:8|confirmed',
-            ]);
-
             // Usar email da sessão
             $email = session('onboarding.email');
             if (!$email) {
@@ -355,13 +398,28 @@ class OnboardingController extends Controller
 
             // Verificar se já existe um usuário com este email
             $existingUser = User::where('email', $email)->first();
+            $needsPassword = !$existingUser || !$existingUser->isCompleted();
 
-            if ($existingUser && $existingUser->isCompleted()) {
-                return redirect()->route('onboarding.step0')->with('error', 'Este e-mail já está sendo usado por uma conta completa.');
+            // Validação condicional: só exige senha se não tem usuário completo
+            $validationRules = [
+                'company_name' => 'required|string|max:255',
+            ];
+
+            if ($needsPassword) {
+                $validationRules['password'] = 'required|string|min:8|confirmed';
             }
 
-            if ($existingUser && $existingUser->isPending()) {
-                // Atualizar usuário existente
+            $request->validate($validationRules);
+
+            if ($existingUser && $existingUser->isCompleted()) {
+                // Usuário já existe e está completo - apenas atualizar nome e perfil ativo, não alterar senha
+                $existingUser->update([
+                    'name' => $request->company_name,
+                    'active_profile' => 'company',
+                ]);
+                $user = $existingUser;
+            } elseif ($existingUser) {
+                // Usuário existe mas está pendente - atualizar com senha
                 $existingUser->update([
                     'name' => $request->company_name,
                     'password' => Hash::make($request->password),
@@ -396,36 +454,56 @@ class OnboardingController extends Controller
 
     public function step3Company()
     {
-        return view('onboarding.company.step3');
+        $step3Data = session('onboarding.step3_data', []);
+        return view('onboarding.company.step3', compact('step3Data'));
     }
 
     public function step3CompanyProcess(Request $request)
     {
         $request->validate([
-            'company_name' => 'required|string|max:255',
-            'cnpj' => 'nullable|string|max:20',
-            'phone' => 'nullable|string|max:20',
-            'website' => 'nullable|url',
+            'website' => 'nullable|url|max:255',
+            'employees' => 'nullable|string',
+            'description' => 'nullable|string|max:1000',
+            'logo' => 'nullable|image|max:2048',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'image|max:2048',
         ]);
 
-        session(['onboarding.step3_data' => $request->all()]);
+        // Processar upload de logo se houver (pode vir como 'logo' ou 'attachments')
+        $logoPath = null;
+        if ($request->hasFile('logo')) {
+            $logoPath = $request->file('logo')->store('companies/logos', 'public');
+            session(['onboarding.logo' => $logoPath]);
+        } elseif ($request->hasFile('attachments') && count($request->file('attachments')) > 0) {
+            // Se vier no formato attachments[], pegar o primeiro arquivo como logo
+            $logoPath = $request->file('attachments')[0]->store('companies/logos', 'public');
+            session(['onboarding.logo' => $logoPath]);
+        }
+
+        $step3Data = $request->except(['logo', 'attachments']);
+
+        // Manter 'employees' na sessão para poder recuperar quando voltar
+        // O mapeamento para 'employees_count' será feito apenas na criação final
+        session(['onboarding.step3_data' => $step3Data]);
 
         return redirect()->route('onboarding.step4.company');
     }
 
     public function step4Company()
     {
-        return view('onboarding.company.step4');
+        $step4Data = session('onboarding.step4_data', []);
+        return view('onboarding.company.step4', compact('step4Data'));
     }
 
     public function step4CompanyProcess(Request $request)
     {
         $request->validate([
-            'description' => 'nullable|string|max:1000',
             'address' => 'nullable|string|max:500',
-            'city' => 'nullable|string|max:100',
-            'state' => 'nullable|string|max:2',
+            'city' => 'required|string|max:100',
+            'state' => 'required|string|max:2',
             'zip_code' => 'nullable|string|max:10',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         session(['onboarding.step4_data' => $request->all()]);
@@ -435,84 +513,155 @@ class OnboardingController extends Controller
 
     public function step5Company()
     {
-        return view('onboarding.company.step5');
+        $step5Data = session('onboarding.step5_data', []);
+        return view('onboarding.company.step5', compact('step5Data'));
     }
 
     public function step5CompanyProcess(Request $request)
     {
         $request->validate([
-            'services' => 'nullable|array',
-            'specialties' => 'nullable|array',
+            'services' => 'nullable|string',
+            'specialties' => 'nullable|string',
             'employees_count' => 'nullable|integer|min:1',
             'company_size' => 'nullable|in:micro,small,medium,large',
         ]);
 
-        session(['onboarding.step5_data' => $request->all()]);
+        $step5Data = $request->all();
+
+        // Converter services e specialties de string (separado por vírgula) para array
+        if (isset($step5Data['services']) && is_string($step5Data['services'])) {
+            $step5Data['services'] = array_filter(array_map('trim', explode(',', $step5Data['services'])));
+        }
+
+        if (isset($step5Data['specialties']) && is_string($step5Data['specialties'])) {
+            $step5Data['specialties'] = array_filter(array_map('trim', explode(',', $step5Data['specialties'])));
+        }
+
+        session(['onboarding.step5_data' => $step5Data]);
 
         return redirect()->route('onboarding.step6.company');
     }
 
     public function step6Company()
     {
-        return view('onboarding.company.step6');
+        $step6Data = session('onboarding.step6_data', []);
+        return view('onboarding.company.step6', compact('step6Data'));
     }
 
     public function step6CompanyProcess(Request $request)
     {
         $request->validate([
-            'logo' => 'nullable|image|max:2048',
             'photos' => 'nullable|array|max:5',
             'photos.*' => 'image|max:2048',
-            'linkedin' => 'nullable|url',
+            'linkedin' => 'nullable|url|max:255',
             'instagram' => 'nullable|string|max:255',
             'facebook' => 'nullable|string|max:255',
-            'youtube' => 'nullable|url',
+            'youtube' => 'nullable|url|max:255',
         ]);
 
-        // Upload de logo
-        $logoPath = null;
-        if ($request->hasFile('logo')) {
-            $logoPath = $request->file('logo')->store('companies/logos', 'public');
-        }
+        try {
+            // Logo já foi enviado no step3, usar da sessão
+            $logoPath = session('onboarding.logo');
 
-        // Upload de fotos
-        $photos = [];
-        if ($request->hasFile('photos')) {
-            foreach ($request->file('photos') as $photo) {
-                $photos[] = $photo->store('companies/photos', 'public');
+            // Upload de fotos (usar da sessão se já foram enviadas, senão processar novas)
+            $photos = session('onboarding.photos', []);
+            if ($request->hasFile('photos')) {
+                $newPhotos = [];
+                foreach ($request->file('photos') as $photo) {
+                    $newPhotos[] = $photo->store('companies/photos', 'public');
+                }
+                $photos = array_merge($photos, $newPhotos);
+                // Limitar a 5 fotos
+                $photos = array_slice($photos, 0, 5);
+                session(['onboarding.photos' => $photos]);
             }
+
+            // Salvar dados do step6 na sessão antes de criar o perfil
+            $step6Data = $request->except(['logo', 'photos']);
+            session(['onboarding.step6_data' => $step6Data]);
+
+            // Criar perfil da empresa com todos os dados
+            $userId = session('onboarding.user_id');
+            $user = User::findOrFail($userId);
+
+            // Preparar dados do step3 (incluir company_name do step2 se não estiver no step3)
+            $step3Data = session('onboarding.step3_data', []);
+            if (!isset($step3Data['company_name'])) {
+                $step2Data = session('onboarding.step2_data', []);
+                if (isset($step2Data['company_name'])) {
+                    $step3Data['company_name'] = $step2Data['company_name'];
+                }
+            }
+
+            // Mapear 'employees' para 'employees_count' na criação final
+            if (isset($step3Data['employees']) && !isset($step3Data['employees_count'])) {
+                $employeesMapping = [
+                    'ate4' => 4,
+                    '5a10' => 10,
+                    '11a20' => 20,
+                    'acima21' => 50,
+                ];
+                $step3Data['employees_count'] = $employeesMapping[$step3Data['employees']] ?? null;
+            }
+
+            $profileData = array_merge(
+                session('onboarding.step2_data', []),
+                $step3Data,
+                session('onboarding.step4_data', []),
+                session('onboarding.step5_data', []),
+                $request->except(['logo', 'photos']),
+                [
+                    'user_id' => $userId,
+                    'phone' => session('onboarding.whatsapp'), // Mapear WhatsApp para phone
+                    'logo' => $logoPath,
+                    'photos' => $photos,
+                ]
+            );
+
+            // Mapear campos corretamente
+            $mappedData = [
+                'user_id' => $profileData['user_id'] ?? null,
+                'company_name' => $profileData['company_name'] ?? null,
+                'cnpj' => $profileData['cnpj'] ?? null,
+                'phone' => $profileData['phone'] ?? null,
+                'website' => $profileData['website'] ?? null,
+                'description' => $profileData['description'] ?? null,
+                'address' => $profileData['address'] ?? null,
+                'city' => $profileData['city'] ?? null,
+                'state' => $profileData['state'] ?? null,
+                'zip_code' => $profileData['zip_code'] ?? null,
+                'latitude' => $profileData['latitude'] ?? null,
+                'longitude' => $profileData['longitude'] ?? null,
+                'services' => $profileData['services'] ?? null,
+                'specialties' => $profileData['specialties'] ?? null,
+                'employees_count' => $profileData['employees_count'] ?? null,
+                'company_size' => $profileData['company_size'] ?? null,
+                'logo' => $profileData['logo'] ?? null,
+                'photos' => $profileData['photos'] ?? null,
+                'linkedin' => $profileData['linkedin'] ?? null,
+                'instagram' => $profileData['instagram'] ?? null,
+                'facebook' => $profileData['facebook'] ?? null,
+                'youtube' => $profileData['youtube'] ?? null,
+            ];
+
+            CompanyProfile::create($mappedData);
+
+            // Marcar usuário como completed apenas se ainda não está (primeiro perfil)
+            // Se já está completed, significa que está criando o segundo perfil
+            if ($user->isPending()) {
+                $user->markAsCompleted();
+            }
+
+            // Fazer login automático
+            Auth::login($user);
+
+            // Limpar sessão
+            $this->clearOnboardingSession();
+
+            return redirect()->route('company.dashboard')->with('success', 'Perfil da empresa criado com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Erro ao processar cadastro: ' . $e->getMessage()])->withInput();
         }
-
-        // Criar perfil da empresa com todos os dados
-        $userId = session('onboarding.user_id');
-        $user = User::findOrFail($userId);
-
-        $profileData = array_merge(
-            session('onboarding.step2_data', []),
-            session('onboarding.step3_data', []),
-            session('onboarding.step4_data', []),
-            session('onboarding.step5_data', []),
-            $request->except(['logo', 'photos']),
-            [
-                'user_id' => $userId,
-                'phone' => session('onboarding.whatsapp'), // Mapear WhatsApp para phone
-                'logo' => $logoPath,
-                'photos' => $photos,
-            ]
-        );
-
-        CompanyProfile::create($profileData);
-
-        // Marcar usuário como completed
-        $user->markAsCompleted();
-
-        // Fazer login automático
-        Auth::login($user);
-
-        // Limpar sessão
-        $this->clearOnboardingSession();
-
-        return redirect()->route('company.dashboard')->with('success', 'Perfil da empresa criado com sucesso!');
     }
 
     // ========================================
@@ -533,6 +682,8 @@ class OnboardingController extends Controller
             'onboarding.step6_data',
             'onboarding.photo',
             'onboarding.resume',
+            'onboarding.logo',
+            'onboarding.photos',
         ]);
     }
 }

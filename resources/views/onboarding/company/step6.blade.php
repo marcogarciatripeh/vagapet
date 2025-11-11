@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Finalizar Cadastro - VagaPet')
+@section('title', 'Redes Sociais e Finalizar - VagaPet')
 
 @section('content')
 <div class="page-wrapper">
@@ -66,19 +66,77 @@
                   </div>
                 </div>
 
-                <div class="text-center">
-                  <div class="success-icon" style="font-size: 80px; color: #28a745; margin: 30px 0;">
-                    <i class="la la-check-circle"></i>
+                <form class="default-form" action="{{ route('onboarding.step6.company.process') }}" method="post" enctype="multipart/form-data">
+                  @csrf
+
+                  @if($errors->any())
+                    <div class="alert alert-danger">
+                      <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                          <li>{{ $error }}</li>
+                        @endforeach
+                      </ul>
+                    </div>
+                  @endif
+
+                  <div class="row">
+
+                    <!-- Fotos do Espaço -->
+                    <div class="form-group col-lg-12 col-md-12">
+                      <label>Fotos do Espaço</label>
+                      @if(session('onboarding.photos') && count(session('onboarding.photos')) > 0)
+                        <div class="alert alert-info">
+                          <i class="la la-info-circle"></i> {{ count(session('onboarding.photos')) }} foto(s) já enviada(s). Você pode adicionar mais (máximo 5 no total).
+                        </div>
+                      @endif
+                      <div class="uploading-outer">
+                        <div class="uploadButton">
+                          <input class="uploadButton-input" type="file" name="photos[]" accept="image/*" id="upload-photos" multiple />
+                          <label class="uploadButton-button ripple-effect" for="upload-photos">Adicionar fotos</label>
+                          <span class="uploadButton-file-name"></span>
+                        </div>
+                        <div class="text">Tamanho máximo: 2MB por foto. Máximo de 5 fotos. Formatos: .jpg e .png</div>
+                      </div>
+                    </div>
+
+                    <!-- Redes Sociais -->
+                    <div class="form-group col-lg-12 col-md-12">
+                      <h5 class="mb-3">Redes Sociais</h5>
+                    </div>
+
+                    <div class="form-group col-lg-6 col-md-12">
+                      <label>LinkedIn</label>
+                      <input type="text" name="linkedin" placeholder="www.linkedin.com/company/empresa" value="{{ old('linkedin', $step6Data['linkedin'] ?? '') }}">
+                    </div>
+
+                    <div class="form-group col-lg-6 col-md-12">
+                      <label>Instagram</label>
+                      <input type="text" name="instagram" placeholder="instagram.com/empresa" value="{{ old('instagram', $step6Data['instagram'] ?? '') }}">
+                    </div>
+
+                    <div class="form-group col-lg-6 col-md-12">
+                      <label>Facebook</label>
+                      <input type="text" name="facebook" placeholder="www.facebook.com/empresa" value="{{ old('facebook', $step6Data['facebook'] ?? '') }}">
+                    </div>
+
+                    <div class="form-group col-lg-6 col-md-12">
+                      <label>YouTube</label>
+                      <input type="text" name="youtube" placeholder="www.youtube.com/@empresa" value="{{ old('youtube', $step6Data['youtube'] ?? '') }}">
+                    </div>
+
                   </div>
 
-                  <h3 style="margin-bottom: 20px;">Cadastro Concluído!</h3>
-                  <p style="margin-bottom: 30px; color: #666;">Sua conta foi criada com sucesso. Agora você pode começar a usar a plataforma.</p>
-
-                  <div class="btn-box">
-                    <a href="{{ route('onboarding.step5.company') }}" class="theme-btn btn-style-one text-white">Voltar</a>
-                    <a href="{{ route('company.dashboard') }}" class="theme-btn btn-style-one text-white">Ir para o Dashboard</a>
+                  <!-- Área botão -->
+                  <div class="row">
+                    <div class="form-group col-lg-6 col-md-12">
+                      <a href="{{ route('onboarding.step5.company') }}" class="theme-btn btn-style-one text-white">Voltar</a>
+                    </div>
+                    <div class="form-group col-lg-6 col-md-12 d-flex justify-content-end">
+                      <button class="theme-btn btn-style-one text-white" type="submit">Finalizar Cadastro</button>
+                    </div>
                   </div>
-                </div>
+                  <!-- Fim área botão -->
+                </form>
               </div>
             </div>
           </div>

@@ -92,22 +92,29 @@
                     <div class="form-group col-lg-6 col-md-12">
                       <label>Sobrenome*</label>
                       <input type="text" name="last_name" placeholder="Digite aqui o seu sobrenome" required value="{{ old('last_name', session('onboarding.step2_data.last_name')) }}">
+                      @if(isset($existingUser) && $existingUser && $existingUser->isCompleted())
+                        <small class="form-text text-success mt-2">
+                          <i class="la la-check-circle"></i> Você já possui uma conta ativa. Não é necessário criar senha novamente.
+                        </small>
+                      @endif
                     </div>
 
-                    <div class="form-group col-lg-6 col-md-12">
-                      <label>Crie uma senha</label>
-                      <input id="password-field" type="password" name="password" placeholder="Digite sua senha" required>
-                      <small class="form-text text-muted">
-                        <i class="la la-info-circle"></i> A senha deve ter pelo menos 8 caracteres
-                      </small>
-                    </div>
-                    <div class="form-group col-lg-6 col-md-12">
-                      <label>Confirme a senha</label>
-                      <input id="password-field" type="password" name="password_confirmation" placeholder="Digite a mesma senha para confirmar" required>
-                      <small class="form-text text-muted">
-                        <i class="la la-info-circle"></i> Digite a mesma senha para confirmar
-                      </small>
-                    </div>
+                    @if(!isset($needsPassword) || $needsPassword)
+                      <div class="form-group col-lg-6 col-md-12">
+                        <label>Crie uma senha</label>
+                        <input id="password-field" type="password" name="password" placeholder="Digite sua senha" required>
+                        <small class="form-text text-muted">
+                          <i class="la la-info-circle"></i> A senha deve ter pelo menos 8 caracteres
+                        </small>
+                      </div>
+                      <div class="form-group col-lg-6 col-md-12">
+                        <label>Confirme a senha</label>
+                        <input id="password-field" type="password" name="password_confirmation" placeholder="Digite a mesma senha para confirmar" required>
+                        <small class="form-text text-muted">
+                          <i class="la la-info-circle"></i> Digite a mesma senha para confirmar
+                        </small>
+                      </div>
+                    @endif
                   </div>
 
                   <!-- Área botão -->

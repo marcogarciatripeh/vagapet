@@ -66,24 +66,40 @@
                   </div>
                 </div>
 
-                <form class="default-form" action="{{ route('onboarding.step3.company.process') }}" method="post">
+                <form class="default-form" action="{{ route('onboarding.step3.company.process') }}" method="post" enctype="multipart/form-data">
                   @csrf
+
+                  @if($errors->any())
+                    <div class="alert alert-danger">
+                      <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                          <li>{{ $error }}</li>
+                        @endforeach
+                      </ul>
+                    </div>
+                  @endif
+
                   <div class="row">
 
-                    <!-- Upload de foto -->
+                    <!-- Upload de logo -->
                     <div class="uploading-outer">
                       <div class="uploadButton">
-                        <input class="uploadButton-input" type="file" name="attachments[]" accept="image/*, application/pdf" id="upload" multiple />
-                        <label class="uploadButton-button ripple-effect" for="upload">Subir logo</label>
+                        <input class="uploadButton-input" type="file" name="logo" accept="image/*" id="upload-logo" />
+                        <label class="uploadButton-button ripple-effect" for="upload-logo">Subir logo</label>
                         <span class="uploadButton-file-name"></span>
                       </div>
-                      <div class="text">Tamanho máximo do arquivo: 1MB, dimensão mínima: 330x300, arquivos suportados: .jpg e .png</div>
+                      <div class="text">Tamanho máximo do arquivo: 2MB, dimensão mínima: 330x300, arquivos suportados: .jpg e .png</div>
+                      @if(session('onboarding.logo'))
+                        <small class="form-text text-success mt-2">
+                          <i class="la la-check-circle"></i> Logo enviado com sucesso
+                        </small>
+                      @endif
                     </div>
 
                     <!-- Site -->
                     <div class="form-group col-lg-6 col-md-12">
                       <label>Site</label>
-                      <input type="text" name="website" placeholder="www.meuservicos.com.br">
+                      <input type="text" name="website" placeholder="www.meuservicos.com.br" value="{{ old('website', $step3Data['website'] ?? '') }}">
                     </div>
 
                     <!-- Equipe -->
@@ -91,17 +107,17 @@
                       <label>Quantidade de funcionários</label>
                       <select name="employees" class="chosen-select">
                         <option value="">Selecione</option>
-                        <option value="ate4">Até 4</option>
-                        <option value="5a10">De 5 a 10</option>
-                        <option value="11a20">De 11 a 20</option>
-                        <option value="acima21">Acima de 21</option>
+                        <option value="ate4" {{ old('employees', isset($step3Data['employees']) ? $step3Data['employees'] : '') == 'ate4' ? 'selected' : '' }}>Até 4</option>
+                        <option value="5a10" {{ old('employees', isset($step3Data['employees']) ? $step3Data['employees'] : '') == '5a10' ? 'selected' : '' }}>De 5 a 10</option>
+                        <option value="11a20" {{ old('employees', isset($step3Data['employees']) ? $step3Data['employees'] : '') == '11a20' ? 'selected' : '' }}>De 11 a 20</option>
+                        <option value="acima21" {{ old('employees', isset($step3Data['employees']) ? $step3Data['employees'] : '') == 'acima21' ? 'selected' : '' }}>Acima de 21</option>
                       </select>
                     </div>
 
                     <!-- Descrição -->
                     <div class="form-group col-lg-12 col-md-12">
                       <label>Descrição</label>
-                      <textarea name="description" placeholder="Fale sobre sua empresa, o que ela tem de diferente, serviços oferecidos (banho, tosa, etc.) e qualquer outro detalhe relevante."></textarea>
+                      <textarea name="description" placeholder="Fale sobre sua empresa, o que ela tem de diferente, serviços oferecidos (banho, tosa, etc.) e qualquer outro detalhe relevante.">{{ old('description', $step3Data['description'] ?? '') }}</textarea>
                     </div>
 
                   </div>

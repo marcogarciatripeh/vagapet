@@ -40,7 +40,17 @@ class CompanyProfileResource extends Resource
     {
         return $form
             ->schema([
+                // Usuário (oculto ou select)
+                Select::make('user_id')
+                    ->label('Usuário')
+                    ->relationship('user', 'name')
+                    ->required()
+                    ->searchable()
+                    ->preload(),
+
+                // 1. Dados da Empresa
                 Forms\Components\Section::make('Dados da Empresa')
+                    ->description('Informações básicas da empresa')
                     ->schema([
                         TextInput::make('company_name')
                             ->label('Nome da Empresa')
@@ -49,52 +59,84 @@ class CompanyProfileResource extends Resource
 
                         TextInput::make('cnpj')
                             ->label('CNPJ')
-                            ->maxLength(20),
+                            ->mask('99.999.999/9999-99')
+                            ->maxLength(18),
 
                         TextInput::make('phone')
                             ->label('Telefone')
                             ->tel()
+                            ->mask('(99) 99999-9999')
                             ->maxLength(20),
 
                         TextInput::make('website')
                             ->label('Website')
                             ->url()
+                            ->placeholder('www.empresa.com.br')
                             ->maxLength(255),
                     ])
                     ->columns(2),
 
+                // 2. Localização
                 Forms\Components\Section::make('Localização')
+                    ->description('Endereço e localização no mapa')
                     ->schema([
                         Textarea::make('address')
-                            ->label('Endereço')
+                            ->label('Endereço Completo (não será divulgado)')
+                            ->placeholder('Rua Exemplo, 123')
+                            ->helperText('Este endereço não ficará público, é apenas para referência')
                             ->rows(2)
-                            ->maxLength(500),
+                            ->maxLength(500)
+                            ->columnSpanFull(),
 
                         TextInput::make('city')
                             ->label('Cidade')
+                            ->placeholder('São Paulo')
+                            ->helperText('Bairro e cidade ficarão visíveis na plataforma')
+                            ->required()
                             ->maxLength(100),
 
                         TextInput::make('state')
-                            ->label('Estado')
-                            ->maxLength(2),
+                            ->label('Estado (UF)')
+                            ->placeholder('SP')
+                            ->maxLength(2)
+                            ->extraInputAttributes(['style' => 'text-transform: uppercase;']),
 
                         TextInput::make('zip_code')
                             ->label('CEP')
+                            ->mask('99999-999')
                             ->maxLength(10),
-                    ])
-                    ->columns(2),
 
+                        TextInput::make('latitude')
+                            ->label('Latitude')
+                            ->numeric()
+                            ->step(0.00000001)
+                            ->placeholder('-23.550520'),
+
+                        TextInput::make('longitude')
+                            ->label('Longitude')
+                            ->numeric()
+                            ->step(0.00000001)
+                            ->placeholder('-46.633308'),
+                    ])
+                    ->columns(3)
+                    ->collapsed(),
+
+                // 3. Informações da Empresa
                 Forms\Components\Section::make('Informações da Empresa')
+                    ->description('Descrição, porte e informações profissionais')
                     ->schema([
                         Textarea::make('description')
                             ->label('Descrição')
-                            ->rows(3)
-                            ->maxLength(1000),
+                            ->placeholder('Fale sobre sua empresa, o que ela tem de diferente, serviços oferecidos (banho, tosa, etc.) e qualquer outro detalhe relevante.')
+                            ->rows(4)
+                            ->maxLength(1000)
+                            ->columnSpanFull(),
 
                         TextInput::make('employees_count')
                             ->label('Número de Funcionários')
                             ->numeric()
-                            ->minValue(1),
+                            ->minValue(1)
+                            ->placeholder('Ex.: 10'),
 
                         Select::make('company_size')
                             ->label('Porte da Empresa')
@@ -109,60 +151,86 @@ class CompanyProfileResource extends Resource
                             ->label('Serviços')
                             ->schema([
                                 TextInput::make('service')
-                                    ->label('Serviço')
+                                    ->label('Nome do Serviço')
+                                    ->placeholder('Ex.: Banho e Tosa')
                                     ->required(),
                             ])
-                            ->simple(TextInput::make('service')),
+                            ->columns(1)
+                            ->collapsible()
+                            ->defaultItems(0)
+                            ->addActionLabel('Adicionar Serviço'),
 
                         Repeater::make('specialties')
                             ->label('Especialidades')
                             ->schema([
                                 TextInput::make('specialty')
-                                    ->label('Especialidade')
+                                    ->label('Nome da Especialidade')
+                                    ->placeholder('Ex.: Clínica Veterinária')
                                     ->required(),
                             ])
-                            ->simple(TextInput::make('specialty')),
-                    ])
-                    ->columns(1),
-
-                Forms\Components\Section::make('Arquivos')
-                    ->schema([
-                        FileUpload::make('logo')
-                            ->label('Logo')
-                            ->image()
-                            ->directory('companies/logos')
-                            ->visibility('public'),
-
-                        FileUpload::make('photos')
-                            ->label('Fotos')
-                            ->image()
-                            ->multiple()
-                            ->directory('companies/photos')
-                            ->visibility('public'),
+                            ->columns(1)
+                            ->collapsible()
+                            ->defaultItems(0)
+                            ->addActionLabel('Adicionar Especialidade'),
                     ])
                     ->columns(2),
 
+                // 4. Arquivos
+                Forms\Components\Section::make('Logo e Fotos')
+                    ->description('Upload de imagens da empresa')
+                    ->schema([
+                        FileUpload::make('logo')
+                            ->label('Logo')
+                            ->helperText('Tamanho máximo: 1MB. Dimensão mínima: 330x300. Formatos: .jpg e .png')
+                            ->image()
+                            ->imageEditor()
+                            ->maxSize(1024)
+                            ->directory('companies/logos')
+                            ->visibility('public')
+                            ->columnSpanFull(),
+
+                        FileUpload::make('photos')
+                            ->label('Fotos do Espaço')
+                            ->helperText('Tamanho máximo: 2MB por foto. Máximo de 5 fotos. Formatos: .jpg e .png')
+                            ->image()
+                            ->imageEditor()
+                            ->multiple()
+                            ->maxFiles(5)
+                            ->maxSize(2048)
+                            ->directory('companies/photos')
+                            ->visibility('public')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+
+                // 5. Redes Sociais
                 Forms\Components\Section::make('Redes Sociais')
+                    ->description('Inclua suas redes sociais se quiser que outros vejam seu perfil')
                     ->schema([
                         TextInput::make('linkedin')
                             ->label('LinkedIn')
+                            ->placeholder('www.linkedin.com/company/empresa')
                             ->url()
                             ->maxLength(255),
 
                         TextInput::make('instagram')
                             ->label('Instagram')
+                            ->placeholder('instagram.com/empresa')
                             ->maxLength(255),
 
                         TextInput::make('facebook')
                             ->label('Facebook')
+                            ->placeholder('www.facebook.com/empresa')
                             ->maxLength(255),
 
                         TextInput::make('youtube')
                             ->label('YouTube')
+                            ->placeholder('www.youtube.com/@empresa')
                             ->url()
                             ->maxLength(255),
                     ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->collapsed(),
             ]);
     }
 
