@@ -51,14 +51,30 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             // Redirecionar baseado no perfil ativo
-            if ($user->active_profile === 'company' && $user->hasCompanyProfile()) {
-                return redirect()->intended(route('company.dashboard'));
-            } elseif ($user->active_profile === 'professional' && $user->hasProfessionalProfile()) {
-                return redirect()->intended(route('professional.dashboard'));
-            } else {
-                // Usuário sem perfil definido - redirecionar para escolha
-                return redirect()->route('choose-profile');
+            $hasProfessional = $user->hasProfessionalProfile();
+            $hasCompany = $user->hasCompanyProfile();
+            
+            // Se tem ambos os perfis, usar o active_profile
+            if ($hasProfessional && $hasCompany) {
+                if ($user->active_profile === 'company') {
+                    return redirect()->intended(route('company.dashboard'));
+                } else {
+                    // Default para professional se não tiver active_profile definido
+                    return redirect()->intended(route('professional.dashboard'));
+                }
             }
+            
+            // Se tem apenas um perfil, redirecionar para ele
+            if ($hasCompany) {
+                $user->update(['active_profile' => 'company']);
+                return redirect()->intended(route('company.dashboard'));
+            } elseif ($hasProfessional) {
+                $user->update(['active_profile' => 'professional']);
+                return redirect()->intended(route('professional.dashboard'));
+            }
+            
+            // Se não tem nenhum perfil completo, redirecionar para home
+            return redirect()->route('home')->with('info', 'Complete seu perfil para acessar o painel.');
         }
 
         return back()->withErrors(['email' => 'Credenciais inválidas.']);
@@ -71,17 +87,6 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('home')->with('success', 'Logout realizado com sucesso.');
-    }
-
-    public function chooseProfile()
-    {
-        $user = Auth::user();
-
-        if (!$user) {
-            return redirect()->route('login');
-        }
-
-        return view('auth.choose-profile', compact('user'));
     }
 
     public function switchProfile(Request $request)

@@ -18,7 +18,6 @@
   <!-- Seção de Listagem (Layout com Mapa) -->
   <section class="ls-section map-layout">
     <div class="filters-backdrop"></div>
-
     <div class="ls-cotainer">
       <!-- Coluna de Filtros -->
       <div class="filters-column hide-left">
@@ -115,7 +114,9 @@
       <!-- Fim da Coluna de Filtros -->
 
       <!-- Coluna do Mapa -->
-      @include('layouts.partials.professionals-map')
+      <div class="map-column width-50">
+        @include('layouts.partials.professionals-map')
+      </div>
 
       <!-- Coluna de Conteúdo -->
       <div class="content-column width-50">
@@ -194,9 +195,8 @@
   </section>
   <!-- Fim da Seção de Listagem -->
 
-  <!-- Rodapé -->
-  @include('layouts.partials.copyright')
-  <!-- Fim do Rodapé -->
+  <!-- Footer -->
+  @include('layouts.partials.footer')
 
 </div>
 <!-- Fim Page Wrapper -->
@@ -204,4 +204,5 @@
 
 @push('scripts')
 @include('layouts.partials.scripts')
+@include('layouts.partials.favorite-scripts')
 @endpush

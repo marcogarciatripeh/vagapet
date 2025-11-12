@@ -13147,7 +13147,7 @@ Ls Section / style Four
 
 .ls-section.map-layout .map-column {
   position: fixed;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 87px);
   right: 0;
   bottom: 0;
 }
@@ -21304,7 +21304,7 @@ Work Section
 	}
 
 	.ls-section.map-layout .map-column {
-		height: calc(100vh - 80px);
+		height: calc(100vh - 87px);
 	}
 
 	.contact-section .upper-box{

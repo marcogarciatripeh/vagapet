@@ -16,12 +16,22 @@ class EnsureCompanyProfile
     public function handle(Request $request, Closure $next): Response
     {
         if (!auth()->check()) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'error' => 'Você precisa estar logado para acessar esta página.'
+                ], 401);
+            }
             return redirect()->route('login')->with('error', 'Você precisa estar logado para acessar esta página.');
         }
 
         $user = auth()->user();
 
         if (!$user->hasCompanyProfile()) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'error' => 'Você precisa ter um perfil de empresa para acessar esta página.'
+                ], 403);
+            }
             return redirect()->route('home')->with('error', 'Você precisa ter um perfil de empresa para acessar esta página.');
         }
 

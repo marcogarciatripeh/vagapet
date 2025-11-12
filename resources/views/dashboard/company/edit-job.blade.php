@@ -25,7 +25,7 @@
                 @include('dashboard.company.partials.job-form', [
                   'job' => $job,
                   'formAction' => route('company.update-job', $job->id),
-                  'formMethod' => 'PUT',
+                  'formMethod' => 'POST',
                   'submitLabel' => 'Atualizar vaga',
                 ])
               </div>

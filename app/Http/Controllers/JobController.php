@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Job;
 use App\Models\CompanyProfile;
 
@@ -71,12 +72,24 @@ class JobController extends Controller
 
         $jobs = $query->paginate(12);
 
+        // Verificar quais vagas estão favoritadas (para profissionais logados)
+        $favoritedJobIds = collect();
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user && $user->professionalProfile) {
+                $favoritedJobIds = \App\Models\Favorite::where('user_id', $user->id)
+                    ->where('favoritable_type', Job::class)
+                    ->whereIn('favoritable_id', $jobs->pluck('id'))
+                    ->pluck('favoritable_id');
+            }
+        }
+
         // Dados para filtros
         $cities = Job::active()->distinct()->pluck('city')->filter()->sort()->values();
         $states = Job::active()->distinct()->pluck('state')->filter()->sort()->values();
         $areas = Job::active()->distinct()->pluck('area')->filter()->sort()->values();
 
-        return view('public.jobs.index', compact('jobs', 'cities', 'states', 'areas'));
+        return view('public.jobs.index', compact('jobs', 'favoritedJobIds', 'cities', 'states', 'areas'));
     }
 
     public function show($slug)
@@ -89,6 +102,22 @@ class JobController extends Controller
         // Incrementar visualizações
         $job->incrementViews();
 
+        // Verificar se o usuário já se candidatou
+        $hasApplied = false;
+        $isFavorited = false;
+        
+        if (Auth::check() && Auth::user()->professionalProfile) {
+            $hasApplied = $job->applications()
+                ->where('professional_profile_id', Auth::user()->professionalProfile->id)
+                ->exists();
+            
+            // Verificar se a vaga está favoritada
+            $isFavorited = Auth::user()->favorites()
+                ->where('favoritable_type', Job::class)
+                ->where('favoritable_id', $job->id)
+                ->exists();
+        }
+
         // Vagas relacionadas (mesma empresa ou área)
         $related_jobs = Job::active()
             ->where('id', '!=', $job->id)
@@ -100,6 +129,6 @@ class JobController extends Controller
             ->limit(4)
             ->get();
 
-        return view('public.jobs.show', compact('job', 'related_jobs'));
+        return view('public.jobs.show', compact('job', 'related_jobs', 'hasApplied', 'isFavorited'));
     }
 }

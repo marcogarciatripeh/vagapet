@@ -277,4 +277,5 @@
 
 @push('scripts')
   @include('layouts.partials.scripts')
+  @include('layouts.partials.favorite-scripts')
 @endpush

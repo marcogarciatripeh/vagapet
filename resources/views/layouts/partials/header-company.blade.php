@@ -20,8 +20,64 @@
           'dropdownLabel' => 'Painéis',
           'containerClass' => 'mr-2'
         ])
-        <button class="menu-btn"><span class="count">1</span><span class="icon la la-heart-o"></span></button>
-        <button class="menu-btn"><span class="icon la la-bell"></span></button>
+        <a href="{{ route('company.favorite-professionals') }}" class="menu-btn" title="Profissionais Favoritos">
+          <span class="icon la la-heart-o"></span>
+        </a>
+
+        <!-- Notificações -->
+        @php
+          $newApplicationsCount = Auth::user()->companyProfile
+            ? App\Models\JobApplication::whereHas('job', function($q) {
+                $q->where('company_profile_id', Auth::user()->companyProfile->id);
+              })->where('status', 'pending')->whereNull('viewed_at')->count()
+            : 0;
+        @endphp
+        <div class="dropdown">
+          <button class="menu-btn" data-toggle="dropdown" id="notifications-bell" onclick="markNotificationsAsViewed()">
+            @if($newApplicationsCount > 0)
+              <span class="count" id="notifications-count">{{ $newApplicationsCount }}</span>
+            @endif
+            <span class="icon la la-bell"></span>
+          </button>
+          <ul class="dropdown-menu pull-right notifications-dropdown">
+            @if($newApplicationsCount > 0)
+              <li class="dropdown-header">{{ $newApplicationsCount }} {{ \Illuminate\Support\Str::plural('nova candidatura', $newApplicationsCount) }}</li>
+              <li class="divider"></li>
+              <li>
+                <a href="{{ route('company.candidates') }}?status=pending" style="display: block; padding: 10px 20px; color: #1967d2;">
+                  <i class="la la-user-check"></i> Ver todas as candidaturas
+                </a>
+              </li>
+            @else
+              <li style="padding: 15px 20px; text-align: center; color: #888;">
+                Nenhuma notificação nova
+              </li>
+            @endif
+          </ul>
+        </div>
+
+        <script>
+        function markNotificationsAsViewed() {
+          const countBadge = document.getElementById('notifications-count');
+          if (countBadge) {
+            fetch('{{ route("company.mark-notifications-viewed") }}', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+              }
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                countBadge.style.display = 'none';
+              }
+            })
+            .catch(error => console.error('Erro:', error));
+          }
+        }
+        </script>
+
         <div class="dropdown dashboard-option">
           <a class="dropdown-toggle" role="button" data-toggle="dropdown">
             @if(Auth::user()->companyProfile && Auth::user()->companyProfile->logo)

@@ -65,7 +65,6 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/escolher-perfil', [AuthController::class, 'chooseProfile'])->name('choose-profile');
     Route::post('/trocar-perfil', [AuthController::class, 'switchProfile'])->name('switch-profile');
     Route::get('/alterar-senha', [AuthController::class, 'changePassword'])->name('change-password');
     Route::post('/alterar-senha', [AuthController::class, 'updatePassword'])->name('change-password.update');
@@ -144,4 +143,5 @@ Route::prefix('empresa')->middleware(['auth', 'company'])->group(function () {
     Route::get('/pagina', [DashboardCompanyController::class, 'publicPage'])->name('company.public-page');
     Route::get('/profissionais-favoritos', [DashboardCompanyController::class, 'favoriteProfessionals'])->name('company.favorite-professionals');
     Route::post('/toggle-favorito', [DashboardCompanyController::class, 'toggleFavorite'])->name('company.toggle-favorite');
+    Route::post('/marcar-notificacoes-vistas', [DashboardCompanyController::class, 'markNotificationsViewed'])->name('company.mark-notifications-viewed');
 });

@@ -20,8 +20,11 @@
           'dropdownLabel' => 'Painéis',
           'containerClass' => 'mr-2'
         ])
-        <button class="menu-btn"><span class="count">1</span><span class="icon la la-heart-o"></span></button>
+        <a href="{{ route('professional.favorites') }}" class="menu-btn" title="Meus Favoritos">
+          <span class="icon la la-heart-o"></span>
+        </a>
         <button class="menu-btn"><span class="icon la la-bell"></span></button>
+        @auth
         <div class="dropdown dashboard-option">
           <a class="dropdown-toggle" role="button" data-toggle="dropdown">
             @if(Auth::user()->professionalProfile && Auth::user()->professionalProfile->photo)
@@ -35,10 +38,12 @@
             @include('layouts.partials.menu-professional')
           </ul>
         </div>
+        @endauth
       </div>
     </div>
   </div>
   <!-- Mobile Header -->
+  @auth
   <div class="mobile-header">
     <a href="#nav-mobile" class="mobile-nav-toggler navbar-trigger"><span class="flaticon-menu-1"></span></a>
     <div class="logo"><a href="{{ route('professional.dashboard') }}"><img src="{{ asset('images/logo-empresa.svg') }}" alt="Logo VagaPet"></a></div>
@@ -52,5 +57,6 @@
         <i class="la la-angle-down"></i></button>
     </div>
   </div>
+  @endauth
   <div id="nav-mobile"></div>
 </header>

@@ -18,24 +18,28 @@
               <div class="widget-title">
                 <h4>Lista</h4>
                 <div class="chosen-outer">
-                  <select class="chosen-select">
-                    <option>Últimos 6 meses</option>
-                    <option>Últimos 12 meses</option>
-                    <option>Últimos 16 meses</option>
-                    <option>Últimos 24 meses</option>
-                    <option>Últimos 5 anos</option>
-                  </select>
+                  <form method="GET" action="{{ route('company.favorite-professionals') }}" id="period-filter-form">
+                    <select class="chosen-select" name="period" onchange="document.getElementById('period-filter-form').submit();">
+                      <option value="">Todos os períodos</option>
+                      <option value="6" {{ request('period') == 6 ? 'selected' : '' }}>Últimos 6 meses</option>
+                      <option value="12" {{ request('period') == 12 ? 'selected' : '' }}>Últimos 12 meses</option>
+                      <option value="16" {{ request('period') == 16 ? 'selected' : '' }}>Últimos 16 meses</option>
+                      <option value="24" {{ request('period') == 24 ? 'selected' : '' }}>Últimos 24 meses</option>
+                      <option value="60" {{ request('period') == 60 ? 'selected' : '' }}>Últimos 5 anos</option>
+                    </select>
+                  </form>
                 </div>
               </div>
 
               <div class="widget-content">
-                <div class="row">
-                  @forelse($favorites as $favorite)
+                <div class="row favorites-list">
+                  @if($favorites->count())
+                    @foreach($favorites as $favorite)
                     @php
                       $professional = $favorite->favoritable;
                     @endphp
                     @if($professional)
-                      <div class="job-block col-lg-12 col-md-12 col-sm-12">
+                      <div class="job-block col-lg-12 col-md-12 col-sm-12" id="favorite-card-{{ $favorite->id }}">
                         <div class="inner-box">
                           <div class="content">
                             <span class="company-logo">
@@ -52,27 +56,43 @@
                                 <li class="time">{{ $area }}</li>
                               @endforeach
                             </ul>
-                            <form method="POST" action="{{ route('company.toggle-favorite') }}" class="bookmark-btn position-relative">
-                              @csrf
-                              <input type="hidden" name="favoritable_type" value="{{ App\Models\ProfessionalProfile::class }}">
-                              <input type="hidden" name="favoritable_id" value="{{ $professional->id }}">
-                              <button type="submit" class="bookmark-btn active" title="Remover dos favoritos">
-                                <span class="flaticon-bookmark"></span>
-                              </button>
-                            </form>
+                          </div>
+                          <div class="option-box">
+                            <ul class="option-list">
+                              <li class="ml-0">
+                                <button type="button" data-text="Ver perfil" onclick="window.open('{{ route('professionals.show', $professional) }}', '_blank')">
+                                  <span class="la la-eye"></span>
+                                </button>
+                              </li>
+                              <li>
+                                <button type="button" data-text="Remover dos favoritos" onclick="removeFavorite({{ $professional->id }}, {{ $favorite->id }}, event); return false;">
+                                  <span class="la la-trash"></span>
+                                </button>
+                              </li>
+                            </ul>
                           </div>
                         </div>
                       </div>
                     @endif
-                  @empty
-                    <div class="col-12 text-center py-5">
+                    @endforeach
+                  @else
+                    <div class="col-12 text-center py-5" id="favorites-empty-state">
                       <img src="{{ asset('images/resource/default-avatar.png') }}" alt="Sem favoritos" style="max-width: 160px;" class="mb-3">
                       <h5>Você ainda não favoritou profissionais</h5>
                       <p class="text-muted">Explore perfis e favorite talentos para acessar rapidamente mais tarde.</p>
                       <a href="{{ route('professionals.index') }}" class="theme-btn btn-style-two mt-3">Buscar profissionais</a>
                     </div>
-                  @endforelse
+                  @endif
                 </div>
+
+                @if($favorites->count())
+                  <div class="col-12 text-center py-5" id="favorites-empty-state" style="display:none;">
+                    <img src="{{ asset('images/resource/default-avatar.png') }}" alt="Sem favoritos" style="max-width: 160px;" class="mb-3">
+                    <h5>Você ainda não favoritou profissionais</h5>
+                    <p class="text-muted">Explore perfis e favorite talentos para acessar rapidamente mais tarde.</p>
+                    <a href="{{ route('professionals.index') }}" class="theme-btn btn-style-two mt-3">Buscar profissionais</a>
+                  </div>
+                @endif
 
                 @if($favorites instanceof \Illuminate\Contracts\Pagination\Paginator && $favorites->count())
                   <div class="mt-4">
@@ -93,5 +113,47 @@
 
 @push('scripts')
 @include('layouts.partials.scripts')
+@include('layouts.partials.favorite-scripts')
+<script>
+function removeFavorite(professionalId, favoriteId, event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  
+  if (!confirm('Deseja remover este profissional dos favoritos?')) {
+    return false;
+  }
+  
+  toggleFavorite('App\\Models\\ProfessionalProfile', professionalId, {
+    onRemoved: function() {
+      // Remover o card da lista
+      const card = document.getElementById('favorite-card-' + favoriteId);
+      if (card) {
+        card.style.transition = 'opacity 0.3s ease';
+        card.style.opacity = '0';
+        setTimeout(function() {
+          card.remove();
+          
+          // Verificar se não há mais favoritos
+          const list = document.querySelector('.favorites-list');
+          if (list && !list.querySelector('.job-block')) {
+            const empty = document.getElementById('favorites-empty-state');
+            if (empty) {
+              empty.style.display = 'block';
+            }
+          }
+        }, 300);
+      }
+    },
+    onError: function(error) {
+      console.error('Erro ao remover favorito:', error);
+      alert('Erro ao remover favorito. Tente novamente.');
+    }
+  });
+  
+  return false;
+}
+</script>
 @endpush
 

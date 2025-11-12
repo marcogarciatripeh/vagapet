@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\ProfessionalProfile;
 
 class ProfessionalController extends Controller
@@ -47,6 +48,18 @@ class ProfessionalController extends Controller
 
         $professionals = $query->paginate(12);
 
+        // Verificar quais profissionais estão favoritados (para empresas logadas)
+        $favoritedIds = collect();
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user && $user->companyProfile) {
+                $favoritedIds = \App\Models\Favorite::where('user_id', $user->id)
+                    ->where('favoritable_type', ProfessionalProfile::class)
+                    ->whereIn('favoritable_id', $professionals->pluck('id'))
+                    ->pluck('favoritable_id');
+            }
+        }
+
         // Dados para filtros
         $cities = ProfessionalProfile::active()->distinct()->pluck('city')->filter()->sort()->values();
         $states = ProfessionalProfile::active()->distinct()->pluck('state')->filter()->sort()->values();
@@ -60,6 +73,7 @@ class ProfessionalController extends Controller
 
         return view('public.professionals.index', [
             'professionals' => $professionals,
+            'favoritedIds' => $favoritedIds,
             'cities' => $cities,
             'states' => $states,
             'areas' => $areas,
@@ -76,6 +90,18 @@ class ProfessionalController extends Controller
         // Incrementar visualizações
         $professional->incrementViews();
 
-        return view('public.professionals.show', compact('professional'));
+        // Verificar se o profissional está favoritado (para empresas)
+        $isFavorited = false;
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user && $user->companyProfile) {
+                $isFavorited = \App\Models\Favorite::where('user_id', $user->id)
+                    ->where('favoritable_type', ProfessionalProfile::class)
+                    ->where('favoritable_id', $professional->id)
+                    ->exists();
+            }
+        }
+
+        return view('public.professionals.show', compact('professional', 'isFavorited'));
     }
 }

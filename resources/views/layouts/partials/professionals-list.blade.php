@@ -45,9 +45,20 @@
             <a href="{{ route('professionals.show', $professional) }}" class="theme-btn btn-style-three">
               <i class="las la-user"></i> Ver perfil
             </a>
-            <button class="bookmark-btn" type="button" title="Favoritar profissional">
-              <span class="flaticon-bookmark"></span>
-            </button>
+            @auth
+              @if(Auth::user()->companyProfile)
+                @php
+                  $isFavorited = isset($favoritedIds) && $favoritedIds->contains($professional->id);
+                @endphp
+                <button class="bookmark-btn {{ $isFavorited ? 'active' : '' }}" data-favorite-id="{{ $professional->id }}" onclick="toggleFavorite('App\\Models\\ProfessionalProfile', {{ $professional->id }})" type="button" title="{{ $isFavorited ? 'Remover dos favoritos' : 'Favoritar profissional' }}">
+                  <span class="flaticon-bookmark"></span>
+                </button>
+              @endif
+            @else
+              <button class="bookmark-btn" onclick="toggleFavorite('App\\Models\\ProfessionalProfile', {{ $professional->id }})" type="button" title="Favoritar profissional">
+                <span class="flaticon-bookmark"></span>
+              </button>
+            @endauth
           </div>
         </div>
       </div>

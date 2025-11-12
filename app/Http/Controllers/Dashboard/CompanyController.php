@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\Favorite;
@@ -149,6 +150,12 @@ class CompanyController extends Controller
             $query->where('title', 'like', "%{$request->search}%");
         }
 
+        // Filtro de período
+        if ($request->filled('period')) {
+            $months = (int) $request->period;
+            $query->where('created_at', '>=', now()->subMonths($months));
+        }
+
         $jobs = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('dashboard.company.manage-jobs', compact('jobs'));
@@ -187,7 +194,12 @@ class CompanyController extends Controller
             'currency' => 'nullable|string|max:3',
         ]);
 
-        $data = $request->all();
+        $data = $request->only([
+            'title', 'description', 'requirements', 'benefits', 'contract_type', 'area',
+            'experience_level', 'work_hours', 'salary_type',
+            'work_location', 'city', 'state', 'deadline', 'currency'
+        ]);
+        
         $data['company_profile_id'] = $profile->id;
         $data['is_remote'] = $request->boolean('is_remote');
         $data['is_hybrid'] = $request->boolean('is_hybrid');
@@ -196,15 +208,33 @@ class CompanyController extends Controller
         $data['currency'] = $request->get('currency', 'BRL');
         $data['deadline'] = $request->deadline ?: null;
 
+        // Tratar campos de salário baseado no tipo - sempre incluir explicitamente
         if ($data['salary_type'] === 'negotiable') {
             $data['salary_min'] = null;
             $data['salary_max'] = null;
         } elseif ($data['salary_type'] === 'fixed') {
+            $salaryMin = $request->input('salary_min');
+            $data['salary_min'] = ($salaryMin !== null && $salaryMin !== '' && is_numeric($salaryMin)) ? (float) $salaryMin : null;
             $data['salary_max'] = null;
-        } elseif ($data['salary_type'] === 'range' && $request->filled('salary_min') && $request->filled('salary_max')) {
-            if ($data['salary_min'] > $data['salary_max']) {
+        } elseif ($data['salary_type'] === 'range') {
+            // Garantir que sempre incluímos os campos, mesmo se vazios
+            $salaryMin = $request->input('salary_min');
+            $salaryMax = $request->input('salary_max');
+            
+            // Converter para float se tiver valor numérico válido, senão null
+            $data['salary_min'] = ($salaryMin !== null && $salaryMin !== '' && is_numeric($salaryMin)) ? (float) $salaryMin : null;
+            $data['salary_max'] = ($salaryMax !== null && $salaryMax !== '' && is_numeric($salaryMax)) ? (float) $salaryMax : null;
+            
+            // Se ambos estão preenchidos, garantir que min <= max
+            if ($data['salary_min'] !== null && $data['salary_max'] !== null && $data['salary_min'] > $data['salary_max']) {
                 [$data['salary_min'], $data['salary_max']] = [$data['salary_max'], $data['salary_min']];
             }
+        } else {
+            // Fallback: garantir que os campos existam
+            $salaryMin = $request->input('salary_min');
+            $salaryMax = $request->input('salary_max');
+            $data['salary_min'] = ($salaryMin !== null && $salaryMin !== '' && is_numeric($salaryMin)) ? (float) $salaryMin : null;
+            $data['salary_max'] = ($salaryMax !== null && $salaryMax !== '' && is_numeric($salaryMax)) ? (float) $salaryMax : null;
         }
 
         $slugBase = Str::slug($request->title);
@@ -268,7 +298,12 @@ class CompanyController extends Controller
             'status' => 'required|in:active,paused,closed,draft',
         ]);
 
-        $data = $request->all();
+        $data = $request->only([
+            'title', 'description', 'requirements', 'benefits', 'contract_type', 'area',
+            'experience_level', 'work_hours', 'salary_type',
+            'work_location', 'city', 'state', 'deadline', 'currency', 'status'
+        ]);
+        
         $data['is_remote'] = $request->boolean('is_remote');
         $data['is_hybrid'] = $request->boolean('is_hybrid');
         $data['is_featured'] = $request->boolean('is_featured');
@@ -276,15 +311,33 @@ class CompanyController extends Controller
         $data['currency'] = $request->get('currency', $job->currency ?? 'BRL');
         $data['deadline'] = $request->deadline ?: null;
 
+        // Tratar campos de salário baseado no tipo - sempre incluir explicitamente
         if ($data['salary_type'] === 'negotiable') {
             $data['salary_min'] = null;
             $data['salary_max'] = null;
         } elseif ($data['salary_type'] === 'fixed') {
+            $salaryMin = $request->input('salary_min');
+            $data['salary_min'] = ($salaryMin !== null && $salaryMin !== '') ? (float) $salaryMin : null;
             $data['salary_max'] = null;
-        } elseif ($data['salary_type'] === 'range' && $request->filled('salary_min') && $request->filled('salary_max')) {
-            if ($data['salary_min'] > $data['salary_max']) {
+        } elseif ($data['salary_type'] === 'range') {
+            // Garantir que sempre incluímos os campos, mesmo se vazios
+            $salaryMin = $request->input('salary_min');
+            $salaryMax = $request->input('salary_max');
+            
+            // Converter para float se tiver valor numérico válido, senão null
+            $data['salary_min'] = ($salaryMin !== null && $salaryMin !== '' && is_numeric($salaryMin)) ? (float) $salaryMin : null;
+            $data['salary_max'] = ($salaryMax !== null && $salaryMax !== '' && is_numeric($salaryMax)) ? (float) $salaryMax : null;
+            
+            // Se ambos estão preenchidos, garantir que min <= max
+            if ($data['salary_min'] !== null && $data['salary_max'] !== null && $data['salary_min'] > $data['salary_max']) {
                 [$data['salary_min'], $data['salary_max']] = [$data['salary_max'], $data['salary_min']];
             }
+        } else {
+            // Fallback: garantir que os campos existam
+            $salaryMin = $request->input('salary_min');
+            $salaryMax = $request->input('salary_max');
+            $data['salary_min'] = ($salaryMin !== null && $salaryMin !== '' && is_numeric($salaryMin)) ? (float) $salaryMin : null;
+            $data['salary_max'] = ($salaryMax !== null && $salaryMax !== '' && is_numeric($salaryMax)) ? (float) $salaryMax : null;
         }
 
         $slugBase = Str::slug($request->title);
@@ -303,7 +356,14 @@ class CompanyController extends Controller
             $data['published_at'] = $job->published_at;
         }
 
-        $job->update($data);
+        // Garantir que salary_min e salary_max sempre estejam no array (mesmo que null)
+        // Isso é importante para que o Eloquent atualize os campos mesmo quando são null
+        $data['salary_min'] = $data['salary_min'] ?? null;
+        $data['salary_max'] = $data['salary_max'] ?? null;
+
+        // Usar fill() e save() para garantir que campos null sejam atualizados
+        $job->fill($data);
+        $job->save();
 
         $profile->updateQuietly([
             'jobs_posted_count' => $profile->jobs()->count(),
@@ -385,52 +445,71 @@ class CompanyController extends Controller
         return back()->with('success', 'Candidatura rejeitada.');
     }
 
-    public function favoriteProfessionals()
+    public function favoriteProfessionals(Request $request)
     {
         $user = Auth::user();
         $profile = $user->companyProfile;
 
-        $favorites = $user->favorites()
+        $query = $user->favorites()
             ->where('favoritable_type', ProfessionalProfile::class)
-            ->with('favoritable')
-            ->orderBy('created_at', 'desc')
-            ->paginate(12);
+            ->with('favoritable');
+
+        // Filtro de período
+        if ($request->filled('period')) {
+            $months = (int) $request->period;
+            $query->where('created_at', '>=', now()->subMonths($months));
+        }
+
+        $favorites = $query->orderBy('created_at', 'desc')->paginate(12);
 
         return view('dashboard.company.favorite-professionals', compact('favorites'));
     }
 
     public function toggleFavorite(Request $request)
     {
-        $user = Auth::user();
-        $profile = $user->companyProfile;
+        try {
+            $user = Auth::user();
+            $profile = $user->companyProfile;
 
-        $request->validate([
-            'favoritable_type' => 'required|in:App\Models\ProfessionalProfile',
-            'favoritable_id' => 'required|integer',
-        ]);
-
-        abort_unless(class_exists($request->favoritable_type), 422, 'Tipo inválido.');
-
-        $request->favoritable_type::findOrFail($request->favoritable_id);
-
-        $favorite = $user->favorites()
-            ->where('favoritable_type', $request->favoritable_type)
-            ->where('favoritable_id', $request->favoritable_id)
-            ->first();
-
-        if ($favorite) {
-            $favorite->delete();
-            $action = 'removed';
-        } else {
-            Favorite::create([
-                'user_id' => $user->id,
-                'favoritable_type' => $request->favoritable_type,
-                'favoritable_id' => $request->favoritable_id,
+            // Validar e retornar JSON em caso de erro
+            $validated = $request->validate([
+                'favoritable_type' => 'required|in:App\Models\ProfessionalProfile',
+                'favoritable_id' => 'required|integer',
             ]);
-            $action = 'added';
-        }
 
-        return response()->json(['action' => $action]);
+            abort_unless(class_exists($request->favoritable_type), 422, 'Tipo inválido.');
+
+            $request->favoritable_type::findOrFail($request->favoritable_id);
+
+            $favorite = $user->favorites()
+                ->where('favoritable_type', $request->favoritable_type)
+                ->where('favoritable_id', $request->favoritable_id)
+                ->first();
+
+            if ($favorite) {
+                $favorite->delete();
+                $action = 'removed';
+            } else {
+                Favorite::create([
+                    'user_id' => $user->id,
+                    'favoritable_type' => $request->favoritable_type,
+                    'favoritable_id' => $request->favoritable_id,
+                ]);
+                $action = 'added';
+            }
+
+            return response()->json(['action' => $action]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'error' => 'Erro de validação',
+                'messages' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Erro ao processar favorito',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function publicPage()
@@ -439,5 +518,23 @@ class CompanyController extends Controller
         $profile = $user->companyProfile;
 
         return view('dashboard.company.public-page', compact('profile'));
+    }
+
+    public function markNotificationsViewed()
+    {
+        $user = Auth::user();
+        $profile = $user->companyProfile;
+
+        if ($profile) {
+            // Marcar todas as candidaturas pendentes como visualizadas
+            JobApplication::whereHas('job', function($q) use ($profile) {
+                $q->where('company_profile_id', $profile->id);
+            })
+            ->where('status', 'pending')
+            ->whereNull('viewed_at')
+            ->update(['viewed_at' => now()]);
+        }
+
+        return response()->json(['success' => true]);
     }
 }
