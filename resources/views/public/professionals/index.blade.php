@@ -134,14 +134,23 @@
                 </div>
                 <div class="col-6">
                   <div class="sort-by float-end">
-                    <select class="chosen-select mt-3">
-                      <option>Mostrar 10</option>
-                      <option>Mostrar 20</option>
-                      <option>Mostrar 30</option>
-                      <option>Mostrar 40</option>
-                      <option>Mostrar 50</option>
-                      <option>Mostrar 60</option>
-                    </select>
+                    <form method="GET" action="{{ route('professionals.index') }}" id="per-page-form" style="display: inline-block;">
+                      @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                      @endforeach
+                      <select name="per_page" class="chosen-select mt-3" onchange="document.getElementById('per-page-form').submit();">
+                        @php
+                          $currentPerPage = request('per_page', 12);
+                        @endphp
+                        <option value="10" {{ $currentPerPage == 10 ? 'selected' : '' }}>Mostrar 10</option>
+                        <option value="12" {{ $currentPerPage == 12 ? 'selected' : '' }}>Mostrar 12</option>
+                        <option value="20" {{ $currentPerPage == 20 ? 'selected' : '' }}>Mostrar 20</option>
+                        <option value="30" {{ $currentPerPage == 30 ? 'selected' : '' }}>Mostrar 30</option>
+                        <option value="40" {{ $currentPerPage == 40 ? 'selected' : '' }}>Mostrar 40</option>
+                        <option value="50" {{ $currentPerPage == 50 ? 'selected' : '' }}>Mostrar 50</option>
+                        <option value="60" {{ $currentPerPage == 60 ? 'selected' : '' }}>Mostrar 60</option>
+                      </select>
+                    </form>
                   </div>
                 </div>
               </div>
@@ -203,6 +212,46 @@
 @endsection
 
 @push('scripts')
+@php
+// Preparar dados do mapa no formato esperado pelo maps.js
+$mapLocations = $mapProfessionals->map(function($p) {
+    $photoUrl = $p['photo'];
+    $url = $p['url'];
+    $title = htmlspecialchars($p['title'], ENT_QUOTES, 'UTF-8');
+    $type = htmlspecialchars($p['type'], ENT_QUOTES, 'UTF-8');
+    $address = htmlspecialchars($p['address'], ENT_QUOTES, 'UTF-8');
+    
+    $html = '<div class="map-listing-item">' .
+        '<div class="inner-box">' .
+        '<div class="infoBox-close"><i class="fa fa-times"></i></div>' .
+        '<div class="image-box">' .
+        '<figure class="image"><img src="' . $photoUrl . '" alt=""></figure>' .
+        '</div>' .
+        '<div class="content">' .
+        '<h3><a href="' . $url . '">' . $title . '</a></h3>' .
+        '<ul class="job-info">' .
+        '<li><span class="icon flaticon-briefcase"></span> ' . $type . '</li>' .
+        '<li><span class="icon flaticon-map-locator"></span> ' . $address . '</li>' .
+        '</ul>' .
+        '</div>' .
+        '</div>';
+    
+    $icon = '<div style="background-image: url(' . $photoUrl . ');"></div>';
+    
+    return [
+        $html,
+        $p['latitude'],
+        $p['longitude'],
+        $p['id'],
+        $icon
+    ];
+})->values()->all();
+@endphp
 @include('layouts.partials.scripts')
 @include('layouts.partials.favorite-scripts')
+<script>
+// Preparar dados do mapa ANTES do maps.js carregar
+window.mapLocations = @json($mapLocations);
+</script>
+<script src="{{ asset('js/maps.js') }}"></script>
 @endpush

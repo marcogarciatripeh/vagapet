@@ -19,39 +19,30 @@
       </div>
 
       <div class="row">
-        <div class="ui-block col-xl-3 col-lg-6 col-md-6 col-sm-6">
+        <div class="ui-block col-xl-4 col-lg-6 col-md-6 col-sm-6">
           <div class="ui-item ui-blue">
             <div class="left"><i class="icon flaticon-briefcase"></i></div>
             <div class="right">
-              <h4>22</h4>
+              <h4>{{ $stats['jobs_count'] }}</h4>
               <p>Vagas Publicadas</p>
             </div>
           </div>
         </div>
-        <div class="ui-block col-xl-3 col-lg-6 col-md-6 col-sm-6">
+        <div class="ui-block col-xl-4 col-lg-6 col-md-6 col-sm-6">
           <div class="ui-item ui-red">
             <div class="left"><i class="icon la la-file-invoice"></i></div>
             <div class="right">
-              <h4>9.382</h4>
+              <h4>{{ number_format($stats['applications_received'], 0, ',', '.') }}</h4>
               <p>Candidaturas</p>
             </div>
           </div>
         </div>
-        <div class="ui-block col-xl-3 col-lg-6 col-md-6 col-sm-6">
-          <div class="ui-item ui-yellow">
-            <div class="left"><i class="icon la la-comment-o"></i></div>
-            <div class="right">
-              <h4>74</h4>
-              <p>Mensagens</p>
-            </div>
-          </div>
-        </div>
-        <div class="ui-block col-xl-3 col-lg-6 col-md-6 col-sm-6">
+        <div class="ui-block col-xl-4 col-lg-6 col-md-6 col-sm-6">
           <div class="ui-item ui-green">
             <div class="left"><i class="icon la la-bookmark-o"></i></div>
             <div class="right">
-              <h4>32</h4>
-              <p>Favoritos</p>
+              <h4>{{ $stats['favorites_count'] }}</h4>
+              <p>Profissionais Favoritos</p>
             </div>
           </div>
         </div>
@@ -86,15 +77,27 @@
         <!-- Notificações Rápidas -->
         <div class="col-xl-5 col-lg-12">
           <div class="notification-widget ls-widget">
-            <div class="widget-title"><h4>Notificações</h4></div>
+            <div class="widget-title">
+              <h4>Notificações</h4>
+              @if($recent_applications->isNotEmpty())
+                <a href="{{ route('company.candidates') }}" class="theme-btn btn-style-three small">Ver todas</a>
+              @endif
+            </div>
             <div class="widget-content">
-              <ul class="notification-list">
-                <li><span class="icon flaticon-briefcase"></span> <strong>Lucas Silva</strong> se candidatou à vaga <span class="colored">Atendente de Loja (Cobasi - Tatuapé)</span></li>
-                <li><span class="icon flaticon-briefcase"></span> <strong>Ana Oliveira</strong> se candidatou à vaga <span class="colored">Vendedor de Produtos Pet (Petz - Morumbi)</span></li>
-                <li class="success"><span class="icon flaticon-briefcase"></span> <strong>Bruno Santos</strong> se candidatou à vaga <span class="colored">Auxiliar de Serviços Gerais (Pet Center - Vila Olímpia)</span></li>
-                <li><span class="icon flaticon-briefcase"></span> <strong>Fernanda Lima</strong> se candidatou à vaga <span class="colored">Vendedor de Ração (Cobasi - Moema)</span></li>
-                <li class="success"><span class="icon flaticon-briefcase"></span> <strong>Rafael Souza</strong> se candidatou à vaga <span class="colored">Atendente de Banho e Tosa (Petz - Itaim)</span></li>
-              </ul>
+              @if($recent_applications->isNotEmpty())
+                <ul class="notification-list">
+                  @foreach($recent_applications as $application)
+                    <li class="{{ $application->status === 'approved' ? 'success' : '' }}">
+                      <span class="icon flaticon-briefcase"></span>
+                      <strong>{{ $application->professionalProfile->first_name ?? 'Profissional' }} {{ $application->professionalProfile->last_name ?? '' }}</strong>
+                      se candidatou à vaga
+                      <span class="colored">{{ $application->job->title }}</span>
+                    </li>
+                  @endforeach
+                </ul>
+              @else
+                <p class="text-center text-muted py-4">Nenhuma candidatura recente</p>
+              @endif
             </div>
           </div>
         </div>
@@ -115,13 +118,13 @@
   var chart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
+      labels: @json($chartLabels),
       datasets: [{
         label: "Visualizações",
         backgroundColor: 'transparent',
         borderColor: '#1967D2',
         borderWidth: 1,
-        data: [196, 132, 215, 362, 210, 252],
+        data: @json($chartData),
         pointRadius: 3,
         pointHoverRadius: 3,
         pointHitRadius: 10,

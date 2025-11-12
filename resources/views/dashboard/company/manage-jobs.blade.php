@@ -60,7 +60,15 @@
                           <ul class="job-info">
                             <li><span class="icon flaticon-briefcase"></span> {{ $job->applications_count ?? 0 }} {{ \Illuminate\Support\Str::plural('candidatura', $job->applications_count ?? 0) }}</li>
                             <li><span class="icon flaticon-map-locator"></span> {{ $job->city ?? 'Não informado' }}, {{ $job->state ?? '' }}</li>
-                            <li><span class="icon flaticon-clock-3"></span> {{ $job->created_at->format('d M Y') }}</li>
+                            @php
+                              $mesesPt = [
+                                1 => 'Jan', 2 => 'Fev', 3 => 'Mar', 4 => 'Abr',
+                                5 => 'Mai', 6 => 'Jun', 7 => 'Jul', 8 => 'Ago',
+                                9 => 'Set', 10 => 'Out', 11 => 'Nov', 12 => 'Dez'
+                              ];
+                              $mesAbrev = $mesesPt[$job->created_at->month];
+                            @endphp
+                            <li><span class="icon flaticon-clock-3"></span> {{ $job->created_at->format('d') }} {{ $mesAbrev }} {{ $job->created_at->format('Y') }}</li>
                           </ul>
                           <div class="option-box pb-4">
                             <ul class="option-list">

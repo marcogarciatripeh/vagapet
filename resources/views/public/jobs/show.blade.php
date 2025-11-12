@@ -101,9 +101,23 @@
                 @if($job->companyProfile)
                   <li><i class="icon icon-user-2"></i><h5>Empresa:</h5><span><a href="{{ route('companies.show', $job->companyProfile->id) }}">{{ $job->companyProfile->company_name }}</a></span></li>
                 @endif
-                <li><i class="icon icon-calendar"></i><h5>Publicado em:</h5><span>{{ $job->published_at ? $job->published_at->format('d \d\e F \d\e Y') : $job->created_at->format('d \d\e F \d\e Y') }}</span></li>
+                @php
+                  $mesesPt = [
+                    1 => 'janeiro', 2 => 'fevereiro', 3 => 'março', 4 => 'abril',
+                    5 => 'maio', 6 => 'junho', 7 => 'julho', 8 => 'agosto',
+                    9 => 'setembro', 10 => 'outubro', 11 => 'novembro', 12 => 'dezembro'
+                  ];
+                  $dataPublicacao = $job->published_at ?: $job->created_at;
+                  $mesPublicacao = $mesesPt[$dataPublicacao->month];
+                  $dataFormatada = $dataPublicacao->format('d') . ' de ' . $mesPublicacao . ' de ' . $dataPublicacao->format('Y');
+                @endphp
+                <li><i class="icon icon-calendar"></i><h5>Publicado em:</h5><span>{{ $dataFormatada }}</span></li>
                 @if($job->deadline)
-                  <li><i class="icon icon-expiry"></i><h5>Aceita candidaturas até:</h5><span>{{ $job->deadline->format('d \d\e F \d\e Y') }}</span></li>
+                  @php
+                    $mesDeadline = $mesesPt[$job->deadline->month];
+                    $deadlineFormatada = $job->deadline->format('d') . ' de ' . $mesDeadline . ' de ' . $job->deadline->format('Y');
+                  @endphp
+                  <li><i class="icon icon-expiry"></i><h5>Aceita candidaturas até:</h5><span>{{ $deadlineFormatada }}</span></li>
                 @endif
                 <li><i class="icon icon-location"></i><h5>Localização:</h5><span>{{ $job->work_location ?? $job->city }}, {{ $job->city }}, {{ $job->state }}</span></li>
                 @if($job->work_hours)

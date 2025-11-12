@@ -46,7 +46,38 @@ class ProfessionalController extends Controller
         $direction = $request->get('direction', 'desc');
         $query->orderBy($sort, $direction);
 
-        $professionals = $query->paginate(12);
+        // Paginação
+        $perPage = $request->get('per_page', 12);
+        $perPage = in_array($perPage, [10, 12, 20, 30, 40, 50, 60]) ? (int) $perPage : 12;
+        $professionals = $query->paginate($perPage)->withQueryString();
+
+        // Buscar TODOS os profissionais para o mapa (com coordenadas)
+        $mapProfessionals = ProfessionalProfile::active()
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->where('latitude', '!=', 0)
+            ->where('longitude', '!=', 0)
+            ->get()
+            ->map(function ($professional) {
+                $photoUrl = $professional->photo 
+                    ? asset('storage/' . $professional->photo) 
+                    : asset('images/resource/default-avatar.png');
+                
+                $areas = is_array($professional->areas) 
+                    ? implode(', ', array_slice($professional->areas, 0, 2))
+                    : ($professional->areas ?? 'Profissional');
+                
+                return [
+                    'id' => $professional->id,
+                    'title' => $professional->first_name . ' ' . $professional->last_name,
+                    'type' => $areas,
+                    'address' => ($professional->city ?? '') . ', ' . ($professional->state ?? ''),
+                    'latitude' => (float) $professional->latitude,
+                    'longitude' => (float) $professional->longitude,
+                    'photo' => $photoUrl,
+                    'url' => route('professionals.show', $professional->id),
+                ];
+            });
 
         // Verificar quais profissionais estão favoritados (para empresas logadas)
         $favoritedIds = collect();
@@ -73,6 +104,7 @@ class ProfessionalController extends Controller
 
         return view('public.professionals.index', [
             'professionals' => $professionals,
+            'mapProfessionals' => $mapProfessionals,
             'favoritedIds' => $favoritedIds,
             'cities' => $cities,
             'states' => $states,

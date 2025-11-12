@@ -1,11 +1,12 @@
 /*var infoBox_ratingType='star-rating';*/
 
-(function($){"use strict";function mainMap() {var ib=new InfoBox(); function locationData (locationImg, locationURL, locationTitle, job_type, job_address ) {return(''+
+(function($){"use strict";
+function locationData (locationImg, locationURL, locationTitle, job_type, job_address ) {return(''+
 '<div class="map-listing-item">'+
     '<div class="inner-box">'+
         '<div class="infoBox-close"><i class="fa fa-times"></i></div>'+
         '<div class="image-box">'+
-            '<figure class="image"><img src="'+locationImg+'" alt=""></figure>'+        
+            '<figure class="image"><img src="'+locationImg+'" alt=""></figure>'+
         '</div>'+
         '<div class="content">'+
         '<h3><a href="'+locationURL+'">' + locationTitle + '</a></h3>'+
@@ -17,15 +18,8 @@
 '</div>')};
 
 
-var locations=[
-    [locationData('images/resource/company-logo/1-1.png', 'job-single-v1.html', "Software Engineer", 'Segment', 'London, UK', ), 40.94401669296697, -74.16938781738281, 1, '<div style="background-image: url(images/resource/company-logo/3-1.png);"></div>'],
-    [locationData('images/resource/company-logo/1-2.png', 'job-single-v1.html', "Software Engineer", 'Segment', 'London, UK', ), 40.77055783505125, -74.26002502441406, 2, '<div style="background-image: url(images/resource/company-logo/3-2.png);"></div>'], 
-    [locationData('images/resource/company-logo/1-3.png', 'job-single-v1.html', "Software Engineer", 'Segment', 'London, UK', ), 40.7427837, -73.11445617675781, 3, '<div style="background-image: url(images/resource/company-logo/3-3.png);"></div>'], 
-    [locationData('images/resource/company-logo/1-4.png', 'job-single-v1.html', "Software Engineer", 'Segment', 'London, UK', ), 40.70437865245596, -73.98674011230469, 4, '<div style="background-image: url(images/resource/company-logo/3-4.png);"></div>'], 
-    [locationData('images/resource/company-logo/1-5.png', 'job-single-v1.html', "Software Engineer", 'Segment', 'London, UK', ), 40.641311, -73.778139, 5, '<div style="background-image: url(images/resource/company-logo/3-5.png);"></div>'], 
-    [locationData('images/resource/company-logo/1-6.png', 'job-single-v1.html', "Software Engineer", 'Segment', 'London, UK', ), 41.080938, -73.535957, 6, '<div style="background-image: url(images/resource/company-logo/3-6.png);"></div>'], 
-    [locationData('images/resource/company-logo/1-7.png', 'job-single-v1.html', "Software Engineer", 'Segment', 'London, UK', ), 41.079386, -73.519478, 7, '<div style="background-image: url(images/resource/company-logo/3-7.png);"></div>'], 
-];
+// Dados de exemplo REMOVIDOS - não usar mais dados fake
+// O mapa só mostrará dados reais via window.mapLocations
 
 function numericalRating(ratingElem) {
         $(ratingElem).each(function() {
@@ -85,12 +79,57 @@ function numericalRating(ratingElem) {
         });
     }
     starRating('.star-rating');
-    
+
 /*google.maps.event.addListener(ib,'domready',function(){if(infoBox_ratingType='numerical-rating'){numericalRating('.infoBox .'+infoBox_ratingType+'');}
 if(infoBox_ratingType='star-rating'){starRating('.infoBox .'+infoBox_ratingType+'');}});*/
+
+function mainMap() {
+// Usar APENAS dados dinâmicos - SEM dados fake
+var locations = [];
+if(typeof window.mapLocations !== 'undefined' && window.mapLocations && Array.isArray(window.mapLocations) && window.mapLocations.length > 0) {
+    locations = window.mapLocations;
+} else {
+    // NÃO usar defaultLocations - deixar o mapa vazio se não houver dados reais
+    locations = [];
+}
+var ib=new InfoBox();
+
 var mapZoomAttr=$('#map').attr('data-map-zoom');var mapScrollAttr=$('#map').attr('data-map-scroll');if(typeof mapZoomAttr!==typeof undefined&&mapZoomAttr!==false){var zoomLevel=parseInt(mapZoomAttr);}else{var zoomLevel=5;}
 if(typeof mapScrollAttr!==typeof undefined&&mapScrollAttr!==false){var scrollEnabled=parseInt(mapScrollAttr);}else{var scrollEnabled=false;}
-var map=new google.maps.Map(document.getElementById('map'),{zoom:zoomLevel,scrollwheel:scrollEnabled,center:new google.maps.LatLng(40.80,-73.70),mapTypeId:google.maps.MapTypeId.ROADMAP,zoomControl:false,mapTypeControl:false,scaleControl:false,panControl:false,navigationControl:false,streetViewControl:false,gestureHandling:'cooperative',styles:
+// Calcular centro do mapa baseado nas localizações disponíveis
+var mapCenter = new google.maps.LatLng(-23.550520,-46.633308); // Centro padrão: São Paulo
+if(typeof locations !== 'undefined' && locations.length > 0) {
+    try {
+        var bounds = new google.maps.LatLngBounds();
+        var validLocations = 0;
+        for(var i = 0; i < locations.length; i++) {
+            if(locations[i] && locations[i][1] != null && locations[i][2] != null && !isNaN(locations[i][1]) && !isNaN(locations[i][2])) {
+                bounds.extend(new google.maps.LatLng(parseFloat(locations[i][1]), parseFloat(locations[i][2])));
+                validLocations++;
+            }
+        }
+        if(validLocations > 0) {
+            mapCenter = bounds.getCenter();
+            if(validLocations === 1) {
+                zoomLevel = 12;
+            } else if(validLocations > 1) {
+                // Ajustar zoom para mostrar todos os marcadores
+                var ne = bounds.getNorthEast();
+                var sw = bounds.getSouthWest();
+                var lat_diff = Math.abs(ne.lat() - sw.lat());
+                var lng_diff = Math.abs(ne.lng() - sw.lng());
+                if(lat_diff < 0.1 && lng_diff < 0.1) {
+                    zoomLevel = 13;
+                } else if(lat_diff < 0.5 && lng_diff < 0.5) {
+                    zoomLevel = 11;
+                }
+            }
+        }
+    } catch(e) {
+        console.error('Erro ao calcular centro do mapa:', e);
+    }
+}
+var map=new google.maps.Map(document.getElementById('map'),{zoom:zoomLevel,scrollwheel:scrollEnabled,center:mapCenter,mapTypeId:google.maps.MapTypeId.ROADMAP,zoomControl:false,mapTypeControl:false,scaleControl:false,panControl:false,navigationControl:false,streetViewControl:false,gestureHandling:'cooperative',styles:
     [
     {
         "featureType": "landscape",
@@ -192,7 +231,9 @@ var options={imagePath:'images/',styles:clusterStyles,minClusterSize:2};markerCl
 var scrollEnabling=$('#scrollEnabling');$(scrollEnabling).click(function(e){e.preventDefault();$(this).toggleClass("enabled");if($(this).is(".enabled")){map.setOptions({'scrollwheel':true});}else{map.setOptions({'scrollwheel':false});}})
 $("#geoLocation, .input-with-icon.location a").click(function(e){e.preventDefault();geolocate();});
 
-function geolocate(){if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(position){var pos=new google.maps.LatLng(position.coords.latitude,position.coords.longitude);map.setCenter(pos);map.setZoom(12);});}}}
+function geolocate(){if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(position){var pos=new google.maps.LatLng(position.coords.latitude,position.coords.longitude);map.setCenter(pos);map.setZoom(12);});}}
+} // Fim da função mainMap()
+
 var map=document.getElementById('map');if(typeof(map)!='undefined'&&map!=null){google.maps.event.addDomListener(window,'load',mainMap);}
 
 function singleListingMap() {
@@ -297,7 +338,7 @@ function singleListingMap() {
     },
     {}
 ]
-       
+
     }
     );
     $('#streetView').click(function(e) {

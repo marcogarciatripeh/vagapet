@@ -18,8 +18,8 @@
 
 <!-- Google Map API -->
 <!-- Google Maps -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaaCBm4FEmgKs5cfVrh3JYue3Chj1kJMw"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDxTQNhcxy3E2xiQHa66sk25pyz4KcT-Qs"></script>
 <script src="{{ asset('js/infobox.min.js') }}"></script>
 <script src="{{ asset('js/markerclusterer.js') }}"></script>
-<script src="{{ asset('js/maps.js') }}"></script>
+<!-- maps.js será incluído nas páginas que precisam (profissionais/vagas) -->
 <!-- Fim do Google Maps -->

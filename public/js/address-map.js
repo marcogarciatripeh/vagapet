@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         // Carregar Google Maps API se não estiver carregada
         const script = document.createElement('script');
-        script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap';
+        script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDxTQNhcxy3E2xiQHa66sk25pyz4KcT-Qs&callback=initMap';
         script.async = true;
         script.defer = true;
         document.head.appendChild(script);

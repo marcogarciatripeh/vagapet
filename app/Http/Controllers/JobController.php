@@ -72,6 +72,49 @@ class JobController extends Controller
 
         $jobs = $query->paginate(12);
 
+        // Buscar TODAS as vagas para o mapa (com coordenadas)
+        $mapJobs = Job::active()
+            ->with('companyProfile')
+            ->where(function ($q) {
+                $q->where(function ($subQ) {
+                    $subQ->whereNotNull('latitude')
+                         ->whereNotNull('longitude')
+                         ->where('latitude', '!=', 0)
+                         ->where('longitude', '!=', 0);
+                })->orWhereHas('companyProfile', function ($subQ) {
+                    $subQ->whereNotNull('latitude')
+                         ->whereNotNull('longitude')
+                         ->where('latitude', '!=', 0)
+                         ->where('longitude', '!=', 0);
+                });
+            })
+            ->get()
+            ->map(function ($job) {
+                // Usar coordenadas da vaga ou da empresa
+                $latitude = $job->latitude ?? ($job->companyProfile->latitude ?? null);
+                $longitude = $job->longitude ?? ($job->companyProfile->longitude ?? null);
+                
+                if (!$latitude || !$longitude) {
+                    return null;
+                }
+                
+                $logoUrl = $job->companyProfile && $job->companyProfile->logo
+                    ? asset('storage/' . $job->companyProfile->logo)
+                    : asset('images/resource/default-company.png');
+                
+                return [
+                    'id' => $job->id,
+                    'title' => $job->title,
+                    'type' => ucfirst($job->contract_type ?? 'CLT'),
+                    'address' => ($job->city ?? '') . ', ' . ($job->state ?? ''),
+                    'latitude' => (float) $latitude,
+                    'longitude' => (float) $longitude,
+                    'photo' => $logoUrl,
+                    'url' => route('jobs.show', $job->slug),
+                ];
+            })
+            ->filter(); // Remove nulls
+
         // Verificar quais vagas estão favoritadas (para profissionais logados)
         $favoritedJobIds = collect();
         if (Auth::check()) {
@@ -89,7 +132,7 @@ class JobController extends Controller
         $states = Job::active()->distinct()->pluck('state')->filter()->sort()->values();
         $areas = Job::active()->distinct()->pluck('area')->filter()->sort()->values();
 
-        return view('public.jobs.index', compact('jobs', 'favoritedJobIds', 'cities', 'states', 'areas'));
+        return view('public.jobs.index', compact('jobs', 'mapJobs', 'favoritedJobIds', 'cities', 'states', 'areas'));
     }
 
     public function show($slug)
