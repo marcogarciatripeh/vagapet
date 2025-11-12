@@ -10,6 +10,28 @@
         <h3>Perfil da Empresa</h3>
       </div>
 
+      @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          {{ session('success') }}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      @endif
+
+      @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <ul class="mb-0">
+            @foreach($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      @endif
+
       <div class="row">
         <div class="col-lg-12">
           <!-- Ls widget (Seção de Informações Básicas) -->
@@ -20,19 +42,27 @@
               </div>
 
               <div class="widget-content">
-
-                <div class="uploading-outer">
-                  <div class="uploadButton">
-                    <input class="uploadButton-input" type="file" name="attachments[]" accept="image/*, application/pdf" id="upload" multiple />
-                    <label class="uploadButton-button ripple-effect" for="upload">Subir logo</label>
-                    <span class="uploadButton-file-name"></span>
-                  </div>
-                  <div class="text">Tamanho máximo do arquivo: 1MB, dimensão mínima: 330x300, arquivos suportados: .jpg e .png</div>
-                </div>
-
                 <form class="default-form" method="POST" action="{{ route('company.profile.update') }}" enctype="multipart/form-data">
                   @csrf
                   <div class="row">
+                    <!-- Logo da Empresa -->
+                    <div class="form-group col-lg-12 col-md-12">
+                      <label>Logo da Empresa</label>
+                      @if($profile->logo)
+                        <div class="mb-3">
+                          <img src="{{ url('storage/' . $profile->logo) }}" alt="Logo da Empresa" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 8px;">
+                        </div>
+                      @endif
+                      <div class="uploading-outer">
+                        <div class="uploadButton">
+                          <input class="uploadButton-input" type="file" name="logo" accept="image/*" id="upload-logo" />
+                          <label class="uploadButton-button ripple-effect" for="upload-logo">{{ $profile->logo ? 'Alterar Logo' : 'Subir Logo' }}</label>
+                          <span class="uploadButton-file-name"></span>
+                        </div>
+                        <div class="text">Tamanho máximo: 1MB. Formatos: .jpg e .png</div>
+                      </div>
+                    </div>
+
                     <!-- Nome Empresa -->
                     <div class="form-group col-lg-6 col-md-12">
                       <label>Nome da empresa*</label>
@@ -48,7 +78,8 @@
                     <!-- Endereço de E-mail -->
                     <div class="form-group col-lg-6 col-md-12">
                       <label>Endereço de E-mail*</label>
-                      <input type="email" name="email" placeholder="maria@exemplo.com" value="{{ old('email', Auth::user()->email) }}" readonly>
+                      <input type="email" placeholder="maria@exemplo.com" value="{{ Auth::user()->email }}" readonly disabled style="background-color: #e9ecef; cursor: not-allowed;">
+                      <input type="hidden" name="email" value="{{ Auth::user()->email }}">
                     </div>
 
                     <!-- Site -->
@@ -72,7 +103,7 @@
                     <!-- CNPJ -->
                     <div class="form-group col-lg-6 col-md-12">
                       <label>CNPJ</label>
-                      <input type="text" name="cnpj" placeholder="00.000.000/0000-00" value="{{ old('cnpj', $profile->cnpj) }}">
+                      <input type="text" name="cnpj" id="cnpj" placeholder="00.000.000/0000-00" value="{{ old('cnpj', $profile->cnpj) }}" maxlength="18">
                     </div>
 
                     <!-- Serviços -->
@@ -109,6 +140,10 @@
               <div class="widget-content">
                 <form class="default-form" method="POST" action="{{ route('company.profile.update') }}">
                   @csrf
+                  <!-- Campos obrigatórios ocultos -->
+                  <input type="hidden" name="company_name" value="{{ $profile->company_name ?? '' }}">
+                  <input type="hidden" name="city" value="{{ $profile->city ?? '' }}">
+                  
                   <div class="row">
                     <!-- Facebook -->
                     <div class="form-group col-lg-6 col-md-12">
@@ -155,6 +190,9 @@
               <div class="widget-content">
                 <form class="default-form" method="POST" action="{{ route('company.profile.update') }}">
                   @csrf
+                  <!-- Campos obrigatórios ocultos -->
+                  <input type="hidden" name="company_name" value="{{ $profile->company_name }}">
+                  
                   <div class="row">
 
                     <!-- Endereço Completo -->
@@ -207,4 +245,32 @@
 
 @push('scripts')
 @include('layouts.partials.scripts')
+<script>
+  // Função para aplicar máscara de CNPJ
+  function formatCNPJ(value) {
+    value = value.replace(/\D/g, '');
+    
+    if (value.length <= 14) {
+      value = value.replace(/^(\d{2})(\d)/, '$1.$2');
+      value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+      value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
+      value = value.replace(/(\d{4})(\d)/, '$1-$2');
+    }
+    
+    return value;
+  }
+
+  // Aplicar máscara ao carregar a página
+  document.addEventListener('DOMContentLoaded', function() {
+    const cnpjInput = document.getElementById('cnpj');
+    if (cnpjInput && cnpjInput.value) {
+      cnpjInput.value = formatCNPJ(cnpjInput.value);
+    }
+  });
+
+  // Aplicar máscara ao digitar
+  document.getElementById('cnpj').addEventListener('input', function(e) {
+    e.target.value = formatCNPJ(e.target.value);
+  });
+</script>
 @endpush

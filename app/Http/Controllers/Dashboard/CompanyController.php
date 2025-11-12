@@ -68,30 +68,44 @@ class CompanyController extends Controller
         $user = Auth::user();
         $profile = $user->companyProfile;
 
+        if (!$profile) {
+            return redirect()->route('home')->with('error', 'Você precisa ter um perfil de empresa para acessar esta página.');
+        }
+
         $request->validate([
             'company_name' => 'required|string|max:255',
             'cnpj' => 'nullable|string|max:20',
             'phone' => 'nullable|string|max:20',
-            'website' => 'nullable|url',
-            'description' => 'nullable|string|max:1000',
+            'website' => 'nullable|url|max:255',
+            'description' => 'nullable|string|max:5000',
             'address' => 'nullable|string|max:500',
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:2',
             'zip_code' => 'nullable|string|max:10',
-            'services' => 'nullable|array',
-            'specialties' => 'nullable|array',
-            'employees_count' => 'nullable|integer|min:1',
-            'company_size' => 'nullable|in:micro,small,medium,large',
-            'logo' => 'nullable|image|max:2048',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'services' => 'nullable|string|max:1000',
+            'specialties' => 'nullable|string|max:1000',
+            'company_size' => 'nullable|in:1-4,5-10,11-20,21+',
+            'logo' => 'nullable|image|max:1024',
             'photos' => 'nullable|array|max:5',
             'photos.*' => 'image|max:2048',
-            'linkedin' => 'nullable|url',
+            'linkedin' => 'nullable|string|max:255',
             'instagram' => 'nullable|string|max:255',
             'facebook' => 'nullable|string|max:255',
-            'youtube' => 'nullable|url',
+            'youtube' => 'nullable|string|max:255',
         ]);
 
         $data = $request->except(['logo', 'photos']);
+
+        // Converter services e specialties de string para array
+        if ($request->filled('services')) {
+            $data['services'] = array_map('trim', explode(',', $request->services));
+        }
+
+        if ($request->filled('specialties')) {
+            $data['specialties'] = array_map('trim', explode(',', $request->specialties));
+        }
 
         // Upload de logo
         if ($request->hasFile('logo')) {
@@ -107,7 +121,7 @@ class CompanyController extends Controller
             foreach ($request->file('photos') as $photo) {
                 $photos[] = $photo->store('companies/photos', 'public');
             }
-            $data['photos'] = $photos;
+            $data['photos'] = array_merge($profile->photos ?? [], $photos);
         }
 
         $profile->update($data);

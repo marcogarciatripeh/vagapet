@@ -11,6 +11,28 @@
         <div class="text">Pronto para voltar ao trabalho?</div>
       </div>
 
+      @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          {{ session('success') }}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      @endif
+
+      @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <ul class="mb-0">
+            @foreach($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      @endif
+
       <div class="row">
         <div class="col-lg-12">
           <!-- Ls widget (Seção de Informações Básicas) -->
@@ -21,18 +43,27 @@
               </div>
 
               <div class="widget-content">
-                <div class="uploading-outer">
-                  <div class="uploadButton">
-                    <input class="uploadButton-input" type="file" name="attachments[]" accept="image/*, application/pdf" id="upload" multiple />
-                    <label class="uploadButton-button ripple-effect" for="upload">Subir foto</label>
-                    <span class="uploadButton-file-name"></span>
-                  </div>
-                  <div class="text">Tamanho máximo do arquivo: 1MB, dimensão mínima: 330x300, arquivos suportados: .jpg e .png</div>
-                </div>
-
                 <form class="default-form" method="POST" action="{{ route('professional.profile.update') }}" enctype="multipart/form-data">
                   @csrf
                   <div class="row">
+                    <!-- Foto de Perfil -->
+                    <div class="form-group col-lg-12 col-md-12">
+                      <label>Foto de Perfil</label>
+                      @if($profile->photo)
+                        <div class="mb-3">
+                          <img src="{{ url('storage/' . $profile->photo) }}" alt="Foto de Perfil" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 8px;">
+                        </div>
+                      @endif
+                      <div class="uploading-outer">
+                        <div class="uploadButton">
+                          <input class="uploadButton-input" type="file" name="photo" accept="image/*" id="upload-photo" />
+                          <label class="uploadButton-button ripple-effect" for="upload-photo">{{ $profile->photo ? 'Alterar Foto' : 'Subir Foto' }}</label>
+                          <span class="uploadButton-file-name"></span>
+                        </div>
+                        <div class="text">Tamanho máximo: 1MB. Formatos: .jpg e .png</div>
+                      </div>
+                    </div>
+
                     <!-- Nome -->
                     <div class="form-group col-lg-6 col-md-12">
                       <label>Nome*</label>
@@ -60,7 +91,8 @@
                     <!-- Endereço de E-mail -->
                     <div class="form-group col-lg-6 col-md-12">
                       <label>Endereço de E-mail*</label>
-                      <input type="email" name="email" placeholder="maria@exemplo.com" value="{{ Auth::user()->email }}" readonly>
+                      <input type="email" placeholder="maria@exemplo.com" value="{{ Auth::user()->email }}" readonly disabled style="background-color: #e9ecef; cursor: not-allowed;">
+                      <input type="hidden" name="email" value="{{ Auth::user()->email }}">
                     </div>
 
                     <!-- Site -->
@@ -132,6 +164,11 @@
               <div class="widget-content">
                 <form class="default-form" method="POST" action="{{ route('professional.profile.update') }}">
                   @csrf
+                  <!-- Campos obrigatórios ocultos -->
+                  <input type="hidden" name="first_name" value="{{ $profile->first_name }}">
+                  <input type="hidden" name="last_name" value="{{ $profile->last_name }}">
+                  <input type="hidden" name="city" value="{{ $profile->city }}">
+                  
                   <div class="row">
                     <!-- Facebook -->
                     <div class="form-group col-lg-6 col-md-12">
@@ -178,6 +215,10 @@
               <div class="widget-content">
                 <form class="default-form" method="POST" action="{{ route('professional.profile.update') }}">
                   @csrf
+                  <!-- Campos obrigatórios ocultos -->
+                  <input type="hidden" name="first_name" value="{{ $profile->first_name }}">
+                  <input type="hidden" name="last_name" value="{{ $profile->last_name }}">
+                  
                   <div class="row">
                     <!-- Endereço -->
                     <div class="form-group col-lg-12 col-md-12">

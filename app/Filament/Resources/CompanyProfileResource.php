@@ -132,20 +132,15 @@ class CompanyProfileResource extends Resource
                             ->maxLength(1000)
                             ->columnSpanFull(),
 
-                        TextInput::make('employees_count')
-                            ->label('Número de Funcionários')
-                            ->numeric()
-                            ->minValue(1)
-                            ->placeholder('Ex.: 10'),
-
                         Select::make('company_size')
-                            ->label('Porte da Empresa')
+                            ->label('Quantidade de funcionários')
                             ->options([
-                                'micro' => 'Microempresa',
-                                'small' => 'Pequena',
-                                'medium' => 'Média',
-                                'large' => 'Grande',
-                            ]),
+                                '1-4' => 'Até 4',
+                                '5-10' => 'De 5 a 10',
+                                '11-20' => 'De 11 a 20',
+                                '21+' => 'Acima de 21',
+                            ])
+                            ->placeholder('Selecione'),
 
                         TagsInput::make('services')
                             ->label('Serviços oferecidos')

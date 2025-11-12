@@ -61,6 +61,10 @@ class ProfessionalController extends Controller
         $user = Auth::user();
         $profile = $user->professionalProfile;
 
+        if (!$profile) {
+            return redirect()->route('home')->with('error', 'Você precisa ter um perfil profissional para acessar esta página.');
+        }
+
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -72,23 +76,34 @@ class ProfessionalController extends Controller
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:2',
             'zip_code' => 'nullable|string|max:10',
-            'bio' => 'nullable|string|max:1000',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'bio' => 'nullable|string|max:5000',
             'title' => 'nullable|string|max:255',
             'experience_level' => 'nullable|in:estagio,junior,pleno,senior',
-            'areas' => 'nullable|array',
-            'skills' => 'nullable|array',
+            'areas' => 'nullable|string|max:1000',
+            'skills' => 'nullable|string|max:1000',
             'education' => 'nullable|array',
             'experiences' => 'nullable|array',
             'years_experience' => 'nullable|integer|min:0',
-            'photo' => 'nullable|image|max:2048',
+            'photo' => 'nullable|image|max:1024',
             'resume' => 'nullable|file|mimes:pdf|max:5120',
-            'linkedin' => 'nullable|url',
+            'linkedin' => 'nullable|string|max:255',
             'instagram' => 'nullable|string|max:255',
             'facebook' => 'nullable|string|max:255',
-            'website' => 'nullable|url',
+            'website' => 'nullable|string|max:255',
         ]);
 
         $data = $request->except(['photo', 'resume']);
+
+        // Converter areas e skills de string para array
+        if ($request->filled('areas')) {
+            $data['areas'] = array_map('trim', explode(',', $request->areas));
+        }
+
+        if ($request->filled('skills')) {
+            $data['skills'] = array_map('trim', explode(',', $request->skills));
+        }
 
         // Upload de foto
         if ($request->hasFile('photo')) {
