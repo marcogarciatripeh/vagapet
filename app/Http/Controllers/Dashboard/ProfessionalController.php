@@ -27,7 +27,7 @@ class ProfessionalController extends Controller
             'applications_count' => $profile->jobApplications()->count(),
             'pending_applications' => $profile->jobApplications()->pending()->count(),
             'approved_applications' => $profile->jobApplications()->approved()->count(),
-            'favorites_count' => $profile->favorites()->count(),
+            'favorites_count' => $user->favorites()->count(),
         ];
 
         // Candidaturas recentes
@@ -193,7 +193,7 @@ class ProfessionalController extends Controller
         $user = Auth::user();
         $profile = $user->professionalProfile;
 
-        $favorites = $profile->favorites()
+        $favorites = $user->favorites()
             ->with('favoritable')
             ->orderBy('created_at', 'desc')
             ->paginate(12);
@@ -211,7 +211,10 @@ class ProfessionalController extends Controller
             'favoritable_id' => 'required|integer',
         ]);
 
-        $favorite = $profile->favorites()
+        abort_unless(class_exists($request->favoritable_type), 422, 'Tipo inválido.');
+        $request->favoritable_type::findOrFail($request->favoritable_id);
+
+        $favorite = $user->favorites()
             ->where('favoritable_type', $request->favoritable_type)
             ->where('favoritable_id', $request->favoritable_id)
             ->first();

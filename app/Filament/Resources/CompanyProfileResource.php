@@ -16,7 +16,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TagsInput;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -147,31 +147,32 @@ class CompanyProfileResource extends Resource
                                 'large' => 'Grande',
                             ]),
 
-                        Repeater::make('services')
-                            ->label('Serviços')
-                            ->schema([
-                                TextInput::make('service')
-                                    ->label('Nome do Serviço')
-                                    ->placeholder('Ex.: Banho e Tosa')
-                                    ->required(),
+                        TagsInput::make('services')
+                            ->label('Serviços oferecidos')
+                            ->placeholder('Digite um serviço e pressione enter')
+                            ->suggestions([
+                                'Banho e tosa',
+                                'Creche e hotel',
+                                'Veterinária',
+                                'Adestramento',
+                                'Transporte Pet',
+                                'Loja Pet',
+                                'Farmácia Pet',
                             ])
-                            ->columns(1)
-                            ->collapsible()
-                            ->defaultItems(0)
-                            ->addActionLabel('Adicionar Serviço'),
+                            ->helperText('Use vírgula ou enter para adicionar múltiplos serviços.'),
 
-                        Repeater::make('specialties')
+                        TagsInput::make('specialties')
                             ->label('Especialidades')
-                            ->schema([
-                                TextInput::make('specialty')
-                                    ->label('Nome da Especialidade')
-                                    ->placeholder('Ex.: Clínica Veterinária')
-                                    ->required(),
+                            ->placeholder('Digite uma especialidade e pressione enter')
+                            ->suggestions([
+                                'Cães de pequeno porte',
+                                'Cães de grande porte',
+                                'Gatos',
+                                'Exóticos',
+                                'Reabilitação',
+                                'Especialistas em felinos',
                             ])
-                            ->columns(1)
-                            ->collapsible()
-                            ->defaultItems(0)
-                            ->addActionLabel('Adicionar Especialidade'),
+                            ->helperText('Ajuda os candidatos a entenderem o foco da empresa.'),
                     ])
                     ->columns(2),
 
@@ -289,6 +290,22 @@ class CompanyProfileResource extends Resource
                         default => 'Não informado',
                     }),
 
+                TextColumn::make('user.status')
+                    ->label('Status')
+                    ->badge()
+                    ->colors([
+                        'warning' => 'pending',
+                        'success' => 'completed',
+                        'danger' => 'inactive',
+                    ])
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'pending' => 'Em análise',
+                        'completed' => 'Ativo',
+                        'inactive' => 'Inativo',
+                        default => 'Sem status',
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('views_count')
                     ->label('Visualizações')
                     ->sortable(),
@@ -326,10 +343,72 @@ class CompanyProfileResource extends Resource
                         'large' => 'Grande',
                     ]),
 
+                SelectFilter::make('status')
+                    ->label('Status da Conta')
+                    ->options([
+                        'pending' => 'Em análise',
+                        'completed' => 'Ativo',
+                        'inactive' => 'Inativo',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (! $data['value']) {
+                            return $query;
+                        }
+
+                        return $query->whereHas('user', fn (Builder $userQuery) => $userQuery->where('status', $data['value']));
+                    }),
+
+                SelectFilter::make('is_active')
+                    ->label('Perfil Ativo?')
+                    ->options([
+                        '1' => 'Ativo',
+                        '0' => 'Inativo',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (! isset($data['value'])) {
+                            return $query;
+                        }
+
+                        return $query->whereHas('user', fn (Builder $userQuery) => $userQuery->where('is_active', (bool) $data['value']));
+                    }),
+
                 TrashedFilter::make(),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make()
+                    ->label('Ver página')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn (CompanyProfile $record) => route('companies.show', $record))
+                    ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('approve')
+                    ->label('Aprovar')
+                    ->icon('heroicon-o-check')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->visible(fn (CompanyProfile $record) => optional($record->user)->is_active === false)
+                    ->action(function (CompanyProfile $record) {
+                        if ($record->user) {
+                            $record->user->update([
+                                'is_active' => true,
+                                'status' => 'completed',
+                            ]);
+                        }
+                    }),
+                Tables\Actions\Action::make('deactivate')
+                    ->label('Desativar')
+                    ->icon('heroicon-o-x-mark')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->visible(fn (CompanyProfile $record) => optional($record->user)->is_active === true)
+                    ->action(function (CompanyProfile $record) {
+                        if ($record->user) {
+                            $record->user->update([
+                                'is_active' => false,
+                                'status' => 'inactive',
+                            ]);
+                        }
+                    }),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),

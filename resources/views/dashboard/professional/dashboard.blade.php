@@ -8,7 +8,7 @@
   <section class="user-dashboard">
     <div class="dashboard-outer">
       <div class="upper-title-box">
-        <h3>Olá, Profissional!</h3>
+        <h3>Olá, {{ Auth::user()->professionalProfile->first_name ?? Auth::user()->name }}!</h3>
         <div class="text">Aqui você vê o resumo do seu perfil.</div>
       </div>
 

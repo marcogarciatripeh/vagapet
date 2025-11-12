@@ -10,7 +10,7 @@
       <div class="upper-title-box">
         <div class="row">
           <div class="col-lg-9">
-            <h3>Olá, Empresa!</h3>
+            <h3>Olá, {{ Auth::user()->companyProfile->company_name ?? Auth::user()->name }}!</h3>
           </div>
           <div class="col-lg-3">
             <a href="{{ route('company.create-job') }}" type="button" class="theme-btn btn-style-one medium">Publicar Vaga</a>

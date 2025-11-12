@@ -15,24 +15,11 @@
         </nav>
       </div>
 
-      <div class="outer-box">
+      <div class="outer-box d-flex align-items-center gap-2">
         <!-- Botão do painel do usuário -->
-        @if(Auth::user()->active_profile === 'professional')
-          <a href="{{ route('professional.dashboard') }}" class="btn btn-md btn-primary menu-btn text-white">
-            <i class="la la-dashboard"></i>
-            <span>Painel Profissional</span>
-          </a>
-        @elseif(Auth::user()->active_profile === 'company')
-          <a href="{{ route('company.dashboard') }}" class="btn btn-md btn-primary menu-btn text-white">
-            <i class="la la-dashboard"></i>
-            <span>Painel Empresa</span>
-          </a>
-        @else
-          <a href="{{ route('choose-profile') }}" class="btn btn-md btn-primary menu-btn text-white">
-            <i class="la la-cog"></i>
-            <span>Escolher Perfil</span>
-          </a>
-        @endif
+        @include('layouts.partials.dashboard-switcher-button', [
+          'buttonClass' => 'btn btn-md btn-primary menu-btn text-white'
+        ])
 
         <!-- Botão de logout -->
         <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="btn btn-md btn-outline-dark menu-btn">
@@ -48,19 +35,11 @@
     <a href="#nav-mobile" class="mobile-nav-toggler navbar-trigger"><span class="flaticon-menu-1"></span></a>
     <div class="logo pull-left"><a href="{{ route('home') }}"><img src="{{ asset('images/logo-empresa.svg') }}" alt="Logo VagaPet"></a></div>
     <div class="outer-box pull-right">
-      @if(Auth::user()->active_profile === 'professional')
-        <a href="{{ route('professional.dashboard') }}" class="btn btn-sm btn-primary menu-btn text-white">
-          <i class="la la-dashboard"></i> Painel
-        </a>
-      @elseif(Auth::user()->active_profile === 'company')
-        <a href="{{ route('company.dashboard') }}" class="btn btn-sm btn-primary menu-btn text-white">
-          <i class="la la-dashboard"></i> Painel
-        </a>
-      @else
-        <a href="{{ route('choose-profile') }}" class="btn btn-sm btn-primary menu-btn text-white">
-          <i class="la la-cog"></i> Perfil
-        </a>
-      @endif
+      @include('layouts.partials.dashboard-switcher-button', [
+        'buttonClass' => 'btn btn-sm btn-primary menu-btn text-white',
+        'dropdownMenuClass' => 'dropdown-menu dropdown-menu-right',
+        'dropdownLabel' => 'Painéis'
+      ])
     </div>
   </div>
   <div id="nav-mobile"></div>

@@ -17,135 +17,78 @@
       <!-- Filters Column -->
       <div class="filters-column hide-left">
         <div class="inner-column">
-          <div class="filters-outer">
-            <button type="button" class="theme-btn close-filters">X</button>
+          <form method="GET" action="{{ route('companies.index') }}" id="company-filters">
+            <div class="filters-outer">
+              <button type="button" class="theme-btn close-filters">X</button>
 
-            <div class="filter-block">
-              <h4>Buscar por palavras-chave</h4>
-              <div class="form-group">
-                <input type="text" name="listing-search" placeholder="Digite a busca">
-                <span class="icon flaticon-search-3"></span>
-              </div>
-            </div>
-
-            <div class="filter-block">
-              <h4>Localização</h4>
-              <div class="form-group">
-                <input type="text" name="listing-search" placeholder="Cidade ou CEP">
-                <span class="icon flaticon-map-locator"></span>
-              </div>
-              <p>Raio ao redor do local selecionado</p>
-              <div class="range-slider-one">
-                <div class="area-range-slider"></div>
-                <div class="input-outer">
-                  <div class="amount-outer"><span class="area-amount"></span> km</div>
+              <div class="filter-block">
+                <h4>Buscar por palavras-chave</h4>
+                <div class="form-group">
+                  <input type="text" name="search" value="{{ request('search') }}" placeholder="Digite a busca">
+                  <span class="icon flaticon-search-3"></span>
                 </div>
               </div>
-            </div>
 
-            <div class="filter-block">
-              <h4>Serviços</h4>
-              <div class="form-group">
-                <select class="chosen-select">
-                  <option>Selecione</option>
-                  <option>Adestramento</option>
-                  <option>Administrativo</option>
-                  <option>Banho e tosa</option>
-                  <option>Creche e hotel</option>
-                  <option>Enfermeiro, auxiliar ou técnico</option>
-                  <option>Limpeza</option>
-                  <option>Marketing</option>
-                  <option>Motorista</option>
-                  <option>Recepção</option>
-                  <option>Serviços gerais</option>
-                  <option>Vendas</option>
-                  <option>Veterinária</option>
-                </select>
-                <span class="icon flaticon-briefcase"></span>
+              <div class="filter-block">
+                <h4>Localização</h4>
+                <div class="form-group">
+                  <select name="city" class="chosen-select">
+                    <option value="">Todas as cidades</option>
+                    @foreach($cities as $city)
+                      <option value="{{ $city }}" {{ request('city') === $city ? 'selected' : '' }}>{{ $city }}</option>
+                    @endforeach
+                  </select>
+                  <span class="icon flaticon-map-locator"></span>
+                </div>
+                <div class="form-group mt-3">
+                  <select name="state" class="chosen-select">
+                    <option value="">Todos os estados</option>
+                    @foreach($states as $state)
+                      <option value="{{ $state }}" {{ request('state') === $state ? 'selected' : '' }}>{{ $state }}</option>
+                    @endforeach
+                  </select>
+                  <span class="icon flaticon-worldwide"></span>
+                </div>
               </div>
-            </div>
 
-            <div class="switchbox-outer">
-              <h4>Tipo de contrato</h4>
-              <ul class="switchbox">
-                <li>
-                  <label class="switch">
-                    <input type="checkbox" checked>
-                    <span class="slider round"></span>
-                    <span class="title">CLT ou Fixo</span>
-                  </label>
-                </li>
-                <li>
-                  <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider round"></span>
-                    <span class="title">Freelancer</span>
-                  </label>
-                </li>
-                <li>
-                  <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider round"></span>
-                    <span class="title">Temporário</span>
-                  </label>
-                </li>
-                <li>
-                  <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider round"></span>
-                    <span class="title">Estágio</span>
-                  </label>
-                </li>
-              </ul>
-            </div>
+              <div class="filter-block">
+                <h4>Serviços oferecidos</h4>
+                <div class="form-group">
+                  <select name="services" class="chosen-select">
+                    <option value="">Todos os serviços</option>
+                    @foreach($servicesList as $service)
+                      <option value="{{ $service }}" {{ request('services') === $service ? 'selected' : '' }}>{{ $service }}</option>
+                    @endforeach
+                  </select>
+                  <span class="icon flaticon-briefcase"></span>
+                </div>
+              </div>
 
-            <!-- Bloco de Filtro: Tags -->
-            <div class="filter-block">
-              <h4>Benefícios oferecidos</h4>
-              <ul class="tags-style-one">
-                <li><a href="#">VT</a></li>
-                <li><a href="#">Hora extra</a></li>
-                <li><a href="#">Comissão</a></li>
-                <li><a href="#">Adicional de insalubridade</a></li>
-                <li><a href="#">Seguro de vida</a></li>
-                <li><a href="#">Bônus</a></li>
-                <li><a href="#">Cesta básica</a></li>
-                <li><a href="#">Assistência médica</a></li>
-                <li><a href="#">Assistência odontológica</a></li>
-              </ul>
-            </div>
+              <div class="filter-block">
+                <h4>Porte da empresa</h4>
+                <div class="form-group">
+                  <select name="company_size" class="chosen-select">
+                    <option value="">Todos os portes</option>
+                    <option value="micro" {{ request('company_size') === 'micro' ? 'selected' : '' }}>Microempresa</option>
+                    <option value="small" {{ request('company_size') === 'small' ? 'selected' : '' }}>Pequena</option>
+                    <option value="medium" {{ request('company_size') === 'medium' ? 'selected' : '' }}>Média</option>
+                    <option value="large" {{ request('company_size') === 'large' ? 'selected' : '' }}>Grande</option>
+                  </select>
+                  <span class="icon flaticon-team"></span>
+                </div>
+              </div>
 
-            <!-- Checkboxes: Data de Publicação -->
-            <div class="checkbox-outer">
-              <h4>Data de Publicação</h4>
-              <ul class="checkboxes">
-                <li>
-                  <input id="check-f" type="checkbox" name="check">
-                  <label for="check-f">Todas</label>
-                </li>
-                <li>
-                  <input id="check-g" type="checkbox" name="check">
-                  <label for="check-g">Última Hora</label>
-                </li>
-                <li>
-                  <input id="check-h" type="checkbox" name="check">
-                  <label for="check-h">Últimas 24 Horas</label>
-                </li>
-                <li>
-                  <input id="check-i" type="checkbox" name="check">
-                  <label for="check-i">Últimos 7 Dias</label>
-                </li>
-                <li>
-                  <input id="check-j" type="checkbox" name="check">
-                  <label for="check-j">Últimos 14 Dias</label>
-                </li>
-                <li>
-                  <input id="check-k" type="checkbox" name="check">
-                  <label for="check-k">Últimos 30 Dias</label>
-                </li>
-              </ul>
+              <div class="form-group mt-4">
+                <button type="submit" class="theme-btn btn-style-two w-100"><i class="las la-search"></i> Aplicar filtros</button>
+              </div>
+
+              @if(request()->all())
+                <div class="form-group mt-2">
+                  <a href="{{ route('companies.index') }}" class="theme-btn btn-style-three w-100 text-center"><i class="las la-undo"></i> Limpar filtros</a>
+                </div>
+              @endif
             </div>
-          </div>
+          </form>
         </div>
       </div>
 
@@ -175,17 +118,41 @@
             </div>
           </div>
 
-          <!-- Remover filtros -->
-          <div class="row">
-            <div class="col-12 mb-5 text-center">
-              <p>Filtros aplicados:</p>
-              <ul>
-                <li class="badge text-bg-light"><a href="#" >Remover todos os filtros <i class="la la-times"></i></a></li>
-                <li class="badge text-bg-light"><a href="#" >CLT ou fixo <i class="la la-times"></i></a></li>
-                <li class="badge text-bg-light"><a href="#" >Banho e tosa <i class="la la-times"></i></a></li>
-              </ul>
+          @php
+            $filterLabels = collect([
+              'search' => request('search') ? 'Busca: "' . request('search') . '"' : null,
+              'city' => request('city') ? 'Cidade: ' . request('city') : null,
+              'state' => request('state') ? 'Estado: ' . request('state') : null,
+              'services' => request('services') ? 'Serviço: ' . request('services') : null,
+              'company_size' => request('company_size') ? 'Porte: ' . [
+                'micro' => 'Microempresa',
+                'small' => 'Pequena',
+                'medium' => 'Média',
+                'large' => 'Grande',
+              ][request('company_size')] : null,
+            ])->filter();
+          @endphp
+
+          @if($filterLabels->isNotEmpty())
+            <div class="row">
+              <div class="col-12 mb-4 text-center">
+                <p>Filtros aplicados:</p>
+                <ul class="list-unstyled d-flex flex-wrap gap-2 justify-content-center">
+                  <li class="badge text-bg-light">
+                    <a href="{{ route('companies.index') }}">Remover todos os filtros <i class="la la-times"></i></a>
+                  </li>
+                  @foreach($filterLabels as $key => $label)
+                    @php
+                      $params = collect(request()->query())->forget($key)->filter()->all();
+                    @endphp
+                    <li class="badge text-bg-light">
+                      <a href="{{ route('companies.index', $params) }}">{{ $label }} <i class="la la-times"></i></a>
+                    </li>
+                  @endforeach
+                </ul>
+              </div>
             </div>
-          </div>
+          @endif
 
           <!-- Job Blocks -->
           @include('layouts.partials.companies-list')

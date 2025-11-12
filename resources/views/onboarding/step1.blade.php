@@ -49,8 +49,11 @@
             <div class="tabs-box">
               <div class="widget-title">
                 <h4>Escolha o seu perfil</h4>
-                @if(session('onboarding.email'))
-                  <p class="text-muted">Conta: {{ session('onboarding.email') }}</p>
+                @php
+                  $displayEmail = session('onboarding.email') ?? (Auth::check() ? Auth::user()->email : null);
+                @endphp
+                @if($displayEmail)
+                  <p class="text-muted">Conta: {{ $displayEmail }}</p>
                 @endif
               </div>
 

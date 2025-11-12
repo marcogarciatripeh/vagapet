@@ -170,15 +170,45 @@ class CompanyController extends Controller
             'is_featured' => 'boolean',
             'is_urgent' => 'boolean',
             'deadline' => 'nullable|date|after:today',
+            'currency' => 'nullable|string|max:3',
         ]);
 
         $data = $request->all();
         $data['company_profile_id'] = $profile->id;
-        $data['slug'] = \Illuminate\Support\Str::slug($request->title);
+        $data['is_remote'] = $request->boolean('is_remote');
+        $data['is_hybrid'] = $request->boolean('is_hybrid');
+        $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_urgent'] = $request->boolean('is_urgent');
+        $data['currency'] = $request->get('currency', 'BRL');
+        $data['deadline'] = $request->deadline ?: null;
+
+        if ($data['salary_type'] === 'negotiable') {
+            $data['salary_min'] = null;
+            $data['salary_max'] = null;
+        } elseif ($data['salary_type'] === 'fixed') {
+            $data['salary_max'] = null;
+        } elseif ($data['salary_type'] === 'range' && $request->filled('salary_min') && $request->filled('salary_max')) {
+            if ($data['salary_min'] > $data['salary_max']) {
+                [$data['salary_min'], $data['salary_max']] = [$data['salary_max'], $data['salary_min']];
+            }
+        }
+
+        $slugBase = Str::slug($request->title);
+        $slug = $slugBase;
+        $counter = 1;
+        while (Job::where('slug', $slug)->exists()) {
+            $slug = $slugBase . '-' . $counter++;
+        }
+
+        $data['slug'] = $slug;
         $data['status'] = 'draft';
         $data['published_at'] = null;
 
         Job::create($data);
+
+        $profile->updateQuietly([
+            'jobs_posted_count' => $profile->jobs()->count(),
+        ]);
 
         return redirect()->route('company.manage-jobs')->with('success', 'Vaga criada com sucesso!');
     }
@@ -220,18 +250,50 @@ class CompanyController extends Controller
             'is_featured' => 'boolean',
             'is_urgent' => 'boolean',
             'deadline' => 'nullable|date|after:today',
+            'currency' => 'nullable|string|max:3',
             'status' => 'required|in:active,paused,closed,draft',
         ]);
 
         $data = $request->all();
-        $data['slug'] = \Illuminate\Support\Str::slug($request->title);
+        $data['is_remote'] = $request->boolean('is_remote');
+        $data['is_hybrid'] = $request->boolean('is_hybrid');
+        $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_urgent'] = $request->boolean('is_urgent');
+        $data['currency'] = $request->get('currency', $job->currency ?? 'BRL');
+        $data['deadline'] = $request->deadline ?: null;
+
+        if ($data['salary_type'] === 'negotiable') {
+            $data['salary_min'] = null;
+            $data['salary_max'] = null;
+        } elseif ($data['salary_type'] === 'fixed') {
+            $data['salary_max'] = null;
+        } elseif ($data['salary_type'] === 'range' && $request->filled('salary_min') && $request->filled('salary_max')) {
+            if ($data['salary_min'] > $data['salary_max']) {
+                [$data['salary_min'], $data['salary_max']] = [$data['salary_max'], $data['salary_min']];
+            }
+        }
+
+        $slugBase = Str::slug($request->title);
+        $slug = $slugBase;
+        $counter = 1;
+        while (Job::where('slug', $slug)->where('id', '!=', $job->id)->exists()) {
+            $slug = $slugBase . '-' . $counter++;
+        }
+
+        $data['slug'] = $slug;
 
         // Se mudou para ativo, definir data de publicação
         if ($request->status === 'active' && $job->status !== 'active') {
             $data['published_at'] = now();
+        } elseif ($request->status !== 'active' && $job->status === 'active') {
+            $data['published_at'] = $job->published_at;
         }
 
         $job->update($data);
+
+        $profile->updateQuietly([
+            'jobs_posted_count' => $profile->jobs()->count(),
+        ]);
 
         return back()->with('success', 'Vaga atualizada com sucesso!');
     }
@@ -243,6 +305,10 @@ class CompanyController extends Controller
 
         $job = $profile->jobs()->findOrFail($id);
         $job->delete();
+
+        $profile->updateQuietly([
+            'jobs_posted_count' => $profile->jobs()->count(),
+        ]);
 
         return back()->with('success', 'Vaga excluída com sucesso!');
     }
@@ -310,7 +376,7 @@ class CompanyController extends Controller
         $user = Auth::user();
         $profile = $user->companyProfile;
 
-        $favorites = $profile->favorites()
+        $favorites = $user->favorites()
             ->where('favoritable_type', ProfessionalProfile::class)
             ->with('favoritable')
             ->orderBy('created_at', 'desc')
@@ -329,7 +395,11 @@ class CompanyController extends Controller
             'favoritable_id' => 'required|integer',
         ]);
 
-        $favorite = $profile->favorites()
+        abort_unless(class_exists($request->favoritable_type), 422, 'Tipo inválido.');
+
+        $request->favoritable_type::findOrFail($request->favoritable_id);
+
+        $favorite = $user->favorites()
             ->where('favoritable_type', $request->favoritable_type)
             ->where('favoritable_id', $request->favoritable_id)
             ->first();

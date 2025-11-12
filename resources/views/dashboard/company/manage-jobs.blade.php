@@ -17,123 +17,101 @@
           <div class="ls-widget">
             <div class="tabs-box">
               <div class="widget-title">
-                <h4>Minhas Vagas Publicadas</h4>
-                <div class="chosen-outer">
-                  <select class="chosen-select">
-                    <option>Últimos 6 meses</option>
-                    <option>Últimos 12 meses</option>
-                    <option>Últimos 16 meses</option>
-                    <option>Últimos 24 meses</option>
-                    <option>Últimos 5 anos</option>
+                <h4>Minhas Vagas</h4>
+                <div class="flex-grow-1">
+                  <form class="row g-2 justify-content-end" method="GET" action="{{ route('company.manage-jobs') }}">
+                    <div class="col-md-6">
+                      <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Buscar por título">
+                    </div>
+                    <div class="col-md-4">
+                      <select name="status" class="form-select">
+                        <option value="">Todos os status</option>
+                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Publicado</option>
+                        <option value="paused" {{ request('status') === 'paused' ? 'selected' : '' }}>Pausado</option>
+                        <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Rascunho</option>
+                        <option value="closed" {{ request('status') === 'closed' ? 'selected' : '' }}>Encerrado</option>
                   </select>
+                    </div>
+                    <div class="col-md-2">
+                      <button type="submit" class="theme-btn btn-style-two w-100">Filtrar</button>
+                    </div>
+                  </form>
                 </div>
               </div>
 
               <div class="widget-content">
                 <div class="table-outer row">
-                  <!-- Exemplo 1: Veterinário -->
+                  @forelse($jobs as $job)
+                    @php
+                      $statusColors = [
+                        'active' => 'success',
+                        'paused' => 'warning',
+                        'draft' => 'secondary',
+                        'closed' => 'danger',
+                      ];
+                      $statusLabels = [
+                        'active' => 'Publicado',
+                        'paused' => 'Pausado',
+                        'draft' => 'Rascunho',
+                        'closed' => 'Encerrado',
+                      ];
+                      $badgeColor = $statusColors[$job->status] ?? 'secondary';
+                    @endphp
                   <div class="job-block col-lg-6 col-md-12 col-sm-12">
                     <div class="inner-box">
-                      <span class="badge text-bg-success text-white rounded-start-2" style="position:absolute; bottom:0; right:0;">Ativa</span>
-                      <div class="content">
-                        <span class="company-logo">
-                          <img src="{{ asset('images/resource/company-logo/1-2.png') }}" alt="">
+                        <span class="badge text-bg-{{ $badgeColor }} text-white rounded-start-2" style="position:absolute; bottom:0; right:0;">
+                          {{ $statusLabels[$job->status] ?? ucfirst($job->status) }}
                         </span>
-
-                        <h4><a href="#">Veterinário(a) – Amigão PetShop</a></h4>
+                        <div class="content">
+                          <span class="company-logo">
+                            <img src="{{ optional($job->companyProfile)->logo_url ?? asset('images/resource/default-company.png') }}" alt="{{ $job->companyProfile->company_name ?? 'Empresa' }}">
+                          </span>
+                          <h4><a href="{{ route('jobs.show', $job->slug) }}" target="_blank">{{ $job->title }}</a></h4>
 
                         <ul class="job-info">
-                          <li><span class="icon flaticon-briefcase"></span> 14 candidaturas</li>
-                          <li><span class="icon flaticon-map-locator"></span> São Paulo, SP</li>
-                          <li><span class="icon flaticon-clock-3"></span> 10 jan 2023</li>
-                        </ul>
-                        <button class="bookmark-btn"><span class="flaticon-bookmark"></span></button>
+                            <li><span class="icon flaticon-briefcase"></span> {{ $job->applications_count }} {{ \Illuminate\Support\Str::plural('candidatura', $job->applications_count) }}</li>
+                            <li><span class="icon flaticon-map-locator"></span> {{ collect([$job->city, $job->state])->filter()->implode(', ') ?: 'Local não informado' }}</li>
+                            <li><span class="icon flaticon-clock-3"></span> Atualizado {{ $job->updated_at->diffForHumans() }}</li>
+                          </ul>
                         <div class="option-box pb-4">
                           <ul class="option-list">
-                            <li class="ml-0"><button data-text="Ver vaga"><span class="la la-eye"></span></button></li>
-                            <li><button data-text="Editar vaga"><span class="la la-pencil"></span></button></li>
-                            <li><button data-text="Apagar vaga"><span class="la la-trash"></span></button></li>
+                              <li class="ml-0">
+                                <a href="{{ route('jobs.show', $job->slug) }}" target="_blank" data-text="Ver vaga">
+                                  <span class="la la-eye"></span>
+                                </a>
+                              </li>
+                              <li>
+                                <a href="{{ route('company.edit-job', $job->id) }}" data-text="Editar vaga">
+                                  <span class="la la-pencil"></span>
+                                </a>
+                              </li>
+                              <li>
+                                <form method="POST" action="{{ route('company.delete-job', $job->id) }}" onsubmit="return confirm('Deseja realmente excluir esta vaga?');">
+                                  @csrf
+                                  @method('DELETE')
+                                  <button type="submit" data-text="Apagar vaga"><span class="la la-trash"></span></button>
+                                </form>
+                              </li>
                           </ul>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-
-                  <!-- Exemplo 2: Banho e Tosa -->
-                  <div class="job-block col-lg-6 col-md-12 col-sm-12">
-                    <div class="inner-box">
-                      <span class="badge text-bg-warning text-white rounded-start-2" style="position:absolute; bottom:0; right:0;">Em análise</span>
-                      <div class="content">
-                        <span class="company-logo"><img src="{{ asset('images/resource/company-logo/1-2.png') }}" alt=""></span>
-                        <h4><a href="#">Groomer / Banho e Tosa – Amigão PetShop</a></h4>
-                        <ul class="job-info">
-                          <li><span class="icon flaticon-briefcase"></span> 0 candidaturas</li>
-                          <li><span class="icon flaticon-map-locator"></span> São Paulo, SP</li>
-                          <li><span class="icon flaticon-clock-3"></span> 02 fev 2023</li>
-                        </ul>
-                        <button class="bookmark-btn"><span class="flaticon-bookmark"></span></button>
-
-                        <div class="option-box pb-4">
-                          <ul class="option-list">
-                            <li class="ml-0"><button data-text="Ver vaga"><span class="la la-eye"></span></button></li>
-                            <li><button data-text="Editar vaga"><span class="la la-pencil"></span></button></li>
-                            <li><button data-text="Apagar vaga"><span class="la la-trash"></span></button></li>
-                          </ul>
-                        </div>
-                      </div>
+                  @empty
+                    <div class="col-12 text-center py-5">
+                      <img src="{{ asset('images/resource/default-company.png') }}" alt="Sem vagas" style="max-width: 160px;" class="mb-3">
+                      <h5>Você ainda não publicou nenhuma vaga</h5>
+                      <p class="text-muted">Clique no botão abaixo para criar sua primeira oportunidade.</p>
+                      <a href="{{ route('company.create-job') }}" class="theme-btn btn-style-two mt-3">Publicar nova vaga</a>
                     </div>
+                  @endforelse
                   </div>
 
-                  <!-- Exemplo 3: Recepcionista -->
-                  <div class="job-block col-lg-6 col-md-12 col-sm-12">
-                    <div class="inner-box">
-                      <span class="badge text-bg-danger text-white rounded-start-2" style="position:absolute; bottom:0; right:0;">Não publicada</span>
-                      <div class="content">
-                        <span class="company-logo"><img src="{{ asset('images/resource/company-logo/1-2.png') }}" alt=""></span>
-                        <h4><a href="#">Recepcionista – Amigão PetShop</a></h4>
-                        <ul class="job-info">
-                          <li><span class="icon flaticon-briefcase"></span> 0 candidaturas</li>
-                          <li><span class="icon flaticon-map-locator"></span> São Paulo, SP</li>
-                          <li><span class="icon flaticon-clock-3"></span> 15 mar 2023</li>
-                        </ul>
-                        <button class="bookmark-btn"><span class="flaticon-bookmark"></span></button>
-
-                        <div class="option-box pb-4">
-                          <ul class="option-list">
-                            <li class="ml-0"><button data-text="Ver vaga"><span class="la la-eye"></span></button></li>
-                            <li><button data-text="Editar vaga"><span class="la la-pencil"></span></button></li>
-                            <li><button data-text="Apagar vaga"><span class="la la-trash"></span></button></li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
+                @if($jobs instanceof \Illuminate\Contracts\Pagination\Paginator && $jobs->count())
+                  <div class="mt-4">
+                    {{ $jobs->withQueryString()->links() }}
                   </div>
-
-                  <!-- Exemplo 4: Dog Walker -->
-                  <div class="job-block col-lg-6 col-md-12 col-sm-12">
-                    <div class="inner-box">
-                      <span class="badge text-bg-success text-white rounded-start-2" style="position:absolute; bottom:0; right:0;">Ativa</span>
-                      <div class="content">
-                        <span class="company-logo"><img src="{{ asset('images/resource/company-logo/1-2.png') }}" alt=""></span>
-                        <h4><a href="#">Dog Walker / Pet Sitter – Amigão PetShop</a></h4>
-                        <ul class="job-info">
-                          <li><span class="icon flaticon-briefcase"></span> 7 candidaturas</li>
-                          <li><span class="icon flaticon-map-locator"></span> São Paulo, SP</li>
-                          <li><span class="icon flaticon-clock-3"></span> 20 mar 2023</li>
-                        </ul>
-                        <button class="bookmark-btn"><span class="flaticon-bookmark"></span></button>
-
-                        <div class="option-box pb-4">
-                          <ul class="option-list">
-                            <li class="ml-0"><button data-text="Ver vaga"><span class="la la-eye"></span></button></li>
-                            <li><button data-text="Editar vaga"><span class="la la-pencil"></span></button></li>
-                            <li><button data-text="Apagar vaga"><span class="la la-trash"></span></button></li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                @endif
               </div>
             </div>
           </div>

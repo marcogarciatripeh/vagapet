@@ -7,7 +7,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class User extends Authenticatable
 {
@@ -46,9 +45,9 @@ class User extends Authenticatable
         return $this->hasOne(CompanyProfile::class);
     }
 
-    public function favorites(): MorphMany
+    public function favorites(): HasMany
     {
-        return $this->morphMany(Favorite::class, 'favoritable');
+        return $this->hasMany(Favorite::class);
     }
 
     // Helper methods

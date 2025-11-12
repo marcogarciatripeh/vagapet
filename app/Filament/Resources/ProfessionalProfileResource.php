@@ -18,6 +18,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TagsInput;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -102,22 +103,33 @@ class ProfessionalProfileResource extends Resource
                                 'senior' => 'Sênior (mais de 5 anos)',
                             ]),
 
-                        Select::make('areas')
-                            ->label('Área de trabalho')
-                            ->helperText('Você pode incluir mais de uma opção')
-                            ->multiple()
-                            ->options([
-                                'BanhoTosa' => 'Banho & Tosa',
-                                'Recepcao' => 'Recepção',
-                                'Vendas' => 'Vendas',
-                                'Veterinario' => 'Veterinário',
-                                'AuxiliarVeterinario' => 'Auxiliar Veterinário',
-                                'Limpeza' => 'Limpeza',
-                                'Gerente' => 'Gerente',
-                                'Estoque' => 'Estoque',
-                                'Motorista' => 'Motorista',
+                        TagsInput::make('areas')
+                            ->label('Áreas de atuação')
+                            ->placeholder('Informe uma área e pressione enter')
+                            ->suggestions([
+                                'Banho e tosa',
+                                'Creche e hotel',
+                                'Adestramento',
+                                'Veterinária',
+                                'Recepção',
+                                'Marketing',
+                                'Serviços gerais',
+                                'Transporte Pet',
                             ])
-                            ->searchable(),
+                            ->helperText('Use vírgula ou enter para adicionar várias áreas.'),
+
+                        TagsInput::make('skills')
+                            ->label('Habilidades')
+                            ->placeholder('Informe uma habilidade e pressione enter')
+                            ->suggestions([
+                                'Atendimento ao cliente',
+                                'Tosa na tesoura',
+                                'Banho terapêutico',
+                                'Primeiros socorros pet',
+                                'Gestão de agenda',
+                                'Vendas consultivas',
+                            ])
+                            ->helperText('Ajuda as empresas a encontrarem o profissional ideal.'),
 
                         Textarea::make('bio')
                             ->label('Descrição')
@@ -199,6 +211,13 @@ class ProfessionalProfileResource extends Resource
                             ->directory('professionals/photos')
                             ->visibility('public')
                             ->columnSpanFull(),
+                        FileUpload::make('resume')
+                            ->label('Currículo (PDF)')
+                            ->acceptedFileTypes(['application/pdf'])
+                            ->helperText('Envie um PDF de até 2MB.')
+                            ->maxSize(2048)
+                            ->directory('professionals/resumes')
+                            ->visibility('public'),
                     ])
                     ->columns(2),
 
@@ -282,6 +301,106 @@ class ProfessionalProfileResource extends Resource
             ]);
     }
 
+    public static function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['skills'] = collect($data['skills'] ?? [])
+            ->map(fn ($skill) => is_array($skill) ? ($skill['skill'] ?? null) : $skill)
+            ->filter()
+            ->values()
+            ->all();
+
+        $data['education'] = collect($data['education'] ?? [])
+            ->map(function ($item) {
+                if (! is_array($item)) {
+                    return [
+                        'title' => $item,
+                        'institution' => null,
+                        'period' => null,
+                        'description' => null,
+                    ];
+                }
+
+                return [
+                    'title' => $item['title'] ?? $item['course'] ?? null,
+                    'institution' => $item['institution'] ?? null,
+                    'period' => $item['period'] ?? null,
+                    'description' => $item['description'] ?? null,
+                ];
+            })
+            ->filter(fn ($item) => $item['title'])
+            ->values()
+            ->all();
+
+        $data['experiences'] = collect($data['experiences'] ?? [])
+            ->map(function ($item) {
+                if (! is_array($item)) {
+                    return [
+                        'title' => $item,
+                        'company' => null,
+                        'period' => null,
+                        'description' => null,
+                    ];
+                }
+
+                return [
+                    'title' => $item['title'] ?? $item['role'] ?? null,
+                    'company' => $item['company'] ?? null,
+                    'period' => $item['period'] ?? null,
+                    'description' => $item['description'] ?? null,
+                ];
+            })
+            ->filter(fn ($item) => $item['title'])
+            ->values()
+            ->all();
+
+        return $data;
+    }
+
+    public static function mutateFormDataBeforeSave(array $data): array
+    {
+        $data['skills'] = collect($data['skills'] ?? [])
+            ->map(fn ($skill) => is_array($skill) ? ($skill['skill'] ?? null) : $skill)
+            ->filter()
+            ->values()
+            ->all();
+
+        $data['education'] = collect($data['education'] ?? [])
+            ->map(function ($item) {
+                if (! is_array($item)) {
+                    return null;
+                }
+
+                return array_filter([
+                    'title' => $item['title'] ?? $item['course'] ?? null,
+                    'institution' => $item['institution'] ?? null,
+                    'period' => $item['period'] ?? null,
+                    'description' => $item['description'] ?? null,
+                ], fn ($value) => filled($value));
+            })
+            ->filter()
+            ->values()
+            ->all();
+
+        $data['experiences'] = collect($data['experiences'] ?? [])
+            ->map(function ($item) {
+                if (! is_array($item)) {
+                    return null;
+                }
+
+                return array_filter([
+                    'title' => $item['title'] ?? $item['role'] ?? null,
+                    'company' => $item['company'] ?? null,
+                    'period' => $item['period'] ?? null,
+                    'description' => $item['description'] ?? null,
+                ], fn ($value) => filled($value));
+            })
+            ->filter()
+            ->values()
+            ->all();
+
+        return $data;
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -344,6 +463,22 @@ class ProfessionalProfileResource extends Resource
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('user.status')
+                    ->label('Status')
+                    ->badge()
+                    ->colors([
+                        'warning' => 'pending',
+                        'success' => 'completed',
+                        'danger' => 'inactive',
+                    ])
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'pending' => 'Em análise',
+                        'completed' => 'Ativo',
+                        'inactive' => 'Inativo',
+                        default => 'Sem status',
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('views_count')
                     ->label('Visualizações')
                     ->sortable(),
@@ -391,10 +526,81 @@ class ProfessionalProfileResource extends Resource
                         'TO' => 'Tocantins',
                     ]),
 
+                SelectFilter::make('experience_level')
+                    ->label('Experiência')
+                    ->options([
+                        'estagio' => 'Estágio',
+                        'junior' => 'Junior',
+                        'pleno' => 'Pleno',
+                        'senior' => 'Sênior',
+                    ]),
+
+                SelectFilter::make('status')
+                    ->label('Status da Conta')
+                    ->options([
+                        'pending' => 'Em análise',
+                        'completed' => 'Ativo',
+                        'inactive' => 'Inativo',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (! $data['value']) {
+                            return $query;
+                        }
+
+                        return $query->whereHas('user', fn (Builder $userQuery) => $userQuery->where('status', $data['value']));
+                    }),
+
+                SelectFilter::make('is_active')
+                    ->label('Perfil Ativo?')
+                    ->options([
+                        '1' => 'Ativo',
+                        '0' => 'Inativo',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (! isset($data['value'])) {
+                            return $query;
+                        }
+
+                        return $query->whereHas('user', fn (Builder $userQuery) => $userQuery->where('is_active', (bool) $data['value']));
+                    }),
+
                 TrashedFilter::make(),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make()
+                    ->label('Ver página')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn (ProfessionalProfile $record) => route('professionals.show', $record))
+                    ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('approve')
+                    ->label('Aprovar')
+                    ->icon('heroicon-o-check')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->visible(fn (ProfessionalProfile $record) => optional($record->user)->is_active === false)
+                    ->action(function (ProfessionalProfile $record) {
+                        if ($record->user) {
+                            $record->user->update([
+                                'is_active' => true,
+                                'status' => 'completed',
+                            ]);
+                        }
+                    }),
+                Tables\Actions\Action::make('deactivate')
+                    ->label('Desativar')
+                    ->icon('heroicon-o-x-mark')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->visible(fn (ProfessionalProfile $record) => optional($record->user)->is_active === true)
+                    ->action(function (ProfessionalProfile $record) {
+                        if ($record->user) {
+                            $record->user->update([
+                                'is_active' => false,
+                                'status' => 'inactive',
+                            ]);
+                        }
+                    }),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),

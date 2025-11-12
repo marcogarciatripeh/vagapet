@@ -61,21 +61,35 @@ class OnboardingController extends Controller
 
         // Verificar se o usuário já possui o perfil escolhido
         $email = session('onboarding.email');
+        $existingUser = null;
+
         if ($email) {
             $existingUser = User::where('email', $email)->first();
+        }
 
-            if ($existingUser) {
-                if ($request->profile_type === 'professional' && $existingUser->hasProfessionalProfile()) {
-                    return redirect()->route('onboarding.step1')
-                        ->withErrors(['profile_type' => 'Você já possui um perfil profissional cadastrado.'])
-                        ->withInput();
-                }
+        // Se não encontrou por sessão, verificar se está autenticado
+        if (!$existingUser && Auth::check()) {
+            $existingUser = Auth::user();
+            // Salvar o email na sessão para manter consistência
+            session(['onboarding.email' => $existingUser->email]);
+        }
 
-                if ($request->profile_type === 'company' && $existingUser->hasCompanyProfile()) {
-                    return redirect()->route('onboarding.step1')
-                        ->withErrors(['profile_type' => 'Você já possui um perfil de empresa cadastrado.'])
-                        ->withInput();
-                }
+        if ($existingUser) {
+            // Forçar refresh das relações do banco
+            $existingUser->refresh();
+            $hasProfessional = \App\Models\ProfessionalProfile::where('user_id', $existingUser->id)->exists();
+            $hasCompany = \App\Models\CompanyProfile::where('user_id', $existingUser->id)->exists();
+
+            if ($request->profile_type === 'professional' && $hasProfessional) {
+                return redirect()->route('onboarding.step1')
+                    ->withErrors(['profile_type' => 'Você já possui um perfil profissional cadastrado.'])
+                    ->withInput();
+            }
+
+            if ($request->profile_type === 'company' && $hasCompany) {
+                return redirect()->route('onboarding.step1')
+                    ->withErrors(['profile_type' => 'Você já possui um perfil de empresa cadastrado.'])
+                    ->withInput();
             }
         }
 

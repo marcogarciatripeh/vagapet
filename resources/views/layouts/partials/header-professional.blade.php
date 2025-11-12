@@ -14,6 +14,12 @@
         </nav>
       </div>
       <div class="outer-box">
+        @include('layouts.partials.dashboard-switcher-button', [
+          'buttonClass' => 'btn btn-sm btn-primary menu-btn text-white mr-2',
+          'dropdownMenuClass' => 'dropdown-menu dropdown-menu-right',
+          'dropdownLabel' => 'Painéis',
+          'containerClass' => 'mr-2'
+        ])
         <button class="menu-btn"><span class="count">1</span><span class="icon la la-heart-o"></span></button>
         <button class="menu-btn"><span class="icon la la-bell"></span></button>
         <div class="dropdown dashboard-option">

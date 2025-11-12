@@ -14,8 +14,11 @@ class CompanyController extends Controller
 
         // Filtros
         if ($request->filled('search')) {
-            $query->where('company_name', 'like', "%{$request->search}%")
-                  ->orWhere('description', 'like', "%{$request->search}%");
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('company_name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
         }
 
         if ($request->filled('city')) {
@@ -45,8 +48,21 @@ class CompanyController extends Controller
         $cities = CompanyProfile::active()->distinct()->pluck('city')->filter()->sort()->values();
         $states = CompanyProfile::active()->distinct()->pluck('state')->filter()->sort()->values();
         $sizes = ['micro', 'small', 'medium', 'large'];
+        $servicesList = CompanyProfile::active()
+            ->pluck('services')
+            ->flatten()
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
 
-        return view('public.companies.index', compact('companies', 'cities', 'states', 'sizes'));
+        return view('public.companies.index', [
+            'companies' => $companies,
+            'cities' => $cities,
+            'states' => $states,
+            'sizes' => $sizes,
+            'servicesList' => $servicesList,
+        ]);
     }
 
     public function show($id)

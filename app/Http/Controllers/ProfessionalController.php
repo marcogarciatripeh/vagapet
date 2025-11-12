@@ -28,6 +28,10 @@ class ProfessionalController extends Controller
             $query->byArea($request->area);
         }
 
+        if ($request->filled('experience_level')) {
+            $query->where('experience_level', $request->experience_level);
+        }
+
         if ($request->filled('experience_min')) {
             $query->where('years_experience', '>=', $request->experience_min);
         }
@@ -47,8 +51,20 @@ class ProfessionalController extends Controller
         $cities = ProfessionalProfile::active()->distinct()->pluck('city')->filter()->sort()->values();
         $states = ProfessionalProfile::active()->distinct()->pluck('state')->filter()->sort()->values();
         $areas = ProfessionalProfile::active()->distinct()->pluck('areas')->filter()->flatten()->unique()->sort()->values();
+        $experienceLevels = [
+            'estagio' => 'Estágio',
+            'junior' => 'Júnior',
+            'pleno' => 'Pleno',
+            'senior' => 'Sênior',
+        ];
 
-        return view('public.professionals.index', compact('professionals', 'cities', 'states', 'areas'));
+        return view('public.professionals.index', [
+            'professionals' => $professionals,
+            'cities' => $cities,
+            'states' => $states,
+            'areas' => $areas,
+            'experienceLevels' => $experienceLevels,
+        ]);
     }
 
     public function show($id)
