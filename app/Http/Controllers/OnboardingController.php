@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\ProfessionalProfile;
 use App\Models\CompanyProfile;
+use App\Helpers\BrazilianStates;
 
 class OnboardingController extends Controller
 {
@@ -270,17 +271,23 @@ class OnboardingController extends Controller
 
     public function step6Professional()
     {
-        return view('onboarding.professional.step6');
+        $step6Data = session('onboarding.step6_data', []);
+        $states = BrazilianStates::getStates();
+        return view('onboarding.professional.step6', compact('step6Data', 'states'));
     }
 
     public function step6ProfessionalProcess(Request $request)
     {
         $request->validate([
-            'address' => 'nullable|string|max:500',
+            'address' => 'required|string|max:500',
             'neighborhood' => 'nullable|string|max:255',
             'city' => 'required|string|max:255',
-            'state' => 'required|string|max:2',
-            'zip_code' => 'nullable|string|max:10',
+            'state' => ['required', 'string', 'max:2', function ($attribute, $value, $fail) {
+                if (!BrazilianStates::isValid($value)) {
+                    $fail('O estado selecionado é inválido.');
+                }
+            }],
+            'zip_code' => 'required|string|max:10',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
         ]);
@@ -506,16 +513,21 @@ class OnboardingController extends Controller
     public function step4Company()
     {
         $step4Data = session('onboarding.step4_data', []);
-        return view('onboarding.company.step4', compact('step4Data'));
+        $states = BrazilianStates::getStates();
+        return view('onboarding.company.step4', compact('step4Data', 'states'));
     }
 
     public function step4CompanyProcess(Request $request)
     {
         $request->validate([
-            'address' => 'nullable|string|max:500',
+            'address' => 'required|string|max:500',
             'city' => 'required|string|max:100',
-            'state' => 'required|string|max:2',
-            'zip_code' => 'nullable|string|max:10',
+            'state' => ['required', 'string', 'max:2', function ($attribute, $value, $fail) {
+                if (!BrazilianStates::isValid($value)) {
+                    $fail('O estado selecionado é inválido.');
+                }
+            }],
+            'zip_code' => 'required|string|max:10',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
         ]);

@@ -241,18 +241,32 @@
                     <!-- Estado -->
                     <div class="form-group col-lg-4 col-md-12">
                       <label>Estado (UF)*</label>
-                      <input type="text" name="state" placeholder="SP" maxlength="2" value="{{ old('state', $profile->state) }}">
+                      <select name="state" class="chosen-select">
+                        <option value="">Selecione o estado</option>
+                        @foreach($states as $code => $name)
+                          <option value="{{ $code }}" {{ old('state', $profile->state) == $code ? 'selected' : '' }}>
+                            {{ $code }} - {{ $name }}
+                          </option>
+                        @endforeach
+                      </select>
                     </div>
 
                     <!-- CEP -->
                     <div class="form-group col-lg-12 col-md-12">
                       <label>CEP</label>
-                      <input type="text" name="zip_code" placeholder="01234-567" value="{{ old('zip_code', $profile->zip_code) }}">
+                      <input type="text" name="zip_code" id="zip_code" placeholder="01234-567" value="{{ old('zip_code', $profile->zip_code) }}">
                     </div>
 
                     <!-- Latitude/Longitude (ocultos) -->
-                    <input type="hidden" name="latitude" value="{{ old('latitude', $profile->latitude) }}">
-                    <input type="hidden" name="longitude" value="{{ old('longitude', $profile->longitude) }}">
+                    <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude', $profile->latitude ?? -23.550520) }}">
+                    <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude', $profile->longitude ?? -46.633308) }}">
+
+                    <!-- Mapa do Google Maps -->
+                    <div class="form-group col-lg-12 col-md-12">
+                      <label>Localização no Mapa</label>
+                      <div id="map-canvas" style="width: 100%; height: 400px; border: 1px solid #ddd; border-radius: 4px;"></div>
+                      <small class="form-text text-muted">O mapa será atualizado automaticamente quando você preencher o endereço ou CEP.</small>
+                    </div>
 
                     <!-- Botão Salvar -->
                     <div class="form-group col-lg-12 col-md-12">
@@ -274,4 +288,5 @@
 
 @push('scripts')
 @include('layouts.partials.scripts')
+<script src="{{ asset('js/address-map.js') }}"></script>
 @endpush

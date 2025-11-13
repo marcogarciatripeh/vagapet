@@ -95,11 +95,11 @@ class CompanyProfileResource extends Resource
                             ->required()
                             ->maxLength(100),
 
-                        TextInput::make('state')
+                        Select::make('state')
                             ->label('Estado (UF)')
-                            ->placeholder('SP')
-                            ->maxLength(2)
-                            ->extraInputAttributes(['style' => 'text-transform: uppercase;']),
+                            ->options(\App\Helpers\BrazilianStates::getStates())
+                            ->searchable()
+                            ->placeholder('Selecione o estado'),
 
                         TextInput::make('zip_code')
                             ->label('CEP')

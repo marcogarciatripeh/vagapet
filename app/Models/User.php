@@ -7,8 +7,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable;
 
@@ -107,5 +109,13 @@ class User extends Authenticatable
         public function markAsInactive(): void
         {
             $this->update(['status' => 'inactive']);
+        }
+
+        /**
+         * Verifica se o usuário pode acessar o painel admin do Filament
+         */
+        public function canAccessPanel(Panel $panel): bool
+        {
+            return $this->is_admin === true;
         }
     }

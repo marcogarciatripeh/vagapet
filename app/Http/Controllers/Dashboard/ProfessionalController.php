@@ -10,6 +10,7 @@ use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\Favorite;
 use App\Models\ProfessionalProfile;
+use App\Helpers\BrazilianStates;
 
 class ProfessionalController extends Controller
 {
@@ -52,8 +53,9 @@ class ProfessionalController extends Controller
     {
         $user = Auth::user();
         $profile = $user->professionalProfile;
+        $states = BrazilianStates::getStates();
 
-        return view('dashboard.professional.profile', compact('profile'));
+        return view('dashboard.professional.profile', compact('profile', 'states'));
     }
 
     public function updateProfile(Request $request)
@@ -74,7 +76,11 @@ class ProfessionalController extends Controller
             'address' => 'nullable|string|max:500',
             'neighborhood' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:100',
-            'state' => 'nullable|string|max:2',
+            'state' => ['nullable', 'string', 'max:2', function ($attribute, $value, $fail) {
+                if ($value && !BrazilianStates::isValid($value)) {
+                    $fail('O estado selecionado é inválido.');
+                }
+            }],
             'zip_code' => 'nullable|string|max:10',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',

@@ -43,6 +43,12 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $user = Auth::user();
 
+            // Bloquear acesso de admins ao site público
+            if ($user->is_admin) {
+                Auth::logout();
+                return back()->withErrors(['email' => 'Usuários administradores devem fazer login através do painel admin.']);
+            }
+
             if (!$user->is_active) {
                 Auth::logout();
                 return back()->withErrors(['email' => 'Sua conta está inativa. Entre em contato com o suporte.']);

@@ -93,14 +93,14 @@
 
                             <!-- Endereço Completo -->
                             <div class="form-group col-lg-12 col-md-12 mb-3">
-                              <label>Endereço Completo (não será divulgado)</label>
-                              <input type="text" name="address" placeholder="Rua Exemplo, 123"
+                              <label>Endereço Completo (não será divulgado) *</label>
+                              <input type="text" name="address" placeholder="Rua Exemplo, 123" required
                                      value="{{ old('address', session('onboarding.step6_data.address')) }}" class="form-control">
                             </div>
 
-                            <!-- Bairro -->
+                            <!-- Bairro (Complemento) -->
                             <div class="form-group col-lg-6 col-md-12 mb-3">
-                              <label>Bairro</label>
+                              <label>Bairro (Complemento)</label>
                               <input type="text" name="neighborhood" placeholder="Vila Clementina"
                                      value="{{ old('neighborhood', session('onboarding.step6_data.neighborhood')) }}" class="form-control">
                             </div>
@@ -115,15 +115,20 @@
                             <!-- Estado -->
                             <div class="form-group col-lg-4 col-md-12 mb-3">
                               <label>Estado (UF) *</label>
-                              <input type="text" name="state" placeholder="SP" maxlength="2" required
-                                     style="text-transform: uppercase;"
-                                     value="{{ old('state', session('onboarding.step6_data.state')) }}" class="form-control">
+                              <select name="state" required class="form-control chosen-select">
+                                <option value="">Selecione o estado</option>
+                                @foreach($states as $code => $name)
+                                  <option value="{{ $code }}" {{ old('state', $step6Data['state'] ?? '') == $code ? 'selected' : '' }}>
+                                    {{ $code }} - {{ $name }}
+                                  </option>
+                                @endforeach
+                              </select>
                             </div>
 
                             <!-- CEP -->
                             <div class="form-group col-lg-4 col-md-12 mb-3">
-                              <label>CEP</label>
-                              <input type="text" name="zip_code" placeholder="01234-567"
+                              <label>CEP *</label>
+                              <input type="text" name="zip_code" id="zip_code" placeholder="01234-567" required
                                      value="{{ old('zip_code', session('onboarding.step6_data.zip_code')) }}" class="form-control">
                             </div>
 
@@ -131,6 +136,13 @@
                             <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude', session('onboarding.step6_data.latitude', -23.550520)) }}">
                             <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude', session('onboarding.step6_data.longitude', -46.633308)) }}">
 
+                          </div>
+
+                          <!-- Mapa do Google Maps -->
+                          <div class="form-group col-lg-12 col-md-12 mb-3">
+                            <label>Localização no Mapa</label>
+                            <div id="map-canvas" style="width: 100%; height: 400px; border: 1px solid #ddd; border-radius: 4px;"></div>
+                            <small class="form-text text-muted">O mapa será atualizado automaticamente quando você preencher o endereço ou CEP.</small>
                           </div>
 
                           <!-- Área botão -->
@@ -174,4 +186,5 @@
 
 @push('scripts')
 @include('layouts.partials.scripts')
+<script src="{{ asset('js/address-map.js') }}"></script>
 @endpush

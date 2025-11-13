@@ -12,6 +12,7 @@ use App\Models\JobApplication;
 use App\Models\Favorite;
 use App\Models\CompanyProfile;
 use App\Models\ProfessionalProfile;
+use App\Helpers\BrazilianStates;
 
 class CompanyController extends Controller
 {
@@ -102,7 +103,8 @@ class CompanyController extends Controller
             return redirect()->route('home')->with('error', 'Você precisa ter um perfil de empresa para acessar esta página.');
         }
 
-        return view('dashboard.company.profile', compact('profile'));
+        $states = BrazilianStates::getStates();
+        return view('dashboard.company.profile', compact('profile', 'states'));
     }
 
     public function updateProfile(Request $request)
@@ -122,7 +124,11 @@ class CompanyController extends Controller
             'description' => 'nullable|string|max:5000',
             'address' => 'nullable|string|max:500',
             'city' => 'nullable|string|max:100',
-            'state' => 'nullable|string|max:2',
+            'state' => ['nullable', 'string', 'max:2', function ($attribute, $value, $fail) {
+                if ($value && !BrazilianStates::isValid($value)) {
+                    $fail('O estado selecionado é inválido.');
+                }
+            }],
             'zip_code' => 'nullable|string|max:10',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
