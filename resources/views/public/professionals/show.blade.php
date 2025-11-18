@@ -35,40 +35,51 @@
             @if($professional->title)
               <span class="designation">{{ $professional->title }}</span>
             @endif
-            <div class="content mt-3">
-              <ul class="post-tags">
-                @if($professional->areas && is_array($professional->areas))
-                  @foreach(collect($professional->areas)->filter()->take(4) as $area)
-                    <li><a href="#">{{ $area }}</a></li>
-                  @endforeach
-                @endif
-                @if($professional->years_experience)
-                  <li><a href="#">{{ $professional->years_experience }} {{ \Illuminate\Support\Str::plural('ano', $professional->years_experience) }} de experiência</a></li>
-                @endif
-              </ul>
+            <div class="content mt-3" style="display: block !important; flex-direction: column !important;">
+              {{-- Linha 1: Habilidades (centralizada) --}}
+              @if($professional->skills && is_array($professional->skills) && count($professional->skills) > 0)
+                <div class="text-center mb-3" style="display: block !important; width: 100% !important; clear: both;">
+                  <ul class="post-tags justify-content-center" style="display: flex !important; flex-wrap: wrap !important; justify-content: center !important; margin: 0 auto;">
+                    @foreach(collect($professional->skills)->filter() as $skill)
+                      <li><a href="#">{{ $skill }}</a></li>
+                    @endforeach
+                  </ul>
+                </div>
+              @endif
 
-              <ul class="candidate-info">
-                <li><span class="icon flaticon-map-locator"></span> {{ collect([$professional->city, $professional->state])->filter()->implode(', ') ?: 'Localização não informada' }}</li>
-                <li><span class="icon flaticon-eye"></span> {{ number_format($professional->views_count) }} visualizações</li>
-              </ul>
+              {{-- Linha 2: Localização + Visualização (centralizada) --}}
+              <div class="text-center mb-3" style="display: block !important; width: 100% !important; clear: both;">
+                <ul class="candidate-info justify-content-center mb-0" style="display: flex !important; flex-wrap: wrap !important; justify-content: center !important; margin: 0 auto;">
+                  <li style="margin-right: 30px; position: relative !important; padding-left: 25px !important;"><span class="icon flaticon-map-locator"></span> {{ collect([$professional->city, $professional->state])->filter()->implode(', ') ?: 'Localização não informada' }}</li>
+                  <li style="position: relative !important; padding-left: 25px !important;"><span class="icon la la-eye"></span> {{ number_format($professional->views_count) }} visualizações</li>
+                </ul>
+              </div>
 
-              <div class="btn-box">
-                @if($professional->resume)
-                  <a href="{{ url('storage/' . $professional->resume) }}" class="theme-btn btn-style-one" target="_blank" rel="noopener">
-                    <i class="las la-file-pdf"></i> Baixar Currículo
-                  </a>
-                @endif
-                @auth
-                  @if(Auth::user()->companyProfile)
-                    <button class="bookmark-btn {{ $isFavorited ? 'active' : '' }}" data-favorite-id="{{ $professional->id }}" onclick="toggleFavorite('App\\Models\\ProfessionalProfile', {{ $professional->id }})" type="button" title="{{ $isFavorited ? 'Remover dos favoritos' : 'Favoritar profissional' }}">
-                      <i class="flaticon-bookmark"></i>
-                    </button>
+              {{-- Linha 3: Botão de baixar currículo + salvar favoritos (centralizado) --}}
+              @php
+                $isOwnProfile = Auth::check() && Auth::user()->professionalProfile && Auth::user()->professionalProfile->id === $professional->id;
+              @endphp
+              <div class="text-center" style="display: block !important; width: 100% !important; clear: both;">
+                <div class="btn-box d-inline-flex align-items-center gap-2" style="justify-content: center;">
+                  @if($professional->resume)
+                    <a href="{{ url('storage/' . $professional->resume) }}" class="theme-btn btn-style-one" target="_blank" rel="noopener">
+                      <i class="las la-file-pdf"></i> Baixar Currículo
+                    </a>
                   @endif
-                @else
-                  <button class="bookmark-btn" onclick="toggleFavorite('App\\Models\\ProfessionalProfile', {{ $professional->id }})" type="button" title="Favoritar profissional">
-                    <i class="flaticon-bookmark"></i>
-                  </button>
-                @endauth
+                  @auth
+                    @if(Auth::user()->companyProfile && !$isOwnProfile)
+                      <button class="bookmark-btn {{ $isFavorited ? 'active' : '' }}" data-favorite-id="{{ $professional->id }}" onclick="toggleFavorite('App\\Models\\ProfessionalProfile', {{ $professional->id }})" type="button" title="{{ $isFavorited ? 'Remover dos favoritos' : 'Favoritar profissional' }}">
+                        <i class="flaticon-bookmark"></i>
+                      </button>
+                    @endif
+                  @else
+                    @if(!$isOwnProfile)
+                      <button class="bookmark-btn" onclick="toggleFavorite('App\\Models\\ProfessionalProfile', {{ $professional->id }})" type="button" title="Favoritar profissional">
+                        <i class="flaticon-bookmark"></i>
+                      </button>
+                    @endif
+                  @endauth
+                </div>
               </div>
             </div>
           </div>
@@ -85,19 +96,6 @@
               <div class="text">
                 {!! nl2br(e($professional->bio ?? 'O profissional ainda não adicionou uma biografia.')) !!}
               </div>
-
-              @if($professional->skills && is_array($professional->skills) && count($professional->skills) > 0)
-                <div class="resume-outer mt-4">
-                  <div class="upper-title">
-                    <h4>Habilidades</h4>
-                  </div>
-                  <div class="tags-container">
-                    @foreach(collect($professional->skills)->filter() as $skill)
-                      <span class="tag">{{ $skill }}</span>
-                    @endforeach
-                  </div>
-                </div>
-              @endif
 
               @if($professional->education && (is_array($professional->education) || is_object($professional->education)) && count((array)$professional->education) > 0)
                 <div class="resume-outer mt-4">
@@ -217,6 +215,53 @@
   @include('layouts.partials.footer')
 </div>
 @endsection
+
+@push('styles')
+<style>
+  .candidate-block-six .content {
+    display: block !important;
+    flex-direction: column !important;
+  }
+
+  .candidate-block-six .content > div {
+    display: block !important;
+    width: 100% !important;
+    clear: both !important;
+  }
+
+  .candidate-block-six .content .post-tags {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    margin: 0 auto !important;
+  }
+
+  .candidate-block-six .content .candidate-info {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    margin: 0 auto !important;
+  }
+
+  .candidate-block-six .content .candidate-info li {
+    position: relative !important;
+    padding-left: 25px !important;
+  }
+
+  .candidate-block-six .content .candidate-info li .icon {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    font-size: 18px !important;
+    line-height: 22px !important;
+    color: #696969 !important;
+  }
+
+  .candidate-block-six .content .btn-box {
+    justify-content: center !important;
+  }
+</style>
+@endpush
 
 @push('scripts')
 <script src="{{ asset('js/jquery.js') }}"></script>
