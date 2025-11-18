@@ -12,7 +12,17 @@
   <span class="header-span"></span>
 
   <!-- Cabeçalho Principal -->
-  @include('layouts.partials.header-company')
+  @auth
+    @if(Auth::user()->professionalProfile)
+      @include('layouts.partials.header-professional')
+    @elseif(Auth::user()->companyProfile)
+      @include('layouts.partials.header-company')
+    @else
+      @include('layouts.partials.header-logged')
+    @endif
+  @else
+    @include('layouts.partials.header-logout')
+  @endauth
   <!-- Fim do Cabeçalho Principal -->
 
   <!-- Seção de Listagem (Layout com Mapa) -->
