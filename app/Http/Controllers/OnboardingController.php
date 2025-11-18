@@ -210,6 +210,7 @@ class OnboardingController extends Controller
         $photoPath = null;
         if ($request->hasFile('photo')) {
             $photoPath = $request->file('photo')->store('professionals/photos', 'public_direct');
+            \App\Helpers\FileSyncHelper::syncToPublic($photoPath);
             session(['onboarding.photo' => $photoPath]);
         }
 
@@ -521,10 +522,12 @@ class OnboardingController extends Controller
         $logoPath = null;
         if ($request->hasFile('logo')) {
             $logoPath = $request->file('logo')->store('companies/logos', 'public_direct');
+            \App\Helpers\FileSyncHelper::syncToPublic($logoPath);
             session(['onboarding.logo' => $logoPath]);
         } elseif ($request->hasFile('attachments') && count($request->file('attachments')) > 0) {
             // Se vier no formato attachments[], pegar o primeiro arquivo como logo
             $logoPath = $request->file('attachments')[0]->store('companies/logos', 'public_direct');
+            \App\Helpers\FileSyncHelper::syncToPublic($logoPath);
             session(['onboarding.logo' => $logoPath]);
         }
 
@@ -622,7 +625,9 @@ class OnboardingController extends Controller
             if ($request->hasFile('photos')) {
                 $newPhotos = [];
                 foreach ($request->file('photos') as $photo) {
-                    $newPhotos[] = $photo->store('companies/photos', 'public_direct');
+                    $photoPath = $photo->store('companies/photos', 'public_direct');
+                    \App\Helpers\FileSyncHelper::syncToPublic($photoPath);
+                    $newPhotos[] = $photoPath;
                 }
                 $photos = array_merge($photos, $newPhotos);
                 // Limitar a 5 fotos

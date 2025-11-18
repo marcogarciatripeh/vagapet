@@ -162,15 +162,19 @@ class CompanyController extends Controller
         if ($request->hasFile('logo')) {
             if ($profile->logo) {
                 Storage::disk('public_direct')->delete($profile->logo);
+                \App\Helpers\FileSyncHelper::removeFromPublic($profile->logo);
             }
             $data['logo'] = $request->file('logo')->store('companies/logos', 'public_direct');
+            \App\Helpers\FileSyncHelper::syncToPublic($data['logo']);
         }
 
         // Upload de fotos
         if ($request->hasFile('photos')) {
             $photos = [];
             foreach ($request->file('photos') as $photo) {
-                $photos[] = $photo->store('companies/photos', 'public_direct');
+                $photoPath = $photo->store('companies/photos', 'public_direct');
+                \App\Helpers\FileSyncHelper::syncToPublic($photoPath);
+                $photos[] = $photoPath;
             }
             $data['photos'] = array_merge($profile->photos ?? [], $photos);
         }

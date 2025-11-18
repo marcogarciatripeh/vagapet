@@ -329,16 +329,20 @@ class ProfessionalController extends Controller
         if ($request->hasFile('photo')) {
             if ($profile->photo) {
                 Storage::disk('public_direct')->delete($profile->photo);
+                \App\Helpers\FileSyncHelper::removeFromPublic($profile->photo);
             }
             $data['photo'] = $request->file('photo')->store('professionals/photos', 'public_direct');
+            \App\Helpers\FileSyncHelper::syncToPublic($data['photo']);
         }
 
         // Upload de currículo
         if ($request->hasFile('resume')) {
             if ($profile->resume) {
                 Storage::disk('public_direct')->delete($profile->resume);
+                \App\Helpers\FileSyncHelper::removeFromPublic($profile->resume);
             }
             $data['resume'] = $request->file('resume')->store('professionals/resumes', 'public_direct');
+            \App\Helpers\FileSyncHelper::syncToPublic($data['resume']);
         }
 
         // Usar fill() e save() para garantir que campos null sejam salvos corretamente
@@ -420,6 +424,7 @@ class ProfessionalController extends Controller
         // Upload de currículo específico para esta vaga
         if ($request->hasFile('resume_file')) {
             $data['resume_file'] = $request->file('resume_file')->store('applications/resumes', 'public_direct');
+            \App\Helpers\FileSyncHelper::syncToPublic($data['resume_file']);
         }
 
         JobApplication::create($data);
