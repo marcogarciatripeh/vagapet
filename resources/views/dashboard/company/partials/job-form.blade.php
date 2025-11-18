@@ -134,7 +134,7 @@
 
     <div class="form-group col-lg-6 col-md-12">
       <label>Receber candidaturas até</label>
-      <input type="date" name="deadline" value="{{ old('deadline', optional($job->deadline)->format('Y-m-d')) }}">
+      <input type="date" name="deadline" value="{{ old('deadline', $job && $job->deadline ? $job->deadline->format('Y-m-d') : '') }}">
     </div>
 
     <div class="form-group col-lg-6 col-md-12 mt-3 d-flex gap-3 flex-wrap">
