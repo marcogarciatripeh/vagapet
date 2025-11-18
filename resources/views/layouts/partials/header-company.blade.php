@@ -26,11 +26,12 @@
 
         <!-- Notificações -->
         @php
-          $newApplicationsCount = Auth::user()->companyProfile
-            ? App\Models\JobApplication::whereHas('job', function($q) {
+          $newApplicationsCount = 0;
+          if (Auth::check() && Auth::user()->companyProfile) {
+            $newApplicationsCount = App\Models\JobApplication::whereHas('job', function($q) {
                 $q->where('company_profile_id', Auth::user()->companyProfile->id);
-              })->where('status', 'pending')->whereNull('viewed_at')->count()
-            : 0;
+              })->where('status', 'pending')->whereNull('viewed_at')->count();
+          }
         @endphp
         <div class="dropdown">
           <button class="menu-btn" data-toggle="dropdown" id="notifications-bell" onclick="markNotificationsAsViewed()">
@@ -80,12 +81,12 @@
 
         <div class="dropdown dashboard-option">
           <a class="dropdown-toggle" role="button" data-toggle="dropdown">
-            @if(Auth::user()->companyProfile && Auth::user()->companyProfile->logo)
+            @if(Auth::check() && Auth::user()->companyProfile && Auth::user()->companyProfile->logo)
               <img src="{{ Auth::user()->companyProfile->logo_url }}" alt="{{ Auth::user()->companyProfile->company_name }}" class="thumb">
             @else
               <img src="{{ asset('images/resource/default-company.png') }}" alt="Logo" class="thumb">
             @endif
-            <span class="name">{{ Auth::user()->companyProfile ? Auth::user()->companyProfile->company_name : Auth::user()->name }}</span>
+            <span class="name">{{ Auth::check() && Auth::user()->companyProfile ? Auth::user()->companyProfile->company_name : (Auth::check() ? Auth::user()->name : 'Usuário') }}</span>
           </a>
           <ul class="dropdown-menu">
             @include('layouts.partials.menu-company')
@@ -100,7 +101,7 @@
     <div class="logo"><a href="{{ route('company.dashboard') }}"><img src="{{ asset('images/logo-empresa.svg') }}" alt="Logo VagaPet"></a></div>
     <div class="outer-box">
       <button id="toggle-user-sidebar">
-        @if(Auth::user()->companyProfile && Auth::user()->companyProfile->logo)
+        @if(Auth::check() && Auth::user()->companyProfile && Auth::user()->companyProfile->logo)
           <img src="{{ Auth::user()->companyProfile->logo_url }}" alt="{{ Auth::user()->companyProfile->company_name }}" class="thumb">
         @else
           <img src="{{ asset('images/resource/default-company.png') }}" alt="Logo" class="thumb">

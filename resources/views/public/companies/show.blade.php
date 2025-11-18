@@ -7,7 +7,17 @@
   <div class="preloader"></div>
   <span class="header-span"></span>
 
-  @include('layouts.partials.header-company')
+  @auth
+    @if(Auth::user()->professionalProfile)
+      @include('layouts.partials.header-professional')
+    @elseif(Auth::user()->companyProfile)
+      @include('layouts.partials.header-company')
+    @else
+      @include('layouts.partials.header-logged')
+    @endif
+  @else
+    @include('layouts.partials.header-logout')
+  @endauth
 
   <section class="candidate-detail-section style-three">
     <div class="upper-box">
