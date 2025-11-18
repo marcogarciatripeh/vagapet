@@ -7,8 +7,17 @@
   <section class="user-dashboard">
     <div class="dashboard-outer">
       <div class="upper-title-box">
-        <h3>Meu Perfil</h3>
-        <div class="text">Pronto para voltar ao trabalho?</div>
+        <div class="row">
+          <div class="col-lg-9">
+            <h3>Meu Perfil</h3>
+            <div class="text">Pronto para voltar ao trabalho?</div>
+          </div>
+          <div class="col-lg-3">
+            <a href="{{ route('professionals.show', $profile->id) }}" target="_blank" class="theme-btn btn-style-one medium">
+              <span class="la la-eye"></span> Ver Perfil
+            </a>
+          </div>
+        </div>
       </div>
 
       @if(session('success'))
@@ -78,13 +87,13 @@
 
                     <!-- Título Profissional -->
                     <div class="form-group col-lg-6 col-md-12">
-                      <label>Título Profissional*</label>
+                      <label>Título Profissional</label>
                       <input type="text" name="title" placeholder="Groomer Especialista em Banho e Tosa" value="{{ old('title', $profile->title) }}">
                     </div>
 
                     <!-- Telefone -->
                     <div class="form-group col-lg-6 col-md-12">
-                      <label>Telefone*</label>
+                      <label>Telefone</label>
                       <input type="text" name="phone" id="phone" placeholder="(11) 98765-4321" value="{{ old('phone', $profile->phone) }}">
                     </div>
 
@@ -131,6 +140,19 @@
                       <input type="text" name="areas" placeholder="Ex: Banho & Tosa, Recepção, Vendas" value="{{ old('areas', is_array($profile->areas) ? implode(', ', $profile->areas) : $profile->areas) }}">
                     </div>
 
+                    <!-- Habilidades -->
+                    <div class="form-group col-lg-12 col-md-12">
+                      <label>Habilidades</label>
+                      <p>Você pode incluir mais de uma opção (separadas por vírgula)</p>
+                      <input type="text" name="skills" placeholder="Ex: Atendimento ao cliente, Tosa na tesoura, Primeiros socorros pet" value="{{ old('skills', is_array($profile->skills) ? implode(', ', $profile->skills) : $profile->skills) }}">
+                    </div>
+
+                    <!-- Anos de Experiência -->
+                    <div class="form-group col-lg-6 col-md-12">
+                      <label>Anos de Experiência</label>
+                      <input type="number" name="years_experience" placeholder="Ex: 5" min="0" value="{{ old('years_experience', $profile->years_experience) }}">
+                    </div>
+
                     <!-- Data de Nascimento -->
                     <div class="form-group col-lg-6 col-md-12">
                       <label>Data de Nascimento</label>
@@ -143,8 +165,174 @@
                       <textarea name="bio" placeholder="Fale sobre sua experiência com animais, aptidões em pet shops, serviços oferecidos (banho, tosa, recepção, etc.) e qualquer outro detalhe relevante.">{{ old('bio', $profile->bio) }}</textarea>
                     </div>
 
+                    <!-- Currículo (PDF) -->
+                    <div class="form-group col-lg-12 col-md-12">
+                      <label>Currículo (PDF)</label>
+                      @if($profile->resume)
+                        <div class="mb-3">
+                          <a href="{{ url('storage/' . $profile->resume) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <span class="la la-file-pdf"></span> Ver currículo atual
+                          </a>
+                        </div>
+                      @endif
+                      <div class="uploading-outer">
+                        <div class="uploadButton">
+                          <input class="uploadButton-input" type="file" name="resume" accept=".pdf" id="upload-resume" />
+                          <label class="uploadButton-button ripple-effect" for="upload-resume">{{ $profile->resume ? 'Alterar Currículo' : 'Subir Currículo' }}</label>
+                          <span class="uploadButton-file-name"></span>
+                        </div>
+                        <div class="text">Tamanho máximo: 5MB. Formato: PDF</div>
+                      </div>
+                    </div>
+
                     <!-- Botão Salvar -->
                     <div class="form-group col-lg-6 col-md-12">
+                      <button type="submit" class="theme-btn btn-style-one">Salvar</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ls widget (Seção Formação Profissional) -->
+          <div class="ls-widget">
+            <div class="tabs-box">
+              <div class="widget-title">
+                <h4>Formação Profissional</h4>
+                <p>Adicione seus cursos e formações acadêmicas.</p>
+              </div>
+
+              <div class="widget-content">
+                <form class="default-form" method="POST" action="{{ route('professional.profile.update') }}">
+                  @csrf
+                  <!-- Campos obrigatórios ocultos -->
+                  <input type="hidden" name="first_name" value="{{ $profile->first_name }}">
+                  <input type="hidden" name="last_name" value="{{ $profile->last_name }}">
+                  <input type="hidden" name="city" value="{{ $profile->city ?? '' }}">
+                  
+                  <div class="row">
+                    <div class="col-lg-12">
+                      <div id="education-repeater">
+                        @php
+                          $educations = old('education', []);
+                          if (empty($educations)) {
+                            // Carregar do perfil se existir
+                            $profileEducation = $profile->education;
+                            if (is_array($profileEducation) && count($profileEducation) > 0) {
+                              $educations = $profileEducation;
+                            } else {
+                              $educations = [['title' => '', 'institution' => '', 'period' => '', 'description' => '']];
+                            }
+                          }
+                        @endphp
+                        @foreach($educations as $index => $education)
+                          <div class="education-item mb-4 p-3 border rounded" data-index="{{ $index }}">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                              <h5>Formação {{ $index + 1 }}</h5>
+                              @if($index > 0)
+                                <button type="button" class="btn btn-sm btn-danger remove-education" data-index="{{ $index }}">Remover</button>
+                              @endif
+                            </div>
+                            <div class="row">
+                              <div class="form-group col-lg-6 col-md-12">
+                                <label>Nome do Curso*</label>
+                                <input type="text" name="education[{{ $index }}][title]" placeholder="Ex.: Curso de Auxiliar Veterinário" value="{{ old("education.$index.title", $education['title'] ?? '') }}" required>
+                              </div>
+                              <div class="form-group col-lg-6 col-md-12">
+                                <label>Instituição*</label>
+                                <input type="text" name="education[{{ $index }}][institution]" placeholder="Ex.: Instituto PetCare" value="{{ old("education.$index.institution", $education['institution'] ?? '') }}" required>
+                              </div>
+                              <div class="form-group col-lg-6 col-md-12">
+                                <label>Período</label>
+                                <input type="text" name="education[{{ $index }}][period]" placeholder="Ex.: 2021 - 2022" value="{{ old("education.$index.period", $education['period'] ?? '') }}">
+                              </div>
+                              <div class="form-group col-lg-12 col-md-12">
+                                <label>Descrição</label>
+                                <textarea name="education[{{ $index }}][description]" placeholder="Descreva o conteúdo do curso e aprendizados" rows="2">{{ old("education.$index.description", $education['description'] ?? '') }}</textarea>
+                              </div>
+                            </div>
+                          </div>
+                        @endforeach
+                      </div>
+                      <button type="button" class="btn btn-primary mt-3" id="add-education">Adicionar Formação</button>
+                    </div>
+
+                    <!-- Botão Salvar -->
+                    <div class="form-group col-lg-12 col-md-12 mt-4">
+                      <button type="submit" class="theme-btn btn-style-one">Salvar</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ls widget (Seção Experiência Profissional) -->
+          <div class="ls-widget">
+            <div class="tabs-box">
+              <div class="widget-title">
+                <h4>Experiência Profissional</h4>
+                <p>Adicione suas experiências profissionais anteriores.</p>
+              </div>
+
+              <div class="widget-content">
+                <form class="default-form" method="POST" action="{{ route('professional.profile.update') }}">
+                  @csrf
+                  <!-- Campos obrigatórios ocultos -->
+                  <input type="hidden" name="first_name" value="{{ $profile->first_name }}">
+                  <input type="hidden" name="last_name" value="{{ $profile->last_name }}">
+                  <input type="hidden" name="city" value="{{ $profile->city ?? '' }}">
+                  
+                  <div class="row">
+                    <div class="col-lg-12">
+                      <div id="experiences-repeater">
+                        @php
+                          $experiences = old('experiences', []);
+                          if (empty($experiences)) {
+                            // Carregar do perfil se existir
+                            $profileExperiences = $profile->experiences;
+                            if (is_array($profileExperiences) && count($profileExperiences) > 0) {
+                              $experiences = $profileExperiences;
+                            } else {
+                              $experiences = [['title' => '', 'company' => '', 'period' => '', 'description' => '']];
+                            }
+                          }
+                        @endphp
+                        @foreach($experiences as $index => $experience)
+                          <div class="experience-item mb-4 p-3 border rounded" data-index="{{ $index }}">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                              <h5>Experiência {{ $index + 1 }}</h5>
+                              @if($index > 0)
+                                <button type="button" class="btn btn-sm btn-danger remove-experience" data-index="{{ $index }}">Remover</button>
+                              @endif
+                            </div>
+                            <div class="row">
+                              <div class="form-group col-lg-6 col-md-12">
+                                <label>Cargo*</label>
+                                <input type="text" name="experiences[{{ $index }}][title]" placeholder="Ex.: Groomer Sênior" value="{{ old("experiences.$index.title", $experience['title'] ?? '') }}" required>
+                              </div>
+                              <div class="form-group col-lg-6 col-md-12">
+                                <label>Empresa*</label>
+                                <input type="text" name="experiences[{{ $index }}][company]" placeholder="Ex.: Pet4U" value="{{ old("experiences.$index.company", $experience['company'] ?? '') }}" required>
+                              </div>
+                              <div class="form-group col-lg-6 col-md-12">
+                                <label>Período</label>
+                                <input type="text" name="experiences[{{ $index }}][period]" placeholder="Ex.: 2022 - Atual" value="{{ old("experiences.$index.period", $experience['period'] ?? '') }}">
+                              </div>
+                              <div class="form-group col-lg-12 col-md-12">
+                                <label>Descrição</label>
+                                <textarea name="experiences[{{ $index }}][description]" placeholder="Descreva suas responsabilidades e realizações" rows="2">{{ old("experiences.$index.description", $experience['description'] ?? '') }}</textarea>
+                              </div>
+                            </div>
+                          </div>
+                        @endforeach
+                      </div>
+                      <button type="button" class="btn btn-primary mt-3" id="add-experience">Adicionar Experiência</button>
+                    </div>
+
+                    <!-- Botão Salvar -->
+                    <div class="form-group col-lg-12 col-md-12 mt-4">
                       <button type="submit" class="theme-btn btn-style-one">Salvar</button>
                     </div>
                   </div>
@@ -235,7 +423,7 @@
                     <!-- Cidade -->
                     <div class="form-group col-lg-4 col-md-12">
                       <label>Cidade*</label>
-                      <input type="text" name="city" placeholder="São Paulo" value="{{ old('city', $profile->city) }}">
+                      <input type="text" name="city" placeholder="São Paulo" value="{{ old('city', $profile->city) }}" required>
                     </div>
 
                     <!-- Estado -->
@@ -289,4 +477,107 @@
 @push('scripts')
 @include('layouts.partials.scripts')
 <script src="{{ asset('js/address-map.js') }}"></script>
+<script>
+  // Gerenciar repeater de Formação Profissional
+  @php
+    $initialEducation = old('education', []);
+    if (empty($initialEducation)) {
+      $initialEducation = is_array($profile->education) ? $profile->education : [];
+    }
+  @endphp
+  let educationIndex = {{ count($initialEducation) }};
+  
+  document.getElementById('add-education')?.addEventListener('click', function() {
+    const container = document.getElementById('education-repeater');
+    const template = `
+      <div class="education-item mb-4 p-3 border rounded" data-index="${educationIndex}">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5>Formação ${educationIndex + 1}</h5>
+          <button type="button" class="btn btn-sm btn-danger remove-education" data-index="${educationIndex}">Remover</button>
+        </div>
+        <div class="row">
+          <div class="form-group col-lg-6 col-md-12">
+            <label>Nome do Curso*</label>
+            <input type="text" name="education[${educationIndex}][title]" placeholder="Ex.: Curso de Auxiliar Veterinário" required>
+          </div>
+          <div class="form-group col-lg-6 col-md-12">
+            <label>Instituição*</label>
+            <input type="text" name="education[${educationIndex}][institution]" placeholder="Ex.: Instituto PetCare" required>
+          </div>
+          <div class="form-group col-lg-6 col-md-12">
+            <label>Período</label>
+            <input type="text" name="education[${educationIndex}][period]" placeholder="Ex.: 2021 - 2022">
+          </div>
+          <div class="form-group col-lg-12 col-md-12">
+            <label>Descrição</label>
+            <textarea name="education[${educationIndex}][description]" placeholder="Descreva o conteúdo do curso e aprendizados" rows="2"></textarea>
+          </div>
+        </div>
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', template);
+    educationIndex++;
+  });
+
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-education')) {
+      const index = e.target.getAttribute('data-index');
+      const item = document.querySelector(`.education-item[data-index="${index}"]`);
+      if (item) {
+        item.remove();
+      }
+    }
+  });
+
+  // Gerenciar repeater de Experiência Profissional
+  @php
+    $initialExperiences = old('experiences', []);
+    if (empty($initialExperiences)) {
+      $initialExperiences = is_array($profile->experiences) ? $profile->experiences : [];
+    }
+  @endphp
+  let experienceIndex = {{ count($initialExperiences) }};
+  
+  document.getElementById('add-experience')?.addEventListener('click', function() {
+    const container = document.getElementById('experiences-repeater');
+    const template = `
+      <div class="experience-item mb-4 p-3 border rounded" data-index="${experienceIndex}">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5>Experiência ${experienceIndex + 1}</h5>
+          <button type="button" class="btn btn-sm btn-danger remove-experience" data-index="${experienceIndex}">Remover</button>
+        </div>
+        <div class="row">
+          <div class="form-group col-lg-6 col-md-12">
+            <label>Cargo*</label>
+            <input type="text" name="experiences[${experienceIndex}][title]" placeholder="Ex.: Groomer Sênior" required>
+          </div>
+          <div class="form-group col-lg-6 col-md-12">
+            <label>Empresa*</label>
+            <input type="text" name="experiences[${experienceIndex}][company]" placeholder="Ex.: Pet4U" required>
+          </div>
+          <div class="form-group col-lg-6 col-md-12">
+            <label>Período</label>
+            <input type="text" name="experiences[${experienceIndex}][period]" placeholder="Ex.: 2022 - Atual">
+          </div>
+          <div class="form-group col-lg-12 col-md-12">
+            <label>Descrição</label>
+            <textarea name="experiences[${experienceIndex}][description]" placeholder="Descreva suas responsabilidades e realizações" rows="2"></textarea>
+          </div>
+        </div>
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', template);
+    experienceIndex++;
+  });
+
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-experience')) {
+      const index = e.target.getAttribute('data-index');
+      const item = document.querySelector(`.experience-item[data-index="${index}"]`);
+      if (item) {
+        item.remove();
+      }
+    }
+  });
+</script>
 @endpush
