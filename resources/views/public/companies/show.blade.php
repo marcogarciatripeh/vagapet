@@ -35,9 +35,31 @@
                   Vagas abertas: {{ $active_jobs->count() }}
                 </a>
               @endif
-              <button class="bookmark-btn" type="button" title="Favoritar empresa">
-                <i class="flaticon-bookmark"></i>
-              </button>
+              @auth
+                @if(Auth::user()->professionalProfile)
+                  <button class="bookmark-btn {{ isset($isFavorited) && $isFavorited ? 'active' : '' }}" 
+                          data-favorite-id="{{ $company->id }}" 
+                          onclick="toggleFavorite('App\\Models\\CompanyProfile', {{ $company->id }})" 
+                          type="button" 
+                          title="{{ isset($isFavorited) && $isFavorited ? 'Remover dos favoritos' : 'Favoritar empresa' }}">
+                    <i class="flaticon-bookmark"></i>
+                  </button>
+                @else
+                  <button class="bookmark-btn" 
+                          onclick="alert('Apenas profissionais podem favoritar empresas. Crie um perfil profissional primeiro.')" 
+                          type="button" 
+                          title="Favoritar empresa">
+                    <i class="flaticon-bookmark"></i>
+                  </button>
+                @endif
+              @else
+                <button class="bookmark-btn" 
+                        onclick="window.location.href='{{ route('login') }}'" 
+                        type="button" 
+                        title="Favoritar empresa">
+                  <i class="flaticon-bookmark"></i>
+                </button>
+              @endauth
             </div>
 
             <div class="content mt-3">
@@ -230,5 +252,6 @@
 
 @push('scripts')
 @include('layouts.partials.scripts')
+@include('layouts.partials.favorite-scripts')
 @endpush
 

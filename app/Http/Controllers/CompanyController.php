@@ -104,6 +104,15 @@ class CompanyController extends Controller
         // Vagas ativas da empresa
         $active_jobs = $company->jobs()->active()->limit(6)->get();
 
-        return view('public.companies.show', compact('company', 'active_jobs'));
+        // Verificar se a empresa está favoritada pelo usuário logado
+        $isFavorited = false;
+        if (auth()->check() && auth()->user()->professionalProfile) {
+            $isFavorited = auth()->user()->favorites()
+                ->where('favoritable_type', 'App\Models\CompanyProfile')
+                ->where('favoritable_id', $company->id)
+                ->exists();
+        }
+
+        return view('public.companies.show', compact('company', 'active_jobs', 'isFavorited'));
     }
 }
