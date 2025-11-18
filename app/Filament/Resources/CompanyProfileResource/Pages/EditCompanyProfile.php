@@ -16,4 +16,17 @@ class EditCompanyProfile extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function afterSave(): void
+    {
+        // Sincronizar imagens para o diretório público
+        $record = $this->record;
+        $record->refresh();
+        if ($record->logo) {
+            \App\Helpers\FileSyncHelper::syncToPublic($record->logo);
+        }
+        if ($record->photos && is_array($record->photos)) {
+            \App\Helpers\FileSyncHelper::syncMultipleToPublic($record->photos);
+        }
+    }
 }

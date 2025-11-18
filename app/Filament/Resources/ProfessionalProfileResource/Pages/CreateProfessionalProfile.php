@@ -19,5 +19,14 @@ class CreateProfessionalProfile extends CreateRecord
                 'is_active' => (bool) $this->data['is_public'],
             ]);
         }
+
+        // Sincronizar imagens para o diretório público
+        $record->refresh();
+        if ($record->photo) {
+            \App\Helpers\FileSyncHelper::syncToPublic($record->photo);
+        }
+        if ($record->resume) {
+            \App\Helpers\FileSyncHelper::syncToPublic($record->resume);
+        }
     }
 }

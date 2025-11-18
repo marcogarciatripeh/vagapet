@@ -181,6 +181,7 @@ class CompanyProfileResource extends Resource
                             ->image()
                             ->imageEditor()
                             ->maxSize(1024)
+                            ->disk('public_direct')
                             ->directory('companies/logos')
                             ->visibility('public')
                             ->columnSpanFull(),
@@ -193,6 +194,7 @@ class CompanyProfileResource extends Resource
                             ->multiple()
                             ->maxFiles(5)
                             ->maxSize(2048)
+                            ->disk('public_direct')
                             ->directory('companies/photos')
                             ->visibility('public')
                             ->columnSpanFull(),
@@ -241,7 +243,15 @@ class CompanyProfileResource extends Resource
                 ImageColumn::make('logo')
                     ->label('Logo')
                     ->circular()
-                    ->size(40),
+                    ->size(40)
+                    ->getStateUsing(function ($record) {
+                        if (!$record->logo) {
+                            return null;
+                        }
+                        // Remove o prefixo 'storage/' se existir (para compatibilidade com imagens antigas)
+                        $path = str_replace('storage/', '', $record->logo);
+                        return asset($path);
+                    }),
 
                 TextColumn::make('company_name')
                     ->label('Nome da Empresa')

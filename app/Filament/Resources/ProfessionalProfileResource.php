@@ -220,6 +220,7 @@ class ProfessionalProfileResource extends Resource
                             ->image()
                             ->imageEditor()
                             ->maxSize(1024)
+                            ->disk('public_direct')
                             ->directory('professionals/photos')
                             ->visibility('public')
                             ->columnSpanFull(),
@@ -228,6 +229,7 @@ class ProfessionalProfileResource extends Resource
                             ->acceptedFileTypes(['application/pdf'])
                             ->helperText('Envie um PDF de até 2MB.')
                             ->maxSize(2048)
+                            ->disk('public_direct')
                             ->directory('professionals/resumes')
                             ->visibility('public'),
                     ])
@@ -454,7 +456,15 @@ class ProfessionalProfileResource extends Resource
                 ImageColumn::make('photo')
                     ->label('Foto')
                     ->circular()
-                    ->size(40),
+                    ->size(40)
+                    ->getStateUsing(function ($record) {
+                        if (!$record->photo) {
+                            return null;
+                        }
+                        // Remove o prefixo 'storage/' se existir (para compatibilidade com imagens antigas)
+                        $path = str_replace('storage/', '', $record->photo);
+                        return asset($path);
+                    }),
 
                 TextColumn::make('first_name')
                     ->label('Nome')
