@@ -96,7 +96,11 @@ class ProfessionalController extends Controller
             }
         }
 
-        return view('dashboard.professional.dashboard', compact('stats', 'recent_applications', 'recommended_jobs', 'chartLabels', 'chartData'));
+        // Calcular porcentagem de conclusão do perfil
+        $profileCompletion = $profile->getProfileCompletionPercentage();
+        $isCompleteEnoughForSearch = $profile->isCompleteEnoughForSearch();
+
+        return view('dashboard.professional.dashboard', compact('stats', 'recent_applications', 'recommended_jobs', 'chartLabels', 'chartData', 'profileCompletion', 'isCompleteEnoughForSearch'));
     }
 
     public function profile()

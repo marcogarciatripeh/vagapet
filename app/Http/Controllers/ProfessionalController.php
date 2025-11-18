@@ -10,7 +10,8 @@ class ProfessionalController extends Controller
 {
     public function index(Request $request)
     {
-        $query = ProfessionalProfile::active()->with('user');
+        // Apenas perfis searchable (show_in_search = true E >= 90% completo)
+        $query = ProfessionalProfile::active()->searchable()->with('user');
 
         // Filtros
         if ($request->filled('search')) {
@@ -51,8 +52,9 @@ class ProfessionalController extends Controller
         $perPage = in_array($perPage, [10, 12, 20, 30, 40, 50, 60]) ? (int) $perPage : 12;
         $professionals = $query->paginate($perPage)->withQueryString();
 
-        // Buscar TODOS os profissionais para o mapa (com coordenadas)
+        // Buscar TODOS os profissionais para o mapa (com coordenadas e >= 90% completo)
         $mapProfessionals = ProfessionalProfile::active()
+            ->searchable()
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->where('latitude', '!=', 0)
@@ -91,10 +93,10 @@ class ProfessionalController extends Controller
             }
         }
 
-        // Dados para filtros
-        $cities = ProfessionalProfile::active()->distinct()->pluck('city')->filter()->sort()->values();
-        $states = ProfessionalProfile::active()->distinct()->pluck('state')->filter()->sort()->values();
-        $areas = ProfessionalProfile::active()->distinct()->pluck('areas')->filter()->flatten()->unique()->sort()->values();
+        // Dados para filtros (apenas perfis searchable)
+        $cities = ProfessionalProfile::active()->searchable()->distinct()->pluck('city')->filter()->sort()->values();
+        $states = ProfessionalProfile::active()->searchable()->distinct()->pluck('state')->filter()->sort()->values();
+        $areas = ProfessionalProfile::active()->searchable()->distinct()->pluck('areas')->filter()->flatten()->unique()->sort()->values();
         $experienceLevels = [
             'estagio' => 'Estágio',
             'junior' => 'Júnior',

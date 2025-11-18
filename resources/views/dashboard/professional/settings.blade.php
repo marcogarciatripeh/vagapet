@@ -99,7 +99,7 @@
                 <!-- Campos hidden para preservar valores quando checkboxes não estão presentes -->
                 <input type="hidden" name="allow_direct_contact" value="{{ ($profile->allow_direct_contact ?? true) ? '1' : '0' }}">
                 <input type="hidden" name="show_current_salary" value="{{ ($profile->show_current_salary ?? false) ? '1' : '0' }}">
-                
+
                 <div class="form-group">
                   <label>Visibilidade do perfil</label><br>
                   <!-- Switchbox Outer -->
@@ -127,29 +127,18 @@
 
               <div class="form-group border-bottom mt-4">
                 @php
-                  $filledFields = 0;
-                  $totalFields = 15;
-                  if ($profile->first_name) $filledFields++;
-                  if ($profile->last_name) $filledFields++;
-                  if ($profile->phone) $filledFields++;
-                  if ($profile->birth_date) $filledFields++;
-                  if ($profile->gender) $filledFields++;
-                  if ($profile->address) $filledFields++;
-                  if ($profile->city) $filledFields++;
-                  if ($profile->state) $filledFields++;
-                  if ($profile->zip_code) $filledFields++;
-                  if ($profile->bio) $filledFields++;
-                  if ($profile->title) $filledFields++;
-                  if ($profile->experience_level) $filledFields++;
-                  if ($profile->areas && count($profile->areas) > 0) $filledFields++;
-                  if ($profile->skills && count($profile->skills) > 0) $filledFields++;
-                  if ($profile->photo) $filledFields++;
-                  $percentage = round(($filledFields / $totalFields) * 100);
+                  $percentage = $profile->getProfileCompletionPercentage();
+                  $isCompleteEnoughForSearch = $profile->isCompleteEnoughForSearch();
                 @endphp
                 <label>Status de Preenchimento: <strong>{{ $percentage }}%</strong></label>
                 <div class="progress">
-                  <div class="progress-bar" style="width: {{ $percentage }}%;"></div>
+                  <div class="progress-bar {{ $isCompleteEnoughForSearch ? 'bg-success' : 'bg-warning' }}" style="width: {{ $percentage }}%;"></div>
                 </div>
+                @if(!$isCompleteEnoughForSearch)
+                  <div class="alert alert-warning mt-2 mb-2">
+                    <small><i class="la la-exclamation-triangle"></i> Seu perfil precisa estar pelo menos 90% completo para aparecer nas buscas.</small>
+                  </div>
+                @endif
                 <a href="{{ route('professional.profile') }}" class="btn btn-link mt-2 mb-30">Completar Perfil</a>
               </div>
             </div>
@@ -166,7 +155,7 @@
                 <!-- Campos hidden para preservar valores quando checkboxes não estão presentes -->
                 <input type="hidden" name="is_public" value="{{ ($profile->is_public ?? true) ? '1' : '0' }}">
                 <input type="hidden" name="show_in_search" value="{{ ($profile->show_in_search ?? true) ? '1' : '0' }}">
-                
+
                 <div class="form-group">
                   <label>Configurações de privacidade</label><br>
                   <div class="switchbox-outer margin-top-10">

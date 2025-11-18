@@ -125,6 +125,22 @@
                     </div>
                   </div>
                 </form>
+
+                <!-- Status de Preenchimento -->
+                <div class="form-group border-bottom mt-4">
+                  @php
+                    $percentage = $profile->getProfileCompletionPercentage();
+                  @endphp
+                  <label>Status de Preenchimento: <strong>{{ $percentage }}%</strong></label>
+                  <div class="progress">
+                    <div class="progress-bar {{ $percentage >= 90 ? 'bg-success' : 'bg-warning' }}" style="width: {{ $percentage }}%;"></div>
+                  </div>
+                  @if($percentage < 90)
+                    <div class="alert alert-warning mt-2 mb-2">
+                      <small><i class="la la-exclamation-triangle"></i> Complete seu perfil para melhorar sua visibilidade na plataforma.</small>
+                    </div>
+                  @endif
+                </div>
               </div>
             </div>
           </div>

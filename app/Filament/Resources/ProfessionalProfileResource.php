@@ -21,6 +21,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TagsInput;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 
@@ -533,22 +534,22 @@ class ProfessionalProfileResource extends Resource
                     ->label('Candidaturas')
                     ->sortable(),
 
-                TextColumn::make('is_public')
+                IconColumn::make('is_public')
                     ->label('Público')
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('show_in_search')
+                IconColumn::make('show_in_search')
                     ->label('Aparece em Buscas')
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('allow_direct_contact')
+                IconColumn::make('allow_direct_contact')
                     ->label('Contato Direto')
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('show_current_salary')
+                IconColumn::make('show_current_salary')
                     ->label('Mostra Salário')
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),

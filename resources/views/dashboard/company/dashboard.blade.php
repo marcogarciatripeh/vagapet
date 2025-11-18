@@ -18,6 +18,17 @@
         </div>
       </div>
 
+      @if($profileCompletion < 90)
+        <div class="alert alert-warning alert-dismissible fade show mt-3" role="alert">
+          <strong><i class="la la-exclamation-triangle"></i> Atenção!</strong> 
+          Seu perfil está {{ $profileCompletion }}% completo. Complete seu perfil para melhorar sua visibilidade na plataforma.
+          <a href="{{ route('company.profile') }}" class="alert-link">Complete seu perfil agora</a>.
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      @endif
+
       <div class="row">
         <div class="ui-block col-xl-4 col-lg-6 col-md-6 col-sm-6">
           <div class="ui-item ui-blue">

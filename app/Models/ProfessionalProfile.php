@@ -96,7 +96,28 @@ class ProfessionalProfile extends Model
 
     public function scopeSearchable($query)
     {
-        return $query->where('show_in_search', true);
+        return $query->where('show_in_search', true)
+            ->where(function ($q) {
+                // Apenas perfis com 90% ou mais de conclusão aparecem nas buscas
+                // 13.5 de 15 campos = 90%
+                $q->whereRaw('(
+                    (CASE WHEN first_name IS NOT NULL AND first_name != "" THEN 1 ELSE 0 END) +
+                    (CASE WHEN last_name IS NOT NULL AND last_name != "" THEN 1 ELSE 0 END) +
+                    (CASE WHEN phone IS NOT NULL AND phone != "" THEN 1 ELSE 0 END) +
+                    (CASE WHEN birth_date IS NOT NULL THEN 1 ELSE 0 END) +
+                    (CASE WHEN gender IS NOT NULL THEN 1 ELSE 0 END) +
+                    (CASE WHEN address IS NOT NULL AND address != "" THEN 1 ELSE 0 END) +
+                    (CASE WHEN city IS NOT NULL AND city != "" THEN 1 ELSE 0 END) +
+                    (CASE WHEN state IS NOT NULL AND state != "" THEN 1 ELSE 0 END) +
+                    (CASE WHEN zip_code IS NOT NULL AND zip_code != "" THEN 1 ELSE 0 END) +
+                    (CASE WHEN bio IS NOT NULL AND bio != "" THEN 1 ELSE 0 END) +
+                    (CASE WHEN title IS NOT NULL AND title != "" THEN 1 ELSE 0 END) +
+                    (CASE WHEN experience_level IS NOT NULL THEN 1 ELSE 0 END) +
+                    (CASE WHEN areas IS NOT NULL AND JSON_LENGTH(COALESCE(areas, "[]")) > 0 THEN 1 ELSE 0 END) +
+                    (CASE WHEN skills IS NOT NULL AND JSON_LENGTH(COALESCE(skills, "[]")) > 0 THEN 1 ELSE 0 END) +
+                    (CASE WHEN photo IS NOT NULL AND photo != "" THEN 1 ELSE 0 END)
+                ) >= 13.5'); // 13.5 de 15 = 90%
+            });
     }
 
     public function scopeByCity($query, string $city)
@@ -158,5 +179,44 @@ class ProfessionalProfile extends Model
     public function incrementApplications(): void
     {
         $this->increment('applications_count');
+    }
+
+    /**
+     * Calcula a porcentagem de conclusão do perfil
+     * 
+     * @return int Porcentagem de 0 a 100
+     */
+    public function getProfileCompletionPercentage(): int
+    {
+        $filledFields = 0;
+        $totalFields = 15;
+
+        if ($this->first_name) $filledFields++;
+        if ($this->last_name) $filledFields++;
+        if ($this->phone) $filledFields++;
+        if ($this->birth_date) $filledFields++;
+        if ($this->gender) $filledFields++;
+        if ($this->address) $filledFields++;
+        if ($this->city) $filledFields++;
+        if ($this->state) $filledFields++;
+        if ($this->zip_code) $filledFields++;
+        if ($this->bio) $filledFields++;
+        if ($this->title) $filledFields++;
+        if ($this->experience_level) $filledFields++;
+        if ($this->areas && is_array($this->areas) && count($this->areas) > 0) $filledFields++;
+        if ($this->skills && is_array($this->skills) && count($this->skills) > 0) $filledFields++;
+        if ($this->photo) $filledFields++;
+
+        return (int) round(($filledFields / $totalFields) * 100);
+    }
+
+    /**
+     * Verifica se o perfil está completo o suficiente para aparecer nas buscas (>= 90%)
+     * 
+     * @return bool
+     */
+    public function isCompleteEnoughForSearch(): bool
+    {
+        return $this->getProfileCompletionPercentage() >= 90;
     }
 }

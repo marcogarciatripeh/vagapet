@@ -71,4 +71,34 @@ class CompanyProfile extends Model
     {
         $this->increment('views_count');
     }
+
+    /**
+     * Calcula a porcentagem de conclusão do perfil da empresa
+     * 
+     * @return int Porcentagem de 0 a 100
+     */
+    public function getProfileCompletionPercentage(): int
+    {
+        $filledFields = 0;
+        $totalFields = 15;
+
+        if ($this->company_name) $filledFields++;
+        if ($this->cnpj) $filledFields++;
+        if ($this->phone) $filledFields++;
+        if ($this->website) $filledFields++;
+        if ($this->description) $filledFields++;
+        if ($this->address) $filledFields++;
+        if ($this->city) $filledFields++;
+        if ($this->state) $filledFields++;
+        if ($this->zip_code) $filledFields++;
+        if ($this->services && is_array($this->services) && count($this->services) > 0) $filledFields++;
+        if ($this->specialties && is_array($this->specialties) && count($this->specialties) > 0) $filledFields++;
+        if ($this->company_size) $filledFields++;
+        if ($this->employees_count) $filledFields++;
+        if ($this->logo) $filledFields++;
+        // Redes sociais (pelo menos uma)
+        if ($this->facebook || $this->instagram || $this->linkedin || $this->youtube) $filledFields++;
+
+        return (int) round(($filledFields / $totalFields) * 100);
+    }
 }

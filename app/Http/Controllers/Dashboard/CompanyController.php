@@ -91,7 +91,10 @@ class CompanyController extends Controller
             }
         }
 
-        return view('dashboard.company.dashboard', compact('stats', 'recent_jobs', 'recent_applications', 'chartLabels', 'chartData'));
+        // Calcular porcentagem de conclusão do perfil
+        $profileCompletion = $profile->getProfileCompletionPercentage();
+
+        return view('dashboard.company.dashboard', compact('stats', 'recent_jobs', 'recent_applications', 'chartLabels', 'chartData', 'profileCompletion'));
     }
 
     public function profile()
