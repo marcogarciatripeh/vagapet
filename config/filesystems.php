@@ -86,4 +86,16 @@ return [
         public_path('storage') => storage_path('app/public'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Public Sync Path
+    |--------------------------------------------------------------------------
+    |
+    | Caminho do diretório público onde as imagens devem ser sincronizadas
+    | em produção. Deixe vazio para desabilitar sincronização automática.
+    |
+    */
+
+    'public_sync_path' => env('PUBLIC_SYNC_PATH', null),
+
 ];

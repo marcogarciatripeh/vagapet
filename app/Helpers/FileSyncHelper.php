@@ -16,11 +16,25 @@ class FileSyncHelper
     public static function syncToPublic(string $filePath): bool
     {
         // Só sincronizar em produção (quando PUBLIC_SYNC_PATH estiver definido)
-        $publicSyncPath = env('PUBLIC_SYNC_PATH');
+        // Usar config() ao invés de env() para funcionar mesmo com cache
+        $publicSyncPath = config('filesystems.public_sync_path');
         
-        if (!$publicSyncPath || !file_exists($publicSyncPath)) {
-            // Em desenvolvimento, não precisa sincronizar
+        // Log para debug
+        \Log::info("FileSyncHelper::syncToPublic chamado", [
+            'filePath' => $filePath,
+            'publicSyncPath' => $publicSyncPath,
+            'publicPath' => public_path($filePath),
+            'envValue' => env('PUBLIC_SYNC_PATH')
+        ]);
+        
+        if (!$publicSyncPath) {
+            \Log::warning("PUBLIC_SYNC_PATH não definido no .env - sincronização ignorada");
             return true;
+        }
+        
+        if (!file_exists($publicSyncPath)) {
+            \Log::error("Diretório público não existe: {$publicSyncPath}");
+            return false;
         }
 
         try {
@@ -28,22 +42,40 @@ class FileSyncHelper
             $destinationPath = rtrim($publicSyncPath, '/') . '/' . $filePath;
             $destinationDir = dirname($destinationPath);
 
+            \Log::info("Tentando sincronizar", [
+                'source' => $sourcePath,
+                'destination' => $destinationPath,
+                'sourceExists' => file_exists($sourcePath)
+            ]);
+
+            // Verificar se arquivo fonte existe
+            if (!file_exists($sourcePath)) {
+                \Log::error("Arquivo fonte não existe: {$sourcePath}");
+                return false;
+            }
+
             // Criar diretório de destino se não existir
             if (!is_dir($destinationDir)) {
-                mkdir($destinationDir, 0755, true);
+                if (!mkdir($destinationDir, 0755, true)) {
+                    \Log::error("Não foi possível criar diretório: {$destinationDir}");
+                    return false;
+                }
+                \Log::info("Diretório criado: {$destinationDir}");
             }
 
-            // Copiar arquivo se existir no repositório
-            if (file_exists($sourcePath)) {
-                copy($sourcePath, $destinationPath);
+            // Copiar arquivo
+            if (copy($sourcePath, $destinationPath)) {
                 chmod($destinationPath, 0664);
+                \Log::info("Arquivo sincronizado com sucesso: {$destinationPath}");
                 return true;
+            } else {
+                \Log::error("Falha ao copiar arquivo de {$sourcePath} para {$destinationPath}");
+                return false;
             }
-
-            return false;
         } catch (\Exception $e) {
             \Log::error("Erro ao sincronizar arquivo: {$filePath}", [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
             return false;
         }
@@ -70,7 +102,8 @@ class FileSyncHelper
      */
     public static function removeFromPublic(string $filePath): bool
     {
-        $publicSyncPath = env('PUBLIC_SYNC_PATH');
+        // Usar config() ao invés de env() para funcionar mesmo com cache
+        $publicSyncPath = config('filesystems.public_sync_path');
         
         if (!$publicSyncPath) {
             return true;
