@@ -26,7 +26,7 @@
           <div class="inner-box">
             <figure class="image">
               @if($professional->photo)
-                <img src="{{ url('storage/' . $professional->photo) }}" alt="{{ $professional->full_name }}">
+                <img src="{{ url($professional->photo) }}" alt="{{ $professional->full_name }}">
               @else
                 <img src="{{ asset('images/resource/default-avatar.png') }}" alt="{{ $professional->full_name }}">
               @endif
@@ -62,7 +62,7 @@
               <div class="text-center" style="display: block !important; width: 100% !important; clear: both;">
                 <div class="btn-box d-inline-flex align-items-center gap-2" style="justify-content: center;">
                   @if($professional->resume)
-                    <a href="{{ url('storage/' . $professional->resume) }}" class="theme-btn btn-style-one" target="_blank" rel="noopener">
+                    <a href="{{ url($professional->resume) }}" class="theme-btn btn-style-one" target="_blank" rel="noopener">
                       <i class="las la-file-pdf"></i> Baixar Currículo
                     </a>
                   @endif

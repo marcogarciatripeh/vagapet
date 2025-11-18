@@ -161,16 +161,16 @@ class CompanyController extends Controller
         // Upload de logo
         if ($request->hasFile('logo')) {
             if ($profile->logo) {
-                Storage::disk('public')->delete($profile->logo);
+                Storage::disk('public_direct')->delete($profile->logo);
             }
-            $data['logo'] = $request->file('logo')->store('companies/logos', 'public');
+            $data['logo'] = $request->file('logo')->store('companies/logos', 'public_direct');
         }
 
         // Upload de fotos
         if ($request->hasFile('photos')) {
             $photos = [];
             foreach ($request->file('photos') as $photo) {
-                $photos[] = $photo->store('companies/photos', 'public');
+                $photos[] = $photo->store('companies/photos', 'public_direct');
             }
             $data['photos'] = array_merge($profile->photos ?? [], $photos);
         }

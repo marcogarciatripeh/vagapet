@@ -1,7 +1,7 @@
 @forelse($jobs as $job)
   @php
     $logo = $job->companyProfile && $job->companyProfile->logo 
-      ? url('storage/' . $job->companyProfile->logo) 
+      ? url($job->companyProfile->logo) 
       : asset('images/resource/default-company.png');
     $companyName = $job->companyProfile->company_name ?? 'Empresa';
     $location = collect([$job->city, $job->state])->filter()->implode(', ') ?: 'Local não informado';

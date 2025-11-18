@@ -127,7 +127,7 @@
         @foreach($featured_jobs as $job)
           @php
             $logo = $job->companyProfile && $job->companyProfile->logo 
-              ? url('storage/' . $job->companyProfile->logo) 
+              ? url($job->companyProfile->logo) 
               : asset('images/resource/default-company.png');
             $companyName = $job->companyProfile->company_name ?? 'Empresa';
             $location = collect([$job->city, $job->state])->filter()->implode(', ') ?: 'Local não informado';
@@ -212,7 +212,7 @@
         @foreach($featured_companies->take(6) as $company)
           @php
             $logo = $company->logo 
-              ? url('storage/' . $company->logo) 
+              ? url($company->logo) 
               : asset('images/resource/default-company.png');
             $location = collect([$company->city, $company->state])->filter()->implode(', ') ?: 'Local não informado';
           @endphp

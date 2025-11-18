@@ -162,12 +162,12 @@ class ProfessionalProfile extends Model
 
     public function getPhotoUrlAttribute(): ?string
     {
-        return $this->photo ? asset('storage/' . $this->photo) : null;
+        return $this->photo ? asset($this->photo) : null;
     }
 
     public function getResumeUrlAttribute(): ?string
     {
-        return $this->resume ? asset('storage/' . $this->resume) : null;
+        return $this->resume ? asset($this->resume) : null;
     }
 
     // Helper methods

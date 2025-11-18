@@ -37,7 +37,7 @@
             <div class="content">
               <figure class="image">
                 @if($job->companyProfile && $job->companyProfile->logo)
-                  <img src="{{ url('storage/' . $job->companyProfile->logo) }}" alt="{{ $job->companyProfile->company_name }}">
+                  <img src="{{ url($job->companyProfile->logo) }}" alt="{{ $job->companyProfile->company_name }}">
                 @else
                   <img src="{{ asset('images/resource/candidate-4.png') }}" alt="Empresa">
                 @endif
@@ -154,7 +154,7 @@
                     <div class="content">
                       <span class="company-logo">
                         @if($relatedJob->companyProfile && $relatedJob->companyProfile->logo)
-                          <img src="{{ url('storage/' . $relatedJob->companyProfile->logo) }}" alt="{{ $relatedJob->companyProfile->company_name }}">
+                          <img src="{{ url($relatedJob->companyProfile->logo) }}" alt="{{ $relatedJob->companyProfile->company_name }}">
                         @else
                           <img src="{{ asset('images/resource/company-logo/1-2.png') }}" alt="Empresa">
                         @endif

@@ -50,7 +50,7 @@
                       <label>Logo da Empresa</label>
                       @if($profile->logo)
                         <div class="mb-3">
-                          <img src="{{ url('storage/' . $profile->logo) }}" alt="Logo da Empresa" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 8px;">
+                          <img src="{{ url($profile->logo) }}" alt="Logo da Empresa" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 8px;">
                         </div>
                       @endif
                       <div class="uploading-outer">

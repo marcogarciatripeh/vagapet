@@ -64,7 +64,7 @@ class CompanyProfile extends Model
 
     public function getLogoUrlAttribute(): ?string
     {
-        return $this->logo ? asset('storage/' . $this->logo) : null;
+        return $this->logo ? asset($this->logo) : null;
     }
 
     public function incrementViews(): void

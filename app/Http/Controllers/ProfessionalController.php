@@ -62,7 +62,7 @@ class ProfessionalController extends Controller
             ->get()
             ->map(function ($professional) {
                 $photoUrl = $professional->photo 
-                    ? asset('storage/' . $professional->photo) 
+                    ? asset($professional->photo) 
                     : asset('images/resource/default-avatar.png');
                 
                 $areas = is_array($professional->areas) 

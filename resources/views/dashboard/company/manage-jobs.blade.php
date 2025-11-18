@@ -44,7 +44,7 @@
                       ];
                       $badge = $statusBadge[$job->status] ?? ['class' => 'secondary', 'label' => ucfirst($job->status)];
                       $logo = $job->companyProfile && $job->companyProfile->logo 
-                        ? url('storage/' . $job->companyProfile->logo) 
+                        ? url($job->companyProfile->logo) 
                         : asset('images/resource/company-logo/1-2.png');
                     @endphp
                     <div class="job-block col-lg-6 col-md-12 col-sm-12">

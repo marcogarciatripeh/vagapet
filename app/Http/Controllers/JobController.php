@@ -95,7 +95,7 @@ class JobController extends Controller
                 }
                 
                 $logoUrl = $job->companyProfile && $job->companyProfile->logo
-                    ? asset('storage/' . $job->companyProfile->logo)
+                    ? asset($job->companyProfile->logo)
                     : asset('images/resource/default-company.png');
                 
                 return [

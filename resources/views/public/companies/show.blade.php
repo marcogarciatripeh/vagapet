@@ -93,8 +93,8 @@
                     @foreach($company->photos as $photo)
                       <div class="col-lg-3 col-md-3 col-sm-6">
                         <figure class="image">
-                          <a href="{{ asset('storage/' . $photo) }}" class="lightbox-image">
-                            <img src="{{ asset('storage/' . $photo) }}" alt="Foto do espaço {{ $company->company_name }}">
+                          <a href="{{ asset($photo) }}" class="lightbox-image">
+                            <img src="{{ asset($photo) }}" alt="Foto do espaço {{ $company->company_name }}">
                           </a>
                           <span class="icon flaticon-plus"></span>
                         </figure>

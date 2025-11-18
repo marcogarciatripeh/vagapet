@@ -60,7 +60,7 @@
                       <label>Foto de Perfil</label>
                       @if($profile->photo)
                         <div class="mb-3">
-                          <img src="{{ url('storage/' . $profile->photo) }}" alt="Foto de Perfil" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 8px;">
+                          <img src="{{ url($profile->photo) }}" alt="Foto de Perfil" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 8px;">
                         </div>
                       @endif
                       <div class="uploading-outer">
@@ -170,7 +170,7 @@
                       <label>Currículo (PDF)</label>
                       @if($profile->resume)
                         <div class="mb-3">
-                          <a href="{{ url('storage/' . $profile->resume) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                          <a href="{{ url($profile->resume) }}" target="_blank" class="btn btn-sm btn-outline-primary">
                             <span class="la la-file-pdf"></span> Ver currículo atual
                           </a>
                         </div>

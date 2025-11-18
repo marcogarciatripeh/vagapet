@@ -79,7 +79,7 @@
                             <div class="content">
                               <figure class="image">
                                 @if($application->professionalProfile && $application->professionalProfile->photo)
-                                  <img src="{{ url('storage/' . $application->professionalProfile->photo) }}" alt="{{ $application->professionalProfile->full_name }}">
+                                  <img src="{{ url($application->professionalProfile->photo) }}" alt="{{ $application->professionalProfile->full_name }}">
                                 @else
                                   <img src="{{ asset('images/resource/candidate-' . (($loop->iteration % 4) + 1) . '.png') }}" alt="Candidato">
                                 @endif
@@ -157,7 +157,7 @@
                             <div class="content">
                               <figure class="image">
                                 @if($application->professionalProfile && $application->professionalProfile->photo)
-                                  <img src="{{ url('storage/' . $application->professionalProfile->photo) }}" alt="{{ $application->professionalProfile->full_name }}">
+                                  <img src="{{ url($application->professionalProfile->photo) }}" alt="{{ $application->professionalProfile->full_name }}">
                                 @else
                                   <img src="{{ asset('images/resource/candidate-' . (($loop->iteration % 4) + 1) . '.png') }}" alt="Candidato">
                                 @endif
@@ -190,7 +190,7 @@
                             <div class="content">
                               <figure class="image">
                                 @if($application->professionalProfile && $application->professionalProfile->photo)
-                                  <img src="{{ url('storage/' . $application->professionalProfile->photo) }}" alt="{{ $application->professionalProfile->full_name }}">
+                                  <img src="{{ url($application->professionalProfile->photo) }}" alt="{{ $application->professionalProfile->full_name }}">
                                 @else
                                   <img src="{{ asset('images/resource/candidate-' . (($loop->iteration % 4) + 1) . '.png') }}" alt="Candidato">
                                 @endif

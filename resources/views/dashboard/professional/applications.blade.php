@@ -76,7 +76,7 @@
                         <div class="content">
                           <span class="company-logo">
                             @if($company && $company->logo)
-                              <img src="{{ url('storage/' . $company->logo) }}" alt="{{ $company->company_name }}">
+                              <img src="{{ url($company->logo) }}" alt="{{ $company->company_name }}">
                             @else
                               <img src="{{ asset('images/resource/company-logo/1-2.png') }}" alt="">
                             @endif
