@@ -124,9 +124,7 @@
       <!-- Fim da Coluna de Filtros -->
 
       <!-- Coluna do Mapa -->
-      <div class="map-column width-50">
-        @include('layouts.partials.professionals-map')
-      </div>
+      @include('layouts.partials.professionals-map')
 
       <!-- Coluna de Conteúdo -->
       <div class="content-column width-50">

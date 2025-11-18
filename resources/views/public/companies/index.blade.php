@@ -93,7 +93,11 @@
       </div>
 
       <!-- Map Column -->
-      @include('layouts.partials.jobs-map')
+      <div class="map-column width-50">
+        <div class="map-outer">
+          <div id="map" data-map-zoom="9" data-map-scroll="true"></div>
+        </div>
+      </div>
 
       <!-- Content Column -->
       <div class="content-column width-50">
@@ -171,4 +175,45 @@
 
 @push('scripts')
 @include('layouts.partials.scripts')
+@include('layouts.partials.favorite-scripts')
+@php
+// Preparar dados do mapa no formato esperado pelo maps.js
+$mapLocations = $mapCompanies->map(function($company) {
+    $photoUrl = $company['photo'];
+    $url = $company['url'];
+    $title = htmlspecialchars($company['title'], ENT_QUOTES, 'UTF-8');
+    $type = htmlspecialchars($company['type'], ENT_QUOTES, 'UTF-8');
+    $address = htmlspecialchars($company['address'], ENT_QUOTES, 'UTF-8');
+    
+    $html = '<div class="map-listing-item">' .
+        '<div class="inner-box">' .
+        '<div class="infoBox-close"><i class="fa fa-times"></i></div>' .
+        '<div class="image-box">' .
+        '<figure class="image"><img src="' . $photoUrl . '" alt=""></figure>' .
+        '</div>' .
+        '<div class="content">' .
+        '<h3><a href="' . $url . '">' . $title . '</a></h3>' .
+        '<ul class="job-info">' .
+        '<li><span class="icon flaticon-briefcase"></span> ' . $type . '</li>' .
+        '<li><span class="icon flaticon-map-locator"></span> ' . $address . '</li>' .
+        '</ul>' .
+        '</div>' .
+        '</div>';
+    
+    $icon = '<div style="background-image: url(' . $photoUrl . ');"></div>';
+    
+    return [
+        $html,
+        $company['latitude'],
+        $company['longitude'],
+        $company['id'],
+        $icon
+    ];
+})->values()->all();
+@endphp
+<script>
+// Preparar dados do mapa ANTES do maps.js carregar
+window.mapLocations = @json($mapLocations);
+</script>
+<script src="{{ asset('js/maps.js') }}"></script>
 @endpush

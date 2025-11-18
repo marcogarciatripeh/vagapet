@@ -44,6 +44,30 @@ class CompanyController extends Controller
 
         $companies = $query->paginate(12);
 
+        // Buscar TODAS as empresas para o mapa (com coordenadas)
+        $mapCompanies = CompanyProfile::active()
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->where('latitude', '!=', 0)
+            ->where('longitude', '!=', 0)
+            ->get()
+            ->map(function ($company) {
+                $logoUrl = $company->logo
+                    ? asset($company->logo)
+                    : asset('images/resource/default-company.png');
+                
+                return [
+                    'id' => $company->id,
+                    'title' => $company->company_name,
+                    'type' => ucfirst($company->company_size ?? 'Empresa'),
+                    'address' => ($company->city ?? '') . ', ' . ($company->state ?? ''),
+                    'latitude' => (float) $company->latitude,
+                    'longitude' => (float) $company->longitude,
+                    'photo' => $logoUrl,
+                    'url' => route('companies.show', $company->id),
+                ];
+            });
+
         // Dados para filtros
         $cities = CompanyProfile::active()->distinct()->pluck('city')->filter()->sort()->values();
         $states = CompanyProfile::active()->distinct()->pluck('state')->filter()->sort()->values();
@@ -58,6 +82,7 @@ class CompanyController extends Controller
 
         return view('public.companies.index', [
             'companies' => $companies,
+            'mapCompanies' => $mapCompanies,
             'cities' => $cities,
             'states' => $states,
             'sizes' => $sizes,
