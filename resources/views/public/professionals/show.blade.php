@@ -145,6 +145,11 @@
                         @if(!empty($experience['description']))
                           <div class="text">{{ $experience['description'] }}</div>
                         @endif
+                        @if(($professional->show_current_salary ?? false) && !empty($experience['salary']))
+                          <div class="text mt-2">
+                            <strong>Salário:</strong> {{ $experience['salary'] }}
+                          </div>
+                        @endif
                       </div>
                     </div>
                   @endforeach
@@ -155,18 +160,30 @@
 
           <div class="sidebar-column col-lg-4 col-md-12 col-sm-12 order-1">
             <aside class="sidebar">
-              <div class="sidebar-widget contact-widget">
-                <h4 class="widget-title">Informações de Contato</h4>
-                <div class="widget-content">
-                  <ul class="contact-info">
-                    @if($professional->phone)
-                      <li><span class="icon flaticon-phone"></span> {{ $professional->phone }}</li>
-                    @endif
-                    <li><span class="icon flaticon-mail"></span> {{ $professional->user->email ?? 'E-mail não informado' }}</li>
-                    <li><span class="icon flaticon-map-locator"></span> {{ collect([$professional->city, $professional->state])->filter()->implode(', ') ?: 'Localização não informada' }}</li>
-                  </ul>
+              @if($professional->allow_direct_contact ?? true)
+                <div class="sidebar-widget contact-widget">
+                  <h4 class="widget-title">Informações de Contato</h4>
+                  <div class="widget-content">
+                    <ul class="contact-info">
+                      @if($professional->phone)
+                        <li><span class="icon flaticon-phone"></span> {{ $professional->phone }}</li>
+                      @endif
+                      <li><span class="icon flaticon-mail"></span> {{ $professional->user->email ?? 'E-mail não informado' }}</li>
+                      <li><span class="icon flaticon-map-locator"></span> {{ collect([$professional->city, $professional->state])->filter()->implode(', ') ?: 'Localização não informada' }}</li>
+                    </ul>
+                  </div>
                 </div>
-              </div>
+              @else
+                <div class="sidebar-widget contact-widget">
+                  <h4 class="widget-title">Informações de Contato</h4>
+                  <div class="widget-content">
+                    <p class="text-muted mb-3">O profissional optou por não permitir contato direto. Entre em contato através da plataforma.</p>
+                    <ul class="contact-info">
+                      <li><span class="icon flaticon-map-locator"></span> {{ collect([$professional->city, $professional->state])->filter()->implode(', ') ?: 'Localização não informada' }}</li>
+                    </ul>
+                  </div>
+                </div>
+              @endif
 
               @php
                 $facebookUrl = $professional->facebook;

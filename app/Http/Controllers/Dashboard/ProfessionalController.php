@@ -306,6 +306,7 @@ class ProfessionalController extends Controller
                         'title' => trim($item['title']),
                         'company' => isset($item['company']) ? trim($item['company']) : '',
                         'period' => isset($item['period']) ? trim($item['period']) : '',
+                        'salary' => isset($item['salary']) ? trim($item['salary']) : '',
                         'description' => isset($item['description']) ? trim($item['description']) : '',
                     ];
                 }
@@ -573,13 +574,43 @@ class ProfessionalController extends Controller
         $user = Auth::user();
         $profile = $user->professionalProfile;
 
-        // Atualizar visibilidade do perfil
-        if ($request->has('is_public')) {
-            $user->update(['is_active' => true]);
+        if (!$profile) {
+            return back()->withErrors(['error' => 'Perfil não encontrado.']);
         }
 
-        // Aqui você pode adicionar campos específicos de privacidade no perfil se necessário
-        // Por enquanto, apenas retornamos sucesso
+        // Preparar dados para atualização
+        // Todos os campos são sempre enviados (via hidden ou checkbox)
+        // Processar todos os campos presentes no request
+        $privacyData = [];
+
+        // Atualizar is_public (sempre presente via hidden ou checkbox)
+        if ($request->has('is_public')) {
+            $isPublic = $request->input('is_public') == '1' || $request->boolean('is_public');
+            $privacyData['is_public'] = $isPublic;
+            // Sincronizar com is_active do User
+            $user->update(['is_active' => $isPublic]);
+        }
+
+        // Atualizar show_in_search (sempre presente via hidden ou checkbox)
+        if ($request->has('show_in_search')) {
+            $privacyData['show_in_search'] = $request->input('show_in_search') == '1' || $request->boolean('show_in_search');
+        }
+
+        // Atualizar allow_direct_contact (sempre presente via hidden ou checkbox)
+        if ($request->has('allow_direct_contact')) {
+            $privacyData['allow_direct_contact'] = $request->input('allow_direct_contact') == '1' || $request->boolean('allow_direct_contact');
+        }
+
+        // Atualizar show_current_salary (sempre presente via hidden ou checkbox)
+        if ($request->has('show_current_salary')) {
+            $privacyData['show_current_salary'] = $request->input('show_current_salary') == '1' || $request->boolean('show_current_salary');
+        }
+
+        // Atualizar perfil apenas se houver dados para atualizar
+        if (!empty($privacyData)) {
+            $profile->update($privacyData);
+        }
+
         return back()->with('success', 'Configurações de privacidade atualizadas com sucesso!');
     }
 

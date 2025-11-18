@@ -96,6 +96,10 @@
             <div class="content">
               <form method="POST" action="{{ route('professional.update-privacy-settings') }}" id="privacy-form">
                 @csrf
+                <!-- Campos hidden para preservar valores quando checkboxes não estão presentes -->
+                <input type="hidden" name="allow_direct_contact" value="{{ ($profile->allow_direct_contact ?? true) ? '1' : '0' }}">
+                <input type="hidden" name="show_current_salary" value="{{ ($profile->show_current_salary ?? false) ? '1' : '0' }}">
+                
                 <div class="form-group">
                   <label>Visibilidade do perfil</label><br>
                   <!-- Switchbox Outer -->
@@ -103,14 +107,14 @@
                     <ul class="switchbox">
                       <li>
                         <label class="switch">
-                          <input type="checkbox" name="is_public" value="1" {{ Auth::user()->is_active ? 'checked' : '' }}>
+                          <input type="checkbox" name="is_public" value="1" {{ ($profile->is_public ?? true) ? 'checked' : '' }}>
                           <span class="slider round"></span>
                           <span class="title">Perfil público</span>
                         </label>
                       </li>
                       <li>
                         <label class="switch">
-                          <input type="checkbox" name="show_in_search" value="1" checked>
+                          <input type="checkbox" name="show_in_search" value="1" {{ ($profile->show_in_search ?? true) ? 'checked' : '' }}>
                           <span class="slider round"></span>
                           <span class="title">Aparecer nas buscas</span>
                         </label>
@@ -152,47 +156,6 @@
           </div>
         </li>
 
-        <!-- Notificações -->
-        <li class="accordion block">
-          <div class="acc-btn">Notificações <span class="icon flaticon-add"></span></div>
-          <div class="acc-content">
-            <div class="content">
-              <form method="POST" action="{{ route('professional.update-notification-settings') }}" id="notification-form">
-                @csrf
-                <div class="form-group">
-                  <label>Preferências de notificação</label><br>
-                  <div class="switchbox-outer margin-top-10">
-                    <ul class="switchbox">
-                      <li>
-                        <label class="switch">
-                          <input type="checkbox" name="email_notifications" value="1" checked>
-                          <span class="slider round"></span>
-                          <span class="title">E-mail</span>
-                        </label>
-                      </li>
-                      <li>
-                        <label class="switch">
-                          <input type="checkbox" name="whatsapp_notifications" value="1" checked>
-                          <span class="slider round"></span>
-                          <span class="title">WhatsApp</span>
-                        </label>
-                      </li>
-                      <li>
-                        <label class="switch">
-                          <input type="checkbox" name="sms_notifications" value="1">
-                          <span class="slider round"></span>
-                          <span class="title">SMS</span>
-                        </label>
-                      </li>
-                    </ul>
-                  </div>
-                  <button type="submit" class="btn btn-primary mt-3">Salvar Preferências</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </li>
-
         <!-- Privacidade -->
         <li class="accordion block">
           <div class="acc-btn">Privacidade <span class="icon flaticon-add"></span></div>
@@ -200,22 +163,26 @@
             <div class="content">
               <form method="POST" action="{{ route('professional.update-privacy-settings') }}" id="privacy-settings-form">
                 @csrf
+                <!-- Campos hidden para preservar valores quando checkboxes não estão presentes -->
+                <input type="hidden" name="is_public" value="{{ ($profile->is_public ?? true) ? '1' : '0' }}">
+                <input type="hidden" name="show_in_search" value="{{ ($profile->show_in_search ?? true) ? '1' : '0' }}">
+                
                 <div class="form-group">
                   <label>Configurações de privacidade</label><br>
                   <div class="switchbox-outer margin-top-10">
                     <ul class="switchbox">
                       <li>
                         <label class="switch">
-                          <input type="checkbox" name="allow_direct_contact" value="1" checked>
+                          <input type="checkbox" name="allow_direct_contact" value="1" {{ ($profile->allow_direct_contact ?? true) ? 'checked' : '' }}>
                           <span class="slider round"></span>
                           <span class="title">Permitir contato direto</span>
                         </label>
                       </li>
                       <li>
                         <label class="switch">
-                          <input type="checkbox" name="show_current_salary" value="1">
+                          <input type="checkbox" name="show_current_salary" value="1" {{ ($profile->show_current_salary ?? false) ? 'checked' : '' }}>
                           <span class="slider round"></span>
-                          <span class="title">Mostrar salário atual</span>
+                          <span class="title">Mostrar salário das experiências</span>
                         </label>
                       </li>
                     </ul>
@@ -245,6 +212,47 @@
       }
       e.target.value = value;
     }
+  });
+
+  // Garantir que checkboxes desmarcados enviem valor 0
+  document.getElementById('privacy-form')?.addEventListener('submit', function(e) {
+    const checkboxes = ['is_public', 'show_in_search'];
+    checkboxes.forEach(function(name) {
+      const checkbox = this.querySelector('input[name="' + name + '"]');
+      if (checkbox && !checkbox.checked) {
+        // Remover campo hidden se existir e adicionar com valor 0
+        const hidden = this.querySelector('input[type="hidden"][name="' + name + '"]');
+        if (hidden) {
+          hidden.value = '0';
+        } else {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = name;
+          input.value = '0';
+          this.appendChild(input);
+        }
+      }
+    }.bind(this));
+  });
+
+  document.getElementById('privacy-settings-form')?.addEventListener('submit', function(e) {
+    const checkboxes = ['allow_direct_contact', 'show_current_salary'];
+    checkboxes.forEach(function(name) {
+      const checkbox = this.querySelector('input[name="' + name + '"]');
+      if (checkbox && !checkbox.checked) {
+        // Remover campo hidden se existir e adicionar com valor 0
+        const hidden = this.querySelector('input[type="hidden"][name="' + name + '"]');
+        if (hidden) {
+          hidden.value = '0';
+        } else {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = name;
+          input.value = '0';
+          this.appendChild(input);
+        }
+      }
+    }.bind(this));
   });
 </script>
 @endpush

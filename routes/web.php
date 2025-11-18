@@ -121,7 +121,6 @@ Route::prefix('profissional')->middleware(['auth', 'professional'])->group(funct
     Route::get('/configuracoes', [DashboardProfessionalController::class, 'settings'])->name('professional.settings');
     Route::post('/configuracoes', [DashboardProfessionalController::class, 'updateSettings'])->name('professional.update-settings');
     Route::post('/configuracoes/privacidade', [DashboardProfessionalController::class, 'updatePrivacySettings'])->name('professional.update-privacy-settings');
-    Route::post('/configuracoes/notificacoes', [DashboardProfessionalController::class, 'updateNotificationSettings'])->name('professional.update-notification-settings');
     Route::get('/pagina', [DashboardProfessionalController::class, 'publicPage'])->name('professional.public-page');
     Route::get('/favoritos', [DashboardProfessionalController::class, 'favorites'])->name('professional.favorites');
     Route::post('/toggle-favorito', [DashboardProfessionalController::class, 'toggleFavorite'])->name('professional.toggle-favorite');

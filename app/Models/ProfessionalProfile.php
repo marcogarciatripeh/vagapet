@@ -43,6 +43,10 @@ class ProfessionalProfile extends Model
         'website',
         'views_count',
         'applications_count',
+        'is_public',
+        'show_in_search',
+        'allow_direct_contact',
+        'show_current_salary',
     ];
 
     protected $casts = [
@@ -55,6 +59,10 @@ class ProfessionalProfile extends Model
         'longitude' => 'decimal:8',
         'views_count' => 'integer',
         'applications_count' => 'integer',
+        'is_public' => 'boolean',
+        'show_in_search' => 'boolean',
+        'allow_direct_contact' => 'boolean',
+        'show_current_salary' => 'boolean',
     ];
 
     // Relationships
@@ -79,6 +87,16 @@ class ProfessionalProfile extends Model
         return $query->whereHas('user', function ($q) {
             $q->where('is_active', true);
         });
+    }
+
+    public function scopePublic($query)
+    {
+        return $query->where('is_public', true);
+    }
+
+    public function scopeSearchable($query)
+    {
+        return $query->where('show_in_search', true);
     }
 
     public function scopeByCity($query, string $city)

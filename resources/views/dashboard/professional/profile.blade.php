@@ -320,6 +320,11 @@
                                 <label>Período</label>
                                 <input type="text" name="experiences[{{ $index }}][period]" placeholder="Ex.: 2022 - Atual" value="{{ old("experiences.$index.period", $experience['period'] ?? '') }}">
                               </div>
+                              <div class="form-group col-lg-6 col-md-12">
+                                <label>Salário</label>
+                                <input type="text" name="experiences[{{ $index }}][salary]" placeholder="Ex.: R$ 2.500,00" value="{{ old("experiences.$index.salary", $experience['salary'] ?? '') }}">
+                                <small class="form-text text-muted">Salário recebido nesta posição</small>
+                              </div>
                               <div class="form-group col-lg-12 col-md-12">
                                 <label>Descrição</label>
                                 <textarea name="experiences[{{ $index }}][description]" placeholder="Descreva suas responsabilidades e realizações" rows="2">{{ old("experiences.$index.description", $experience['description'] ?? '') }}</textarea>
@@ -558,6 +563,11 @@
           <div class="form-group col-lg-6 col-md-12">
             <label>Período</label>
             <input type="text" name="experiences[${experienceIndex}][period]" placeholder="Ex.: 2022 - Atual">
+          </div>
+          <div class="form-group col-lg-6 col-md-12">
+            <label>Salário</label>
+            <input type="text" name="experiences[${experienceIndex}][salary]" placeholder="Ex.: R$ 2.500,00">
+            <small class="form-text text-muted">Salário recebido nesta posição</small>
           </div>
           <div class="form-group col-lg-12 col-md-12">
             <label>Descrição</label>

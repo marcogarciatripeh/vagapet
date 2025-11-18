@@ -29,135 +29,69 @@
       <!-- Filters Column -->
       <div class="filters-column hide-left">
         <div class="inner-column">
-          <div class="filters-outer">
-            <button type="button" class="theme-btn close-filters">X</button>
+          <form method="GET" action="{{ route('jobs.index') }}" id="job-filters">
+            <div class="filters-outer">
+              <button type="button" class="theme-btn close-filters">X</button>
 
-            <div class="filter-block">
-              <h4>Buscar por palavras-chave</h4>
-              <div class="form-group">
-                <input type="text" name="listing-search" placeholder="Digite a busca">
-                <span class="icon flaticon-search-3"></span>
-              </div>
-            </div>
-
-            <div class="filter-block">
-              <h4>Localização</h4>
-              <div class="form-group">
-                <input type="text" name="listing-search" placeholder="Cidade ou CEP">
-                <span class="icon flaticon-map-locator"></span>
-              </div>
-              <p>Raio ao redor do local selecionado</p>
-              <div class="range-slider-one">
-                <div class="area-range-slider"></div>
-                <div class="input-outer">
-                  <div class="amount-outer"><span class="area-amount"></span> km</div>
+              <div class="filter-block">
+                <h4>Buscar por palavras-chave</h4>
+                <div class="form-group">
+                  <input type="text" name="search" value="{{ request('search') }}" placeholder="Digite a busca">
+                  <span class="icon flaticon-search-3"></span>
                 </div>
               </div>
-            </div>
 
-            <div class="filter-block">
-              <h4>Área de atuação</h4>
-              <div class="form-group">
-                <select class="chosen-select">
-                  <option>Selecione</option>
-                  <option>Adestramento</option>
-                  <option>Administrativo</option>
-                  <option>Banho e tosa</option>
-                  <option>Creche e hotel</option>
-                  <option>Enfermeiro, auxiliar ou técnico</option>
-                  <option>Limpeza</option>
-                  <option>Marketing</option>
-                  <option>Motorista</option>
-                  <option>Recepção</option>
-                  <option>Serviços gerais</option>
-                  <option>Vendas</option>
-                  <option>Veterinária</option>
-                </select>
-                <span class="icon flaticon-briefcase"></span>
+              <div class="filter-block">
+                <h4>Localização</h4>
+                <div class="form-group">
+                  <input type="text" name="city" value="{{ request('city') }}" placeholder="Cidade">
+                  <span class="icon flaticon-map-locator"></span>
+                </div>
+                <div class="form-group mt-3">
+                  <select name="state" class="chosen-select">
+                    <option value="">Todos os estados</option>
+                    @foreach($states as $state)
+                      <option value="{{ $state }}" {{ request('state') === $state ? 'selected' : '' }}>{{ $state }}</option>
+                    @endforeach
+                  </select>
+                  <span class="icon flaticon-worldwide"></span>
+                </div>
+              </div>
+
+              <div class="filter-block">
+                <h4>Área de atuação</h4>
+                <div class="form-group">
+                  <select name="area" class="chosen-select">
+                    <option value="">Todas as áreas</option>
+                    @foreach($areas as $area)
+                      <option value="{{ $area }}" {{ request('area') === $area ? 'selected' : '' }}>{{ $area }}</option>
+                    @endforeach
+                  </select>
+                  <span class="icon flaticon-briefcase"></span>
+                </div>
+              </div>
+
+              <div class="filter-block">
+                <h4>Tipo de contrato</h4>
+                <div class="form-group">
+                  <select name="contract_type" class="chosen-select">
+                    <option value="">Todos os tipos</option>
+                    <option value="clt" {{ request('contract_type') === 'clt' ? 'selected' : '' }}>CLT</option>
+                    <option value="pj" {{ request('contract_type') === 'pj' ? 'selected' : '' }}>PJ</option>
+                    <option value="freelance" {{ request('contract_type') === 'freelance' ? 'selected' : '' }}>Freelancer</option>
+                    <option value="temporary" {{ request('contract_type') === 'temporary' ? 'selected' : '' }}>Temporário</option>
+                    <option value="internship" {{ request('contract_type') === 'internship' ? 'selected' : '' }}>Estágio</option>
+                  </select>
+                  <span class="icon flaticon-briefcase"></span>
+                </div>
+              </div>
+
+              <div class="filter-block">
+                <button type="submit" class="theme-btn btn-style-one w-100">Aplicar Filtros</button>
+                <a href="{{ route('jobs.index') }}" class="theme-btn btn-style-two w-100 mt-2">Limpar Filtros</a>
               </div>
             </div>
-
-            <div class="switchbox-outer">
-              <h4>Tipo de contrato</h4>
-              <ul class="switchbox">
-                <li>
-                  <label class="switch">
-                    <input type="checkbox" checked>
-                    <span class="slider round"></span>
-                    <span class="title">CLT ou Fixo</span>
-                  </label>
-                </li>
-                <li>
-                  <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider round"></span>
-                    <span class="title">Freelancer</span>
-                  </label>
-                </li>
-                <li>
-                  <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider round"></span>
-                    <span class="title">Temporário</span>
-                  </label>
-                </li>
-                <li>
-                  <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider round"></span>
-                    <span class="title">Estágio</span>
-                  </label>
-                </li>
-              </ul>
-            </div>
-
-            <!-- Bloco de Filtro: Tags -->
-            <div class="filter-block">
-              <h4>Benefícios oferecidos</h4>
-              <ul class="tags-style-one">
-                <li><a href="#">VT</a></li>
-                <li><a href="#">Hora extra</a></li>
-                <li><a href="#">Comissão</a></li>
-                <li><a href="#">Adicional de insalubridade</a></li>
-                <li><a href="#">Seguro de vida</a></li>
-                <li><a href="#">Bônus</a></li>
-                <li><a href="#">Cesta básica</a></li>
-                <li><a href="#">Assistência médica</a></li>
-                <li><a href="#">Assistência odontológica</a></li>
-              </ul>
-            </div>
-
-            <!-- Checkboxes: Data de Publicação -->
-            <div class="checkbox-outer">
-              <h4>Data de Publicação</h4>
-              <ul class="checkboxes">
-                <li>
-                  <input id="check-f" type="checkbox" name="check">
-                  <label for="check-f">Todas</label>
-                </li>
-                <li>
-                  <input id="check-g" type="checkbox" name="check">
-                  <label for="check-g">Última Hora</label>
-                </li>
-                <li>
-                  <input id="check-h" type="checkbox" name="check">
-                  <label for="check-h">Últimas 24 Horas</label>
-                </li>
-                <li>
-                  <input id="check-i" type="checkbox" name="check">
-                  <label for="check-i">Últimos 7 Dias</label>
-                </li>
-                <li>
-                  <input id="check-j" type="checkbox" name="check">
-                  <label for="check-j">Últimos 14 Dias</label>
-                </li>
-                <li>
-                  <input id="check-k" type="checkbox" name="check">
-                  <label for="check-k">Últimos 30 Dias</label>
-                </li>
-              </ul>
-            </div>
-          </div>
+          </form>
         </div>
       </div>
 
@@ -178,93 +112,93 @@
                 </div>
                 <div class="col-6">
                   <div class="sort-by float-end mt-3">
-                    <select class="chosen-select mt-3">
-                      <option>Mostrar 10</option>
-                      <option>Mostrar 20</option>
-                      <option>Mostrar 30</option>
-                      <option>Mostrar 40</option>
-                      <option>Mostrar 50</option>
-                    </select>
+                    <form method="GET" action="{{ route('jobs.index') }}" id="per-page-form" style="display: inline;">
+                      @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                      @endforeach
+                      <select name="per_page" class="chosen-select mt-3" onchange="this.form.submit()">
+                        <option value="10" {{ request('per_page', 12) == 10 ? 'selected' : '' }}>Mostrar 10</option>
+                        <option value="12" {{ request('per_page', 12) == 12 ? 'selected' : '' }}>Mostrar 12</option>
+                        <option value="20" {{ request('per_page', 12) == 20 ? 'selected' : '' }}>Mostrar 20</option>
+                        <option value="30" {{ request('per_page', 12) == 30 ? 'selected' : '' }}>Mostrar 30</option>
+                        <option value="40" {{ request('per_page', 12) == 40 ? 'selected' : '' }}>Mostrar 40</option>
+                        <option value="50" {{ request('per_page', 12) == 50 ? 'selected' : '' }}>Mostrar 50</option>
+                      </select>
+                    </form>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Remover filtros -->
-          <div class="row">
-            <div class="col-12 mb-5 text-center">
-              <p>Filtros aplicados:</p>
-              <ul>
-                <li class="badge text-bg-light"><a href="#" >Remover todos os filtros <i class="la la-times"></i></a></li>
-                <li class="badge text-bg-light"><a href="#" >CLT ou fixo <i class="la la-times"></i></a></li>
-                <li class="badge text-bg-light"><a href="#" >Banho e tosa <i class="la la-times"></i></a></li>
-              </ul>
+          <!-- Filtros aplicados -->
+          @php
+            $hasFilters = request()->filled('search') || request()->filled('city') || request()->filled('state') || request()->filled('area') || request()->filled('contract_type');
+          @endphp
+          @if($hasFilters)
+            <div class="row">
+              <div class="col-12 mb-3">
+                <p class="mb-2"><strong>Filtros aplicados:</strong></p>
+                <div class="d-flex flex-wrap gap-2">
+                  @if(request('search'))
+                    <span class="badge text-bg-light">
+                      Busca: {{ request('search') }}
+                      <a href="{{ route('jobs.index', request()->except('search')) }}" class="ms-1"><i class="la la-times"></i></a>
+                    </span>
+                  @endif
+                  @if(request('city'))
+                    <span class="badge text-bg-light">
+                      Cidade: {{ request('city') }}
+                      <a href="{{ route('jobs.index', request()->except('city')) }}" class="ms-1"><i class="la la-times"></i></a>
+                    </span>
+                  @endif
+                  @if(request('state'))
+                    <span class="badge text-bg-light">
+                      Estado: {{ request('state') }}
+                      <a href="{{ route('jobs.index', request()->except('state')) }}" class="ms-1"><i class="la la-times"></i></a>
+                    </span>
+                  @endif
+                  @if(request('area'))
+                    <span class="badge text-bg-light">
+                      Área: {{ request('area') }}
+                      <a href="{{ route('jobs.index', request()->except('area')) }}" class="ms-1"><i class="la la-times"></i></a>
+                    </span>
+                  @endif
+                  @if(request('contract_type'))
+                    <span class="badge text-bg-light">
+                      Contrato: {{ ucfirst(request('contract_type')) }}
+                      <a href="{{ route('jobs.index', request()->except('contract_type')) }}" class="ms-1"><i class="la la-times"></i></a>
+                    </span>
+                  @endif
+                  <a href="{{ route('jobs.index') }}" class="badge text-bg-danger text-white">
+                    Remover todos <i class="la la-times"></i>
+                  </a>
+                </div>
+              </div>
             </div>
-          </div>
+          @endif
 
           <!-- Job Blocks -->
           <div class="row">
-            <div class="job-block col-lg-12">
-              <div class="inner-box">
-                <div class="content">
-                  <span class="company-logo"><img src="{{ asset('images/logo-petz.png') }}" alt="Petz"></span>
-                  <h4><a href="{{ route('jobs.show', 1) }}">Atendente de Banho e Tosa - Petz (Itaim Bibi)</a></h4>
-                  <ul class="job-info">
-                    <li><span class="icon flaticon-briefcase"></span> Enfermeiro, auxiliar ou técnico</li>
-                    <li><span class="icon flaticon-map-locator"></span> São Paulo, SP</li>
-                    <li><span class="icon flaticon-clock-3"></span> 3 horas atrás</li>
-                    <li><span class="icon flaticon-money"></span> R$ 1.500 - R$ 1.800</li>
-                  </ul>
-                  <ul class="job-other-info"><li class="time">Tempo Integral</li></ul>
-                  <button class="bookmark-btn"><span class="flaticon-bookmark"></span></button>
-                </div>
-              </div>
-            </div>
-
-            <div class="job-block col-lg-12">
-              <div class="inner-box">
-                <div class="content">
-                  <span class="company-logo"><img src="{{ asset('images/logo-cobasi.png') }}" alt="Cobasi"></span>
-                  <h4><a href="{{ route('jobs.show', 2) }}">Vendedor de Ração - Cobasi (Moema)</a></h4>
-                  <ul class="job-info">
-                    <li><span class="icon flaticon-briefcase"></span> Vendas</li>
-                    <li><span class="icon flaticon-map-locator"></span> São Paulo, SP</li>
-                    <li><span class="icon flaticon-clock-3"></span> 1 dia atrás</li>
-                    <li><span class="icon flaticon-money"></span> R$ 1.400 - R$ 1.600</li>
-                  </ul>
-                  <ul class="job-other-info"><li class="time">Meio Período</li></ul>
-                  <button class="bookmark-btn"><span class="flaticon-bookmark"></span></button>
-                </div>
-              </div>
-            </div>
-
-            <div class="job-block col-lg-12">
-              <div class="inner-box">
-                <div class="content">
-                  <span class="company-logo"><img src="{{ asset('images/logo-petcenter.png') }}" alt="Pet Center"></span>
-                  <h4><a href="{{ route('jobs.show', 3) }}">Auxiliar Veterinário - Pet Center (Vila Olímpia)</a></h4>
-                  <ul class="job-info">
-                    <li><span class="icon flaticon-briefcase"></span> Banho e tosa</li>
-                    <li><span class="icon flaticon-map-locator"></span> São Paulo, SP</li>
-                    <li><span class="icon flaticon-clock-3"></span> 2 dias atrás</li>
-                    <li><span class="icon flaticon-money"></span> R$ 1.800</li>
-                  </ul>
-                  <ul class="job-other-info"><li class="time">Tempo Integral</li></ul>
-                  <button class="bookmark-btn"><span class="flaticon-bookmark"></span></button>
-                </div>
-              </div>
-            </div>
+            @include('layouts.partials.jobs-list')
           </div>
 
           <!-- Pagination -->
-          <div class="ls-show-more">
-            <p>Mostrando 3 de 497 Vagas</p>
-            <div class="bar">
-              <span class="bar-inner" style="width:20%"></span>
+          @if($jobs->hasPages())
+            <div class="ls-show-more">
+              <p>Mostrando {{ $jobs->firstItem() ?? 0 }} a {{ $jobs->lastItem() ?? 0 }} de {{ $jobs->total() }} Vagas</p>
+              <div class="bar">
+                <span class="bar-inner" style="width:{{ ($jobs->currentPage() / $jobs->lastPage()) * 100 }}%"></span>
+              </div>
+              <div class="mt-3">
+                {{ $jobs->links() }}
+              </div>
             </div>
-            <button class="show-more">Carregar mais vagas</button>
-          </div>
+          @else
+            <div class="ls-show-more">
+              <p>Mostrando {{ $jobs->count() }} de {{ $jobs->total() }} Vagas</p>
+            </div>
+          @endif
         </div>
       </div>
     </div>

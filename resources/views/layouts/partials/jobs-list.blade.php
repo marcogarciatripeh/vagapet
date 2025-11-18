@@ -2,10 +2,18 @@
   @php
     $logo = $job->companyProfile && $job->companyProfile->logo 
       ? url('storage/' . $job->companyProfile->logo) 
-      : asset('images/resource/company-logo/1-1.png');
+      : asset('images/resource/default-company.png');
     $companyName = $job->companyProfile->company_name ?? 'Empresa';
     $location = collect([$job->city, $job->state])->filter()->implode(', ') ?: 'Local não informado';
-    $salary = $job->salary_range ?? 'A combinar';
+    
+    // Formatar salário
+    $salary = 'A combinar';
+    if ($job->salary_type === 'fixed' && $job->salary_min) {
+      $salary = 'R$ ' . number_format($job->salary_min, 2, ',', '.');
+    } elseif ($job->salary_type === 'range' && $job->salary_min && $job->salary_max) {
+      $salary = 'R$ ' . number_format($job->salary_min, 2, ',', '.') . ' - R$ ' . number_format($job->salary_max, 2, ',', '.');
+    }
+    
     $contractType = match($job->contract_type) {
       'clt' => 'CLT',
       'pj' => 'PJ',
@@ -14,16 +22,18 @@
       'internship' => 'Estágio',
       default => 'Não informado'
     };
+    
+    $isFavorited = isset($favoritedJobIds) && $favoritedJobIds->contains($job->id);
   @endphp
-  <div class="job-block-seven">
+  <div class="job-block col-lg-12">
     <div class="inner-box">
       <div class="content">
-        <figure class="image">
-          <img src="{{ $logo }}" alt="{{ $companyName }}">
-        </figure>
+        <span class="company-logo"><img src="{{ $logo }}" alt="{{ $companyName }}"></span>
         <h4><a href="{{ route('jobs.show', $job->slug) }}">{{ $job->title }}</a></h4>
-        <a href="{{ route('companies.show', $job->companyProfile) }}"><span class="designation">{{ $companyName }}</span></a>
         <ul class="job-info">
+          @if($job->area)
+            <li><span class="icon flaticon-briefcase"></span> {{ $job->area }}</li>
+          @endif
           <li><span class="icon flaticon-map-locator"></span> {{ $location }}</li>
           <li><span class="icon flaticon-clock-3"></span> {{ $job->created_at->diffForHumans() }}</li>
           <li><span class="icon flaticon-money"></span> {{ $salary }}</li>
@@ -31,21 +41,15 @@
         <ul class="job-other-info">
           <li class="time">{{ $contractType }}</li>
         </ul>
-      </div>
-      <div class="btn-box">
-        <a href="{{ route('jobs.show', $job->slug) }}" class="theme-btn btn-style-one">Ver Detalhes</a>
         @auth
           @if(Auth::user()->professionalProfile)
-            @php
-              $isFavorited = isset($favoritedJobIds) && $favoritedJobIds->contains($job->id);
-            @endphp
             <button class="bookmark-btn {{ $isFavorited ? 'active' : '' }}" data-favorite-id="{{ $job->id }}" onclick="toggleFavorite('App\\Models\\Job', {{ $job->id }})" title="{{ $isFavorited ? 'Remover dos favoritos' : 'Favoritar vaga' }}">
-              <i class="flaticon-bookmark"></i>
+              <span class="flaticon-bookmark"></span>
             </button>
           @endif
         @else
           <button class="bookmark-btn" onclick="toggleFavorite('App\\Models\\Job', {{ $job->id }})" title="Favoritar vaga">
-            <i class="flaticon-bookmark"></i>
+            <span class="flaticon-bookmark"></span>
           </button>
         @endauth
       </div>

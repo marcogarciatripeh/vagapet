@@ -16,4 +16,15 @@ class EditProfessionalProfile extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function afterSave(): void
+    {
+        // Sincronizar is_public com is_active do User
+        $record = $this->record;
+        if ($record->user && isset($this->data['is_public'])) {
+            $record->user->update([
+                'is_active' => (bool) $this->data['is_public'],
+            ]);
+        }
+    }
 }

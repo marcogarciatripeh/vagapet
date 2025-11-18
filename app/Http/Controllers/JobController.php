@@ -63,36 +63,32 @@ class JobController extends Controller
                 $query->orderBy('salary_min', $direction);
                 break;
             case 'company':
-                $query->join('company_profiles', 'jobs.company_profile_id', '=', 'company_profiles.id')
+                $query->join('company_profiles', 'vagas.company_profile_id', '=', 'company_profiles.id')
                       ->orderBy('company_profiles.company_name', $direction);
                 break;
             default:
                 $query->orderBy($sort, $direction);
         }
 
-        $jobs = $query->paginate(12);
+        // Paginação
+        $perPage = $request->get('per_page', 12);
+        $perPage = in_array($perPage, [10, 12, 20, 30, 40, 50]) ? (int) $perPage : 12;
+        $jobs = $query->paginate($perPage)->withQueryString();
 
-        // Buscar TODAS as vagas para o mapa (com coordenadas)
+        // Buscar TODAS as vagas para o mapa (com coordenadas da empresa)
         $mapJobs = Job::active()
             ->with('companyProfile')
-            ->where(function ($q) {
-                $q->where(function ($subQ) {
-                    $subQ->whereNotNull('latitude')
-                         ->whereNotNull('longitude')
-                         ->where('latitude', '!=', 0)
-                         ->where('longitude', '!=', 0);
-                })->orWhereHas('companyProfile', function ($subQ) {
-                    $subQ->whereNotNull('latitude')
-                         ->whereNotNull('longitude')
-                         ->where('latitude', '!=', 0)
-                         ->where('longitude', '!=', 0);
-                });
+            ->whereHas('companyProfile', function ($subQ) {
+                $subQ->whereNotNull('latitude')
+                     ->whereNotNull('longitude')
+                     ->where('latitude', '!=', 0)
+                     ->where('longitude', '!=', 0);
             })
             ->get()
             ->map(function ($job) {
-                // Usar coordenadas da vaga ou da empresa
-                $latitude = $job->latitude ?? ($job->companyProfile->latitude ?? null);
-                $longitude = $job->longitude ?? ($job->companyProfile->longitude ?? null);
+                // Usar coordenadas da empresa
+                $latitude = $job->companyProfile->latitude ?? null;
+                $longitude = $job->companyProfile->longitude ?? null;
                 
                 if (!$latitude || !$longitude) {
                     return null;

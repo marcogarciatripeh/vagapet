@@ -103,6 +103,13 @@ class ProfessionalProfileResource extends Resource
                                 'senior' => 'Sênior (mais de 5 anos)',
                             ]),
 
+                        TextInput::make('years_experience')
+                            ->label('Anos de Experiência')
+                            ->numeric()
+                            ->minValue(0)
+                            ->placeholder('Ex.: 5')
+                            ->helperText('Total de anos de experiência profissional'),
+
                         TagsInput::make('areas')
                             ->label('Áreas de atuação')
                             ->placeholder('Informe uma área e pressione enter')
@@ -187,6 +194,10 @@ class ProfessionalProfileResource extends Resource
                                 TextInput::make('period')
                                     ->label('Período')
                                     ->placeholder('Ex.: 2022 - Atual'),
+                                TextInput::make('salary')
+                                    ->label('Salário')
+                                    ->placeholder('Ex.: R$ 2.500,00')
+                                    ->helperText('Salário recebido nesta posição'),
                                 Textarea::make('description')
                                     ->label('Descrição')
                                     ->placeholder('Descreva suas responsabilidades e realizações')
@@ -298,6 +309,33 @@ class ProfessionalProfileResource extends Resource
                     ])
                     ->columns(3)
                     ->collapsed(),
+
+                // 8. Configurações de Privacidade
+                Forms\Components\Section::make('Configurações de Privacidade')
+                    ->description('Controle de visibilidade e privacidade do perfil')
+                    ->schema([
+                        Forms\Components\Toggle::make('is_public')
+                            ->label('Perfil público')
+                            ->helperText('Torna o perfil visível publicamente')
+                            ->default(true),
+
+                        Forms\Components\Toggle::make('show_in_search')
+                            ->label('Aparecer nas buscas')
+                            ->helperText('Permite que o perfil apareça nos resultados de busca')
+                            ->default(true),
+
+                        Forms\Components\Toggle::make('allow_direct_contact')
+                            ->label('Permitir contato direto')
+                            ->helperText('Permite que empresas vejam telefone e e-mail')
+                            ->default(true),
+
+                        Forms\Components\Toggle::make('show_current_salary')
+                            ->label('Mostrar salário das experiências')
+                            ->helperText('Exibe os salários informados nas experiências profissionais')
+                            ->default(false),
+                    ])
+                    ->columns(2)
+                    ->collapsed(),
             ]);
     }
 
@@ -338,6 +376,7 @@ class ProfessionalProfileResource extends Resource
                         'title' => $item,
                         'company' => null,
                         'period' => null,
+                        'salary' => null,
                         'description' => null,
                     ];
                 }
@@ -346,6 +385,7 @@ class ProfessionalProfileResource extends Resource
                     'title' => $item['title'] ?? $item['role'] ?? null,
                     'company' => $item['company'] ?? null,
                     'period' => $item['period'] ?? null,
+                    'salary' => $item['salary'] ?? null,
                     'description' => $item['description'] ?? null,
                 ];
             })
@@ -391,6 +431,7 @@ class ProfessionalProfileResource extends Resource
                     'title' => $item['title'] ?? $item['role'] ?? null,
                     'company' => $item['company'] ?? null,
                     'period' => $item['period'] ?? null,
+                    'salary' => $item['salary'] ?? null,
                     'description' => $item['description'] ?? null,
                 ], fn ($value) => filled($value));
             })
@@ -440,13 +481,18 @@ class ProfessionalProfileResource extends Resource
 
                 TextColumn::make('experience_level')
                     ->label('Experiência')
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
                         'estagio' => 'Estágio',
                         'junior' => 'Junior',
                         'pleno' => 'Pleno',
                         'senior' => 'Sênior',
-                        default => $state,
+                        default => $state ?? 'Não informado',
                     }),
+
+                TextColumn::make('years_experience')
+                    ->label('Anos de Experiência')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('neighborhood')
                     ->label('Bairro')
@@ -486,6 +532,26 @@ class ProfessionalProfileResource extends Resource
                 TextColumn::make('applications_count')
                     ->label('Candidaturas')
                     ->sortable(),
+
+                TextColumn::make('is_public')
+                    ->label('Público')
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('show_in_search')
+                    ->label('Aparece em Buscas')
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('allow_direct_contact')
+                    ->label('Contato Direto')
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('show_current_salary')
+                    ->label('Mostra Salário')
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')
                     ->label('Criado em')
