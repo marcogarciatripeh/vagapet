@@ -228,3 +228,7 @@
 </div>
 @endsection
 
+@push('scripts')
+@include('layouts.partials.scripts')
+@endpush
+
