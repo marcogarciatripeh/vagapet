@@ -16,21 +16,34 @@ class PublicController extends Controller
         $stats = [
             'total_jobs' => Job::active()->count(),
             'total_companies' => CompanyProfile::active()->count(),
-            'total_professionals' => ProfessionalProfile::active()->count(),
+            'total_professionals' => ProfessionalProfile::active()->searchable()->count(),
             'total_applications' => \App\Models\JobApplication::count(),
         ];
 
-        // Vagas em destaque
+        // Vagas em destaque (se não houver featured, pegar as mais recentes)
         $featured_jobs = Job::active()
-            ->featured()
             ->with('companyProfile')
+            ->where(function($query) {
+                $query->where('is_featured', true)
+                      ->orWhere('is_urgent', true);
+            })
             ->orderBy('published_at', 'desc')
             ->limit(6)
             ->get();
 
+        // Se não houver vagas em destaque, pegar as mais recentes
+        if ($featured_jobs->isEmpty()) {
+            $featured_jobs = Job::active()
+                ->with('companyProfile')
+                ->orderBy('published_at', 'desc')
+                ->limit(6)
+                ->get();
+        }
+
         // Vagas recentes
         $recent_jobs = Job::active()
             ->with('companyProfile')
+            ->whereNotIn('id', $featured_jobs->pluck('id'))
             ->orderBy('published_at', 'desc')
             ->limit(8)
             ->get();
@@ -42,7 +55,15 @@ class PublicController extends Controller
             ->limit(6)
             ->get();
 
-        return view('public.home', compact('stats', 'featured_jobs', 'recent_jobs', 'featured_companies'));
+        // Buscar favoritos se usuário estiver logado
+        $favoritedJobIds = collect();
+        if (auth()->check() && auth()->user()->professionalProfile) {
+            $favoritedJobIds = auth()->user()->favorites()
+                ->where('favoritable_type', 'App\Models\Job')
+                ->pluck('favoritable_id');
+        }
+
+        return view('public.home', compact('stats', 'featured_jobs', 'recent_jobs', 'featured_companies', 'favoritedJobIds'));
     }
 
     public function contact()
