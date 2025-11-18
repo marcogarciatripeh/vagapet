@@ -304,6 +304,7 @@ class OnboardingController extends Controller
 
     public function step7ProfessionalProcess(Request $request)
     {
+        $userId = null;
         try {
             $request->validate([
                 'linkedin' => 'nullable|url',
@@ -311,8 +312,6 @@ class OnboardingController extends Controller
                 'facebook' => 'nullable|string|max:255',
                 'website' => 'nullable|url',
             ]);
-
-            // Debug: verificar dados da sessão
 
             // Criar perfil profissional com todos os dados
             $userId = session('onboarding.user_id');
@@ -366,7 +365,24 @@ class OnboardingController extends Controller
             ];
 
 
-            $profile = ProfessionalProfile::create($mappedData);
+            // Verificar se já existe perfil para este usuário
+            $existingProfile = ProfessionalProfile::where('user_id', $userId)->first();
+
+            if ($existingProfile) {
+                // Atualizar perfil existente
+                $existingProfile->update($mappedData);
+                $profile = $existingProfile;
+            } else {
+                // Criar novo perfil
+                // Garantir que campos obrigatórios estejam presentes
+                if (empty($mappedData['first_name']) || empty($mappedData['last_name'])) {
+                    return redirect()->back()
+                        ->withErrors(['error' => 'Nome e sobrenome são obrigatórios. Por favor, preencha os dados anteriores.'])
+                        ->withInput();
+                }
+
+                $profile = ProfessionalProfile::create($mappedData);
+            }
 
             // Marcar usuário como completed apenas se ainda não está (primeiro perfil)
             // Se já está completed, significa que está criando o segundo perfil
@@ -381,8 +397,19 @@ class OnboardingController extends Controller
             $this->clearOnboardingSession();
 
             return redirect()->route('professional.dashboard')->with('success', 'Perfil profissional criado com sucesso!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Erro ao processar cadastro: ' . $e->getMessage()])->withInput();
+            // Log do erro para debug
+            \Log::error('Erro ao processar cadastro profissional', [
+                'user_id' => $userId ?? null,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                ->withErrors(['error' => 'Erro ao processar cadastro. Por favor, tente novamente. Se o problema persistir, entre em contato com o suporte.'])
+                ->withInput();
         }
     }
 
