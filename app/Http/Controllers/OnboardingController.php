@@ -548,6 +548,7 @@ class OnboardingController extends Controller
     {
         $request->validate([
             'address' => 'required|string|max:500',
+            'neighborhood' => 'nullable|string|max:255',
             'city' => 'required|string|max:100',
             'state' => ['required', 'string', 'max:2', function ($attribute, $value, $fail) {
                 if (!BrazilianStates::isValid($value)) {
@@ -680,6 +681,7 @@ class OnboardingController extends Controller
                 'website' => $profileData['website'] ?? null,
                 'description' => $profileData['description'] ?? null,
                 'address' => $profileData['address'] ?? null,
+                'neighborhood' => $profileData['neighborhood'] ?? null,
                 'city' => $profileData['city'] ?? null,
                 'state' => $profileData['state'] ?? null,
                 'zip_code' => $profileData['zip_code'] ?? null,

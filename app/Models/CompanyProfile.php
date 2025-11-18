@@ -15,7 +15,7 @@ class CompanyProfile extends Model
 
     protected $fillable = [
         'user_id', 'company_name', 'cnpj', 'phone', 'website', 'description',
-        'address', 'city', 'state', 'zip_code', 'latitude', 'longitude',
+        'address', 'neighborhood', 'city', 'state', 'zip_code', 'latitude', 'longitude',
         'services', 'specialties', 'employees_count', 'company_size',
         'logo', 'photos', 'linkedin', 'instagram', 'facebook', 'youtube',
         'views_count', 'jobs_posted_count', 'applications_received_count'
